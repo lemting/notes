@@ -1,0 +1,309 @@
+存储: 树形结构
+
+<?xml version="1.0" encoding="UTF-8" ?>
+
+在Java程序中解析xml文件
+	解析目的
+		获取节点名,节点值,属性名,属性值
+	四种解析方式	
+		DOM(官方提供)
+		SAX(官方提供)(基于事件驱动的解析方式)
+		JDOM(需下载jar包)
+		DOM4J(需下载jar包)
+		
+	四种解析方式对比
+		DOM:
+			优点: 形成了树结构,直观好理解,代码更容易编写
+				  接戏过程中树结构保留在内存中,方便修改
+			缺点: 当xml文件较大时,对内存耗费比较大,容易影响解析性能并造成内存溢出
+		SAX: 
+			优点: 采用事件驱动模式,对内存耗费比较小 
+				  适用于只需要处理xml中数据时
+			缺点: 不易编码
+				  很难同时访问同一个xml中的多处不同数据
+		JDOM: 
+			仅使用具体类而不使用接口
+			API大量使用了Collections类
+		DOM4J: 
+			JDOM的一种智能分支,它合并了许多超出基本XML文档表示的功能
+			DOM4J使用接口和抽象基本类方法,是一个优秀的Java XML API 
+			具有性能优异,灵活性号,功能强大和极端易用使用的特点
+			是一个开放源代码的软件
+			
+	DOM方式解析: 
+		1: 创建一个DocumentBuilderFactory对象
+			eg: DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance(); //DocumentBuilderFactory类
+		2: 创建一个DocumentBuilder对象
+			eg: DocumentBuilder db = dbf.newDocumentBuilder();	//DocumentBuilderFactory类
+		3: 通过DocumentBuilder对象的 public Document parse(String fileURL) 方法解析xml文件	//DocumentBuilder类
+			eg: org.w3c.dom.Document d = db.parse("XXX.xml"); //该Document在org.w3c.dom包下
+		1-3: eg: Document d = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse("XXX.xml");
+		4: 获取节点
+			public Element getElementById(String elementId): 获取指定ID的节点  //Document类
+				eg: d.getElementById("123");
+			public NodeList getElementsByTagName(String tagname): 获取指定标签名的节点集合  //Document类
+				eg: NodeList nodelist = d.getElementsByTagName("div");
+			public Node item(int index): 获取指定索引值的节点   //NodeList类
+				eg: Node node = nodelist.item(0);
+		5: 获取节点属性集合
+			public NamedNodeMap getAttributes(): 获取节点属性集合	//Node类
+				eg: NamedNodeMap nnm = node.getAttributes();
+			public Node item(int index): 获取属性集合指定索引的的属性	//NamedNodeMap类
+				eg: Node n = nnm.item(0);
+			public String getNodeName(): 获取节点名		//Node类
+				eg: syso(n.getNodeName());
+			public String getNodeValue(): 获取节点值	//Node类
+				eg: syso(n.getNodeValue());
+		6: 获取节点的子节点
+			public NodeList getChildNodes(): 获取节点的子节点集合
+				eg: NodeList nodelist = n.getChildNodes();
+			public Node item(int index): 获取指定索引的节点
+				eg: Node node = nodelist.item(0);
+			public short getNodeType(): 获取子节点的节点类型
+				eg: node.getNodeType() == Node.ELEMENT_NODE;
+			public String getNodeName(): 获取子节点的节点名
+				eg: syso("节点名: " + node.getNodeName());
+			public String getTextContent(): 获取子节点的节点值
+				eg: syso("节点值: " + node.getTextContent());
+			
+	SAX方式解析: 
+		1: 通过SAXParserFactory的静态newInstance()方法获取SAXParserFactory实例factory
+			eg: SAXParserFactory factory = SAXParserFactory.newInstance();
+		2: 获取SAXParserFactory实例的newSAXParser()方法返回SAXParser实例parser
+			eg: SAXParser parser = factory.newSAXParser();
+		3: 创建一个类继承DafaultHandler,重写其中的一些方法进行业务处理并创建这个类的实例handler
+			重写方法: 
+				public void startDocument(): 用来标识解析开始
+				public void endDocument(): 用来标识解析结束
+				public void startElement(String uri, String localName, String qName, Attributes attributes): 用来遍历xml文件的开始标签
+					uri: 命名空间,localName: 本地名称,qName: 节点名(标签名),attributes: XML属性集合
+				public void endElement(String uri, String localName, String qName): 用来遍历xml文件的结束标签
+					uri: 命名空间,localName: 本地名称,qName: 节点名(标签名)
+				public void characters(char[] ch, int start, int length): 用来接收元素内的字符数据
+		4: 通过SAXParser实例的parse(String URL,DafaultHandler handler)方法解析xml文件
+			eg: parser.parse("XXX.xml",handler);
+		
+	JDOM方式解析: (需要导入jdom的jar包)
+		1: 创建SAXBuilder对象
+			eg: SAXBuilder saxbuilder = new SAXBuilder();
+		2: 通过SAXBuilder对象的build()方法解析xml文件(org.jdom2.Document)		//Document build(InputStream in);(还有其他build方法,详细请看源码)
+			eg: org.jdom.Document doc = saxbuilder.build(new FileInputStream("XXX.xml"));
+		3: 通过Document对象获取根节点Element(org.jdom2.Element)	//Element getRootElement();
+			eg: Element rootelement = doc.getRootElement();
+		4: 通过Element对象获取子节点集合List<Element>	//List<Element> getChildren();
+			eg: List<Element> booklist = rootelement.getChildren();
+		5: 通过Element对象获取属性集合List<Attribute>	//List<Attribute> getAttributes();
+			eg: List<Attribute> attrlist = booklist.get(0).getAttributes();
+		6: 通过Attribute对象获取属性名,属性值	//String getName();//String getValue();
+			eg: syso("属性名: " + attrlist.get(0).getName() + ", 属性值: " + attrlist.get(0).getValue());
+		7: 通过Element对象获取节点名,节点值		//String getName();//String getValue();
+			eg: syso("节点名: " + booklist.get(0).getName() + ", 节点值: " + booklist.get(0).getValue());
+		
+	DOM4J方式解析: (需要导入dom4j的jar包)(具体使用方法于DOM4J官网查看)
+		1: 创建SAXReader对象
+			eg: SAXReader saxreader = new SAXReader();
+		2: 通过SAXReader对象的read()方法解析xml文件(org.dom4j.Document)		//Document read(File url); (还有其他read方法,详细请看源码)
+			rg: Document document = saxreader.read(new File("XXX.xml"));
+		3: 通过Document对象获取根节点Element(org.dom4j.Element)	//Element getRootElement();
+			eg: Element rootelement = document.getRootElement();
+		4: 通过根节点迭代器获取子节点Iterator<Element>: Element (org.dom4j.Element) 	//Iterator<Element> elementIterator();
+			eg: Iterator<Element> iterator = rootelement.elementIterator();
+				Element book = iterator.next();
+		5: 通过子节点属性迭代器获取属性Iterator<Attribute>: Attribute   (org.dom4j.Attribute)	//Iterator<Attribute> attributeIterator();//Attribute: String getName();String getData();
+			eg: Iterator<Attribute> attriter = book.attributeIterator();
+				Attribute attr = attriter.next();
+				syso("属性名: " + attr.getName() + ", 属性值: " + attr.getData());
+		6: 获取子节点的节点名和节点值  	// String getName();//String getData();
+			eg: Element bookChild = book.elementIterator().next();
+				syso("节点名: " + bookChild.getName() + ", 节点值: " + bookChild.getData());			
+				
+				
+XML文件写入
+	DOM方式写入: 	
+		1: 创建一个DocumentBuilderFactory对象
+			eg: DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance(); //DocumentBuilderFactory类
+		2: 创建一个DocumentBuilder对象
+			eg: DocumentBuilder db = dbf.newDocumentBuilder();	//DocumentBuilderFactory类
+		3: 创建Document对象	(org.w3c.dom.Document)
+			eg: Document document = db.newDocument();
+		4: 创建根节点	(org.w3c.dom.Element)	//Element createElement(String elementName);
+			eg: Element rootElement = document.createElement("bookstore");
+		5: 创建子节点	(org.w3c.dom.Element)	//Element createElement(String elementName);
+			eg: Element bookElement = document.createElement("book");
+		6: 设置子节点属性	//void setAttribute(String key,String value);
+			eg: bookElement.setAttribute("id","1");
+		7: 设置子节点的文本值	//void setTextContent(String value);
+			eg: bookElement.setTextContent("小王子");
+		8: 将子节点添加到根节点		//Node appendChild(Node newChild);
+			eg: rootElement.appendChild(bookElement);
+		9: 将根节点添加到dom树中	//Node appendChild(Node newChild);
+			eg: document.appendChild(rootElement);
+		//根据Document对象生成xml文件
+		10: 创建TransformerFactory对象 
+			eg: TransformerFactory tff = TransformerFactory.newInstance();
+		11: 获取Transformer对象
+			eg: Transformer tf = tff.newTransformer();
+		12: 设置xml文件换行
+			eg: tf.setOutputProperty(OutputKeys.INDENT,"yes");
+		13: 通过Transformer对象的transform()方法将document转换为xml文件 	//void transform(new DOMSource(Document对象),new StreamResult(new File("URL")));
+			eg: tf.transform(new DOMSource(document),new StreamResult(new File("books.xml")));
+	
+	SAX方式写入:
+		1: 创建SAXTransformerFactory对象 	//SAXTransformerFactory SAXTransformerFactory.newInstance();
+			eg: SAXTransformerFactory saxtff = (SAXTransformerFactory)SAXTransformerFactory.newInstance();
+		2: 通过SAXTransformerFactory对象获取TransformerHandler对象 	//TransformerHandler newTransformerHandler();
+			eg: TransformerHandler handler =  saxtff.newTransformerHandler();
+		3: 通过TransformerHandler对象创建Transformer对象 	//Transformer getTransformer();
+			Transformer tf = handler.getTransformer();
+		4: 对xml文件进行设置
+			eg: tf.setOutputProperty(OutputKeys.INDENT,"yes"); //设置换行 
+				tf.setOutputProperty(OutputKeys.ENCODING,"UTF-8");	//设置字符编码
+		5: 创建Result对象并创建xml文件 
+			Result result = new StreamResult(new FileOutputStream(new File("books.xml")));
+		6: 使Result对象与handler产生关联
+			handler.setResult(result);
+		//写入xml文件信息
+		7: 打开Document	
+			handler.startDocument();
+		8: 创建AttributesImpl对象
+			eg: AttributesImpl attr = new AttributesImpl();
+		9: 设置属性
+			eg: attr.clear();	//清除所有已设属性
+				attr.addAttribute("", "", "id", "String", "1");	//添加属性
+		10: 创建开始标签
+			eg: handler.startElement("", "", "book",attr);
+		11: 设置标签间的文本
+			eg: String s = "小王子"; handler.characters(s.toCharArray(),0,s.length());
+		11: 创建结束标签
+			eg: handler.endElement("", "", "book");	
+		12: 关闭Document
+			handler.endDocument();
+		
+	JDOM方式写入:
+		1: 生成一个根节点
+			eg: Element rss = new Element("rss");
+		2: 设置根节点版本属性
+			eg:	rss.setAttribute("version","2.0"); 
+		3: 根据根节点创建Document对象
+			eg: Document document = new Document(rss);
+		4: 生成子节点
+			eg: Element channel = new Element("channel");
+		5: 设置节点属性
+			eg:	channel.setAttribute("id","1"); 
+		6: 设置节点文本内容
+			eg: channel.setText("qwer");
+		7: 将子节点添加到根节点
+			eg: rss.addContent(channel);
+		//转换为xml文件
+		7: 设置xml文件格式
+			eg: Format format = Format.getCompactFormat();
+				format.setEncoding("UTF-8"); //设置字符编码	
+				format.setIndent(""); //设置自动换行
+		9: 创建XMLOutputter对象
+			eg: XMLOutputter xmlop = new XMLOutputter(format);
+		10: 通过XMLOutputter对象将Document对象转换为xm文件
+			eg: xmlop.output(document, new FileOutputStream(new File("rssnews.xml")));	
+
+	DOM4J方式写入:
+		1: 创建Document对象,代表xml文档
+			eg: Document document = DocumentHelper.createDocument();
+		2: 创建根节点
+			eg: Element rss = document.addElement("rss");
+		3: 向rss节点中添加版本信息
+			eg: rss.addAttribute("version","2.0");
+		4: 生成子节点
+			eg: Element channel = rss.addElement("channel");
+		5: 向子节点添加属性
+			eg: channel.addAttribute("id","1");
+		6: 向子节点添加文本
+			eg: channel.setText("qwer");
+		//生成xml文件
+		7: 设置生成的xml的格式(自动换行,缩进)
+			eg: OutputFormat format = OutputFormat.createPrettyPrint();
+				format.setEncoding("UTF-8");	//设置字符编码
+		8: 创建XMLWriter对象,并指定生成的xml文件路径
+			eg: XMLWriter xmlw = new XMLWriter(new FileOutputStream(new FIle("rssnews.xml")),format);
+		9: 将Document对象写入xml文件 	
+			eg: xmlw.write(document);
+				//xmlw.setEscapeText(false); //设置是否转义,默认为true: 转义
+		10: 关闭流
+			eg: xmlw.close();
+			
+			
+			
+			
+
+DOM常用类:		
+	org.w3c.dom包下
+	┌──────────────────────────────────────────────────────────────────────────────────────────┐
+	│									 常用的节点类型									       │
+	├──────────────┬─────────────┬──────────────────┬─────────────────────┬────────────────────┤
+	│	节点类型   │   NodeType	 │  Named Constant  │   nodeName的返回值  │  nodeValue的返回值 │
+	├──────────────┼─────────────┼──────────────────┼─────────────────────┼────────────────────┤
+	│	 Element   │	  1		 │	 ELEMENT_NODE	│	 element name	  │		  null		   │
+	│	  Attr	   │ 	  2		 │	ATTRIBUTE_NODE	│	   属性名称	  	  │		 属性值		   │
+	│	  Text	   │	  3		 │    TEXT_NODE		│		#text		  │	    节点内容	   │
+	└──────────────┴─────────────┴──────────────────┴─────────────────────┴────────────────────┘					
+		
+	Node: 节点 (interface org.w3c.dom.Node)
+		成员方法: 
+			NamedNodeMap getAttributes(): NamedNodeMap包含该节点的所有属性
+			NodeList getChildNodes(): NodeList包含此节点的所有子节点
+			Node appendChild(Node newChild): 将节点newChild添加到此节点的子节点列表的末尾.如果newChild已经在树中，那么它首先被删除
+			Node getFirstChild(): 获取这个节点的第一个孩子
+			Node getLastChild(): 获取这个节点的最后一个孩子
+			Node getParentNode(): 获取此节点的父节点
+			Node removeChild(Node oldChild): 删除指定的子节点oldChild,并将其返回
+			Node replaceChild(Node newChild,Node oldChild): 替换子节点oldChild与newChild，并返回oldChild节点
+			boolean isEqualNode(Node arg): 测试两个节点是否相等
+			String getNodeName(): 获取该节点的名称
+			short getNodeType(): 获取代表基础对象的类型的代码
+			String getNodeValue(): 获取该节点的值
+			String getTextContent(): 获取此节点及其后代的文本内容
+			void setNodeValue(String nodeValue): 设置该节点的值
+			void setTextContent(String textContent): 设置此节点及其后代的文本内容(可能会将子节点删除)
+			
+	NodeList: Node节点集合 (interface org.w3c.dom.NodeList)
+			成员方法: 
+				Node item(int index): 返回index中的index项目
+				int getLength(): 获取列表中的节点数
+		
+	NamedNodeMap: (interface org.w3c.dom.NamedNodeMap)
+		成员方法: 
+			int getLength(): 该地图中的节点数
+			Node getNamedItem(String name): 获取由name指定的节点
+			Node item(int index): 获取地图中的index项目
+			Node removeNamedItem(String name): 删除由name指定的节点,并返回该节点
+			Node setNamedItem(Node arg): 添加节点.如果具有该名称的节点已经存在于该映射中,则会被新映射替换
+	
+	Node的子接口: 
+		Document: 代表整个HTML或XML文档  (interface org.w3c.dom.Document) 
+			类型: Node.DOCUMENT_NODE
+			成员方法: 
+				Element getElementById(String elementId): 获取指定ID属性的Element
+				NodeList getElementsByTagName(String tagname): 获取指定标签名的节点集合
+		
+		Element: 表示HTML或XML文档中的元素 (Interface org.w3c.dom.Element)
+			类型: Node.ELEMENT_NODE
+			成员方法: 
+				String getTagName(): 获取元素的名称
+				String getAttribute(String name): 获取指定属性的属性值
+				Attr getAttributeNode(String name): 获取指定名称的属性节点
+				boolean hasAttribute(String name): 判断此元素上是否具有指定名称的属性或具有缺省值
+				void removeAttribute(String name): 删除指定名称的属性
+				Attr removeAttributeNode(Attr oldAttr): 删除指定的属性节点,并返回该属性节点
+				void setAttribute(String name,String value): 添加一个新属性
+				Attr setAttributeNode(Attr newAttr): 添加一个新的属性节点
+		
+		Attr: 表示Element对象中的属性 (Interface org.w3c.dom.Attr)
+			类型: Node.ATTRIBUTE_NODE
+			成员方法:
+				String getName(): 获取此属性的名称
+				String getValue(): 获取此属性的值
+				void setValue(String value): 设置此属性的值
+				boolean getSpecified(): 判断此属性在实例文档中是否被明确赋予了一个值		
+		
+		
+		
+		
+		

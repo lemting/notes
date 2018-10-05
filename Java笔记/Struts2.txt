@@ -1,0 +1,341 @@
+JavaEE 三层之 web 层框架
+
+Struts2 是流行和成熟的基于MVC设计模式的web应用程序框架
+		Struts2框架应用JavaEE三层结构中web层框架
+		Struts2中每次访问action时,默认调用execute()方法
+
+Servlet和Action的区别
+	1: Servlet: 默认在第一次访问时创建,创建一次,单实例对象
+	2: Action: 每次访问action时都会创建,多次创建,多实例对象
+	
+JSP页面引入Struts2标签库: 
+	<%@ taglib uri="/struts-tags" prefix="s" %>
+	
+	
+//Struts2 核心过滤器在web.xml中的配置
+	<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+		xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+		version="3.1">
+		<filter>
+			<filter-name>struts2</filter-name>
+			<filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+		</filter>
+		<filter-mapping>
+			<filter-name>struts2</filter-name>
+			<url-pattern>*.action</url-pattern>
+		</filter-mapping>
+	</web-app>
+	
+	
+一: Struts2
+	A: 创建Struts2项目
+		a: 创建web项目,项目构面添加Struts2
+		d: 在web.xml文件中配置Struts2过滤器
+		c: 创建action
+			1: 继承 ActionSupport 类重写 execute()方法(或者其他方法,但是要在配置文件中配置该方法)
+			2: 实现 Action 接口重写 execute()方法(或者其他方法,但是要在配置文件中配置该方法)
+			3: 创建普通类,写 execute()方法(或者其他方法,但是要在配置文件中配置该方法)
+		d: 在struts.xml文件中配置action
+	B: Struts2执行过程
+		a: 获取请求的路径,得到路径中action		eg: localhost:8080/项目/hello.action
+		b: 在src目录下找struts.xml文件,使用dom4j解析xml文件内容.在xml文件的<action>标签中根据name属性找出对应请求路径中的action.
+		c: name属性匹配时,根据<action>标签的class属性值找到action类的全路径,使用反射实现功能
+		d: 通过反射执行action类的方法
+		e: 获取执行方法的返回值,在xml文件中找到<action>标签子标签<result>,匹配result标签的name属性,若匹配则跳转到配置页面中
+	C: Struts2过滤器
+		a: 过滤器在服务器启动时候创建,创建过滤器时执行init()方法
+			1: 在init()方法中主要加载配置文件(包含自己创建的配置文件和struts2自带配置文件)(struts.xml;web.xml;...)
+	D: 访问Action的方法	
+			调用的方法,如果有返回值,则其类型必须是String;可以没有返回值,此时<result>标签可以不配置
+		a: 使用struts.xml文件的<action>标签的method属性,在这个属性里写要执行的action的方法
+		b: 使用通配符方式实现
+			在name属性中使用通配符'*'(代表任意字符),method中使用{1}代表name属性的第1个'*'所替代的字符
+				eg: <action name="linkman_*" class="action.LinkManAction" method="{1}"></action>
+		c: 动态访问实现(了解,现不用)
+	E: Action 搜索顺序
+			对于一个请求: http://localhost:8080/项目/path1/path2/path3/Xxx.action
+		a: 判断package是否存在,如: /path1/path2/path3
+		b: 若package存在,判断action是否存在(若没有action,则报错)
+		c: 若package不存在,检查上一级路径的package是否存在(直到默认namespace),重复 1 .
+		d: 若没有action,则报错
+			
+二: struts.xml
+		Struts2 核心配置文件,该文件主要负责管理应用中的Action映射,以及该Action包含的Result定义等
+		
+		<?xml version="1.0" encoding="UTF-8" ?>
+		<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+		<struts> 	 
+			/* package: package提供了将多个Action组织为一个模块的方式.(顶层package必须继承自 struts-default)
+					package的名字必须唯一,package可以通过extends继承自其它package作为扩展,配置时父package必须在子package前配置
+				属性: 1: name: package名称;2: extends: 继承的父package名称;3: abstract: 设置package的属性为抽象的,抽象的package不能定义action,取值: true,false
+					  4: namespace: 定义package命名空间,该命名空间影响到url的地址(默认值: "/").
+							eg: namespace="/test",则访问地址为: http://localhost:8080/项目/test/XX.action */
+			<package name="" extends="struts-default" namespace="/">
+				/* action: 配置一个action可以被多次映射(只要action配置的name不同)
+						属性: 1: name: action名称;2: class: 对应类的路径;3: method: 调用action的方法名(默认调用execute) */
+				<action name="" class="" method="execute">									
+					/* result: 节点的配置,根据action的方法的返回值,配置到不同的路径里面
+						属性: 1: name: 匹配Action中方法的返回值;
+							  2: type: 配置如何到路径中(转发或重定向),不写则选用父package的type,struts-default默认是 dispatcher(转发) 
+									取值: dispatcher: 转发到页面;redirect: 重定向到页面;chain: 转发到Action;redirectAction: 重定向到Action
+							  节点文件: 对应页面的相对路径  */
+					<result name="" type="">/Xxx.xxx</result>
+					
+					/* param: 参数
+						属性: 1: name: 参数名;节点文本: 参数值  */
+					<param name="">value</param>
+					
+					/* interceptor-ref: 引用拦截器
+							属性: 1: name: 引用的拦截器名称  */
+					<interceptor-ref name="defaultStack">
+						/* 继承 MethodFilterInterceptor 类的拦截器,可以使用该标签,达到对action中的指定方法不拦截
+							属性: 1: name: 固定值: excludeMethods;  节点文件: 不拦截的方法的方法名,有多个方法则用","隔开 */
+						<param name="excludeMethods">方法名,方法名,方法名,...</param>
+					</interceptor-ref>
+				</action>
+
+				/* global-results: 全局results配置 */
+				<global-results>
+					<result name=""></result>
+				</global-results>
+				
+				<interceptors>	//该处只是声明拦截器
+					/* interceptor: 拦截器
+						属性: 1: name: 拦截器名称;  2: class: 拦截器类路径  */
+					<interceptor name="" class=""></interceptor>
+					
+					/* interceptor-stack: 拦截器栈(也是拦截器),将多个拦截器组织为一个拦截器
+						属性: 1: name: 拦截器栈名称  */
+					<interceptor-stack name="">
+						<interceptor-ref name=""></interceptor-ref>
+						<interceptor-ref name=""></interceptor-ref>
+					</interceptor-stack>
+				</interceptors>
+				
+				/* default-interceptor-ref: 默认拦截器,每个Action都会自动引用,如果Action中引用了其他的拦截器,默认拦截器无效
+						属性: 1: name: 引用的拦截器名称 */
+				<default-interceptor-ref name=""></default-interceptor-ref>
+			</package>
+			
+			/* include: include节点是struts2中组件化的方式,可以将每个功能模块独立到一个xml配置文件中,然后用include节点引用
+				属性: 1: file: 引用的xml文件的路径  */
+			<include file=""></include>	
+			
+			/* constant: 全局属性,跟struts.properties配置文件的属性一样
+				属性: 1: name: 属性名;2: value: 属性值  */
+			<constant name="" value=""></constant>
+		</struts>    
+
+	A: 包含的内容: 
+		a: 全局属性
+		b: 用户请求和响应Action之间的对应关系
+		c: Action可能用到的参数和返回结果
+		d: 各种拦截器的配置
+	B: struts.properties
+			Struts2 框架的全局属性文件,自动加载.该文件包含很多key-value对
+			该文件完全可以不要,在 struts.xml 文件中,使用 constant 元素可以配置全局属性
+		a: 全局属性(根据类型分类,还有很多没有列举)
+				
+二: Struts2数据处理
+	A: Action中访问 Servlet API,处理表单提交数据等
+			struts2 提供了三种方式访问Servlet API
+		a: ServletActionContext(的静态方法)
+			1: HttpServletRequest request = ServletActionContext.getReqest();			//web应用的 HttpServletRequest(request)对象
+			2: HttpServletResponse response = ServletActionContext.getResponse();		//web应用的 HttpServletResponse(response)对象
+			3: ServletContext application = ServletActionContext.getServletContext();	//web应用的 ServletContext(application)对象
+			4: PageContext pageContext = ServletActionContext.getPageContext();			//web应用的 PageContext(pageContext)对象
+		b: ActionContext 
+			1: 创建 ActionContext 对象
+				ActionContext context = ActionContext.getContext();
+			2: 获取一个包含所有 HTTPServletRequest 参数的集合
+				Map<String.Object> params = context.getParameters();		
+		c: 实现***Aware接口
+			1: ServletRequestAware: 实现该接口的Action可以直接访问Web应用的 HttpServletRequest(request)实例
+			2: ServletResponseAware: 实现该接口的Action可以直接访问Web应用的 HttpServletResponse(response)实例
+			3: SessionAware: 实现该接口的Action可以直接访问Web应用的 HttpSession(session)实例
+			4: ServletContextAware:  实现该接口的Action可以直接访问Web应用的 ServletContext(application)实例
+				eg: public class FirstAction implements ServletRequestAware{	
+						private HttpServletRequest request;
+						@Override	//重写该方法,设置HttpServletRequest对象实例
+						public void setServletRequest(HttpServletRequest request){this.request = request;}
+					}
+	B: Struts2 封装获取表单数据方式
+		a: 模型驱动封装
+				可以直接把表单数据封装到实体类对象中(只能把数据封装到一个实体类对象里面)
+			1: action实现 ModelDriven<T> 接口
+			2: 实现接口里的 getModel()方法
+			3: 在action里面创建实体类对象(该对象的属性名要和表单数据的name属性值一样)
+				eg: public class FirstAction implements ModelDriven<UserBean>{	
+						private UserBean user = new UserBean();
+						@Override	//重写该方法,Struts2将自动将表单数据设置到UserBean对象中
+						public UserBean getModel(){return user;}
+					}
+		b: 属性封装
+				直接把表单提交属性封装到action的属性里
+			1: 在action成员变量位置定义变量(变量名称和表单输入项的name属性值一样)
+			2: 在action类中生成变量的setXxx()方法
+		注意: 属性封装和模型驱动封装不能同时使用在同一个表单(不同表单则不影响),若同时使用,则只会实现模型驱动封装
+		c: 表达式封装(属于属性封装)
+				使用表达式封装可以把表单数据封装到实体类对象里面
+			1: 在action里面声明实体类
+			2: 生成实体类变量的getXxx()/setXxx()方法
+			3: 在表单输入项的name属性里面写表达式形式(name="实体类变量.成员变量")
+	C: Struts2 获取数据封装到集合中
+			利用表达式封装
+		a: 封装到List集合
+			1: 在action里面声明List变量
+			2: 生成List变量的getXxx()/setXxx()方法
+			3: 在表单输入项的name属性里面写表达式形式(name="List变量[index].成员变量")
+		b: 封装到Map集合
+			1: ; 2: ; 3: 在表单输入项的name属性里面写表达式形式(name="Map变量['key'].成员变量")
+		
+三: Struts2值栈
+	A: OGNL 表达式
+			Struts2默认的表达式语言,OGNL比EL表达式功能更强大,
+		a: 作用
+			1: 在Struts2里面操作值栈数据,和Struts2标签一起使用
+			2: 支持对象方法的调用.
+			3: 支持类静态方法调用和值访问,表达式的格式为: @[类全名(包括包路径)@[方法名([参数])|字段名]]
+					eg: @java.lang.String@format('foo%s','bar');
+			4: 支持复制操作和表达式串联
+			5: 访问OGNL上下文(OGNL context)和 ActionContext
+			6: 操作集合对象
+		b: OGNL的 #,% 的使用
+			1: #: 使用#获取context里面的数据	eg: <s:property value="#request.username"/> //获取存入request域中的username属性的值
+			2: %: 在Struts2标签中表单标签直接使用OGNL表达式会不识别,只有加%后才会识别: %{OGNL表达式}
+	B: Struts2标签
+			引入标签库: <%@ taglib uri="/struts-tags" prefix="s" %>
+		a: 常用标签
+			1: <s:property value="OGNL 表达式" />	//和 OGNL 表达式在JSP页面中获取值栈数据
+			2: <s:iterator value="OGNL 表达式" ></s:property>	//类似JSTL中<c:foreach>标签,获取值栈的List集合数据
+			3: <s:debug> 	//查看值栈结构和存储值
+			4: <s:if>,<s:elseif>
+		b: 表单标签(HTML的表单标签大部分在Struts2的表单标签里有)
+			1: <s:from> 	//表单,与HTML的<from>标签类似
+			2: <s:textfield label="该输入文本框的前面的信息">	//文本框,与HTML的<input type="text">标签类似
+			3: <s:password>	//密码框,与HTML的<input type="password">标签类似
+			4: <s:radio list="#{'提交值':'显示值','':'','':'',...}">  //单选按钮,与HTML的<input type="radio">标签类似
+ 			5: <s:checkboxlist list="#{'提交值','显示值','':'',...}">	//复选框,与HTML的<input type="checkbox">标签类似
+			6: <s:select list="#{'提交值','显示值','':'',...}">	//下拉项,与HTML的<select>标签类似
+			7: <s:textarea>		//文本域,与HTML的<textarea>标签类似
+			7: <s:file>	 	//上传文件域,与HTML的<input type="file">标签类似
+			8: <s:hidden> 	//隐藏域,与HTML的<input type="hidden">标签类似
+			9: <s:submint>	//提交按钮,与HTML的<input type="submint">标签类似
+			10: <s:reset>	//重置按钮,与HTML的<input type="reset">标签类似
+	
+	C: ValueStack(值栈)
+			在Struts2提供自己本身的一种存储机制,类似域对象,可以在Action和页面上存值和取值
+		a: 值栈存储位置
+			1: 每次访问action时都会创建action对象
+			2: 每个action对象中都会有一个值栈对象(只有一个)(值栈对象有action的引用)
+		b: 值栈内部结构
+			1: root: 结构是List集合,一般操作都是root里面的数据
+			2: context: 结构是Map集合,存储对象的引用(固定存储有request,session,application,parameters,attr对象的引用)
+		c: 获取 ValueStack(值栈)对象
+			1: 使用 ActionContext 类的 getValueStack()方法
+				eg: ValueStack vs = ActionContext.getContext().getValueStack();
+		d: 向值栈放数据
+			1: 在action定义变量,生成变量的getXxx()方法(使用该方式,数据存储到action对象中)
+			2: 获取值栈对象,调用值栈的 set(String key,Object value)方法
+			3: 获取值栈对象,调用值栈的 push(Object obj)方法
+		e: 从值栈取数据
+			1: 在JSP页面中,使用Struts2标签+OGNL表达式获取值栈数据
+				eg: <s:property value="username"/>  	//获取值栈中username对应的数据
+					<s:property value="user.username"/>		//获取值栈中user对象的username属性的值
+					<s:property value="list[0].username"/>	//获取值栈中List对象list的第一个元素的username属性的值
+					<s:iterator value="list"><s:property value="username"/></s:iterator>	//获取值栈中List对象list的每一个元素的username属性的值
+					<s:iterator value="list"  var="user"><s:property value="#user.username"/></s:iterator>	//获取值栈中List对象list的每一个元素的username属性的值
+					<s:property value="[0].top"/>	//获取通过push存入的值,存入的值都会放到数组top中
+			2: 在JSP页面中,使用EL表达式获取数据(不建议使用)
+				为什么EL表达式能获取值栈的数据? Struts2底层增强request对象里的getAttribute()方法
+					首先从request域获取值,若获取到则直接返回;若获取不到,到值栈中把值获取出来,并将值放到域对象里面
+
+四: Interceptor(拦截器)
+	A: 拦截器
+		a: 拦截器执行时机
+			在action对象创建之后,action的方法执行之前
+		b: 过滤器和拦截器的区别
+			1: 过滤器: 过滤器理论上可以任意内容,比如 HTML,JSP,servlet,图片路径,..
+			2: 拦截器: 拦截器只能拦截action内容
+		c: 拦截器结构
+				继承 AbstractInterceptor(实现了Interceptor接口) 类,重写了三个方法 
+			1: init(): 初始化方法
+			2: destory(): 销毁方法
+			3: intercept(): 拦截逻辑操作方法
+	B: 拦截器底层原理
+		a: 使用技术
+			1: AOP思想: 面向切面编程
+			2: 责任链模式: 责任链模式和过滤链很相似
+		b: AOP思想和责任链模式如何应用到拦截器
+			1: 在action对象创建之后,action的方法执行之前(执行)
+			2: 在action的方法执行之前执行默认拦截器,执行过程使用AOP思想,在action没有直接调用拦截器的方法,而是使用配置文件方式进行操作
+			3: 在执行拦截器的时候,执行很多的拦截器,这个过程使用责任链模式
+	C: 自定义拦截器
+		a: 创建方式
+			1: 继承 MethodFilterInterceptor 类,重写 doIntercept()方法(该方式可以让action类的某个方法不进行拦截)
+					doIntercept()方法的返回值: return invocation.invoke();	//放行操作
+											   return "XXX"; 	//该返回值结果,会在<result>标签里寻找匹配的结果页面
+			2: 继承 AbstractInterceptor 类(或实现 Interceptor 接口,建议实现类),重写 init(),destory(),intercept()方法
+	D: 在struts.xml文件配置拦截器		
+			action默认会使用拦截器栈: defaultStack
+		1: action配置了自定义拦截器后,默认拦截器不会生效.要想继续生效,可以在action中将 defaultStack 拦截器栈配置
+		2: action拦截器会对其所有方法进行拦截,但是通过继承 MethodFilterInterceptor 类方式的拦截器可以配置不拦截方法
+			
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

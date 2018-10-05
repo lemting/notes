@@ -1,0 +1,297 @@
+URLEncoder.encode(String s,String enc): 将字符串s以指定的字符集enc解码
+
+web.xml错误页面配置
+	<error-page>
+		<error-code>错误代码</error-code>	(eg: 404)
+		<location>错误时跳转页面路径</location>
+	</error-page>
+	
+
+JSp注释: 
+	1: HTML注释: <!-- html注释 -->  客户端可见
+	2: JSP注释: <%-- jsp注释 --%> 客户端不可见
+	3: JSP脚本注释: //单行 /*多行*/
+	
+A: Jsp指令
+	a: page 指令: 通常位于JSP页面的顶端,同一个页面可以有多个page指令
+		page指令语法:  <%@page 属性1=属性值1 属性2=属性值2 ... %>
+		属性: 
+			1: language: 指定JSP页面使用的脚本语言,默认java
+			2: import: 通过该属性来引用脚本语言中使用到的类文件
+			3: contentType: 用来指定JSP页面所采用的编码方式,默认 text/html,ISO-8859-1
+			4: pageEncoding: 指定使用的字符集
+	b: include 指令: 将一个外部文件嵌入到JSP文件中,同时解析这个页面中的JSP语句
+	   include指令语法: <%@include file="URL" %>	
+	   include指令与include动作比较
+			│				 │			  include指令			│				include动作					 │
+			│   语法格式	 │	  	<%@include file="URL" %>	│<jsp:include page="URL" flush="true/flase"/>│
+			│ 发生作用的时间 │			 页面转换期间			│				 请求期间					 │
+			│   包含的内容	 │	 	文件的实际内容(源代码)		│ 				页面的输出					 │
+			│转换成的Servlet │ 主页面和包含页面转换为一个Servlet│  主页面和包含页面转换为相互独立的Servlet	 │
+			│    编译时间	 │		  较慢--资源必须被解析		│		    	  较快						 │
+			│    执行时间	 │				 稍快				│		较慢--每次资源都必须被解析			 │
+		include指令包含的实际是源代码
+		include动作包含的实际是结果
+			
+	c: taglib 指令: 使用标签库定义新的自定义标签,在JSP页面中启用定制行为
+	
+B: JSP脚本
+		在JSP页面中执行的java代码
+	语法: <% Java代码 %>
+	
+C: JSP声明
+		在JSP页面中定义变量或者方法
+	语法: <%! Java声明 %>
+
+D: JSP表达式
+		在JSP页面中执行的表达式
+	语法: <%= 表达式 %> 
+		注意: 表达式不以分号结束
+
+E: JSP动作
+		JSP动作元素(action elements),动作元素为请求处理阶段提供信息.
+		动作元素遵循XML元素的语法,有一个包含元素名的开始标签,可以有属性和可选的内容和与开始标签匹配的结束标签
+	第一类: 与存取JavaBean有关的,
+			包括: <jsp:useBean><jsp:setProperty><jsp:getProperty>
+	第二类: JSP1.2就开始有的基本元素,包括6个动作元素
+			包括: <jsp:include><jsp:forward><jsp:param><jsp:plugin><jsp:params><jsp:fallback>
+				1: include: 将一个外部页面嵌入到JSP文件中,只能包含同一个web应用中的文件
+						<jsp:include page="URL" flush="true/flase" />
+					属性: page: 要包含的页面;flush: 被包含的页面是否从缓冲区读取
+				2: forward: 页面转发
+					<jsp:forward page="URL" /> 相当于request.getRequestDispatcher("URL").forward(request,response) 
+				3: param: 给页面传递参数,常常与<jsp:forward>一起使用,作为其的子标签(给URL页面传递(name,value))
+					<jsp:param name="参数名" value="参数值" />
+					
+	第三类: JSP2.0新增的元素,主要与JSp Document有关,包括6个元素
+			包括: <jsp:root><jsp:declaration><jsp:scriptlet><jsp:expression><jsp:text><jsp:output>
+	第四类: JSP2.0新增的动作元素,主要是用来动态生成XML元素标签的值,包括3个动作
+			包括: <jsp:attribute><jsp:body><jsp:element> 
+	第五类: JSP2.0新增的动作元素,主要是用在Tag File中,有2个元素
+			包括: <jsp:invoke><jsp:dobody>
+	
+F: JSP内置对象
+		JSP内置对象是Web容器创建的一组对象化,不是用new关键字就可以使用的内置对象
+	
+	常用内置对象: 
+		a: out
+				JspWriter类的实例,是向客户端输出内容常用的对象
+			常用方法: 
+				1: void println(): 向客户端打印字符串
+				2: void clear(): 清除缓冲区的内容,如果在flush之后调用会抛出异常
+				3: void clearBuffer(): 清除缓冲区内容,如果在flush之后调用不会抛出异常
+				4: void fluah(): 将缓冲区内容输出到客户端
+				5: int getBufferSize(): 返回缓冲区的大小(字节),如果不设缓冲区则为0
+				6: int getRemaining(): 返回缓冲区剩余可用大小(字节) 
+				7: boolean isAutoFlush(): 返回缓冲区满时,是自动清空还是抛出异常
+				8: void close(): 关闭输出流
+				
+		b: request(请求)
+				客户端的请求信息被封装在request对象中,通过它才能了解到客户端的需求,然后做出响应.
+				他是HttpServletRequest类的实例.request对象具有请求域,即完成客户端你的请求之前,该对象一直有效
+			常用方法: 
+				1: String getParameter(String name): 返回name指定参数的参数值
+				2: String[] getParameterValues(String name): 返回包含参数name的所有值的数组
+				3: void setAttribute(String arg1,Object arg2): 储存此请求中的属性
+				4: Object getAttribute(String name): 返回指定属性的属性值
+				5: String getContentType(): 回去请求体的MIME类型
+				6: String getProtocol(): 返回请求用的协议类型及版本号
+				7: String getServerName(): 返回接受请求用的服务器主机名
+				8: int getServerPort(): 返回服务器接受此请求所用的端口号
+				9: void setCharacterEncoding(String env): 设置request默认字符集(无法解决URL传递中文出现乱码问题)
+				10: String getCharacterEncoding(): 返回request字符编码方式
+				11: int getContentLength(): 返回请求体的长度(字节)
+				12: String getRemoteAddr(): 返回发送此请求的客户端IP地址
+				13: String getRealPath(String path): 返回一虚拟路径的真实路径
+				14: String getContextPath(): 返回上下文路径
+				request.getRequestDispatcher(String path).forward(ServletRequest arg0,ServletRequest arg1): 请求转发
+						eg: request.getRequestDispatcher("newRequest.jsp").forward(request,response): 转发到newRequest.jsp,请求对象会保存
+				
+		c: response(响应) 
+				包含了响应客户端请求的有关信息,但在JSP中很少直接用到它.
+				他是HttpServletResponse类的实例.
+				response对象具有页面作用域,即访问一个页面时,该页面的response对象只能对这次访问有效,其他页面的response对象对当前页面无效
+			常用方法: 
+				1: String getCharacterEncoding(): 返回响应用的是何种字符编码
+				2: void setContentType(String type): 设置响应的MIME类型
+				3: PrintWriter getWriter(): 返回可以向客户端输出字符的一个对象(PrintWriter的输出总是提前于内置out对象)
+				4: void sendRedirect(String location): 重新定向客户端的请求(可以实现页面跳转)
+					请求重定向和请求转发的区别
+						请求重定向: 客户端行为,从本质上讲等同于两次请求,前一次的请求对象不会保存,地址栏的URl地址会改变
+						请求转发: 服务器行为,一次请求,转发后请求对象会保存,地址栏的URL地址不会改变
+							eg: 假设你去办理某个护照
+								重定向: 你先去A局,A局的人说:"这个是不归我管,去B局",然后,你就从A局退出来,自己乘车去了B局.								
+								转发: 你去了A局,A局看了之后,知道这个事情其实归B局管,但是他没有叫你去B局,他自己到后面办公室联系B局的人,让他们办好后,送了过来.
+				
+		d: session
+				session表示客户端与服务器的一次会话(从一个客户打开浏览器并连接到服务器开始到客户关闭浏览器离开这个服务器结束,称为一个会话)
+				session对象是HttpSession类的实例.session对象在第一个JSP页面被装载时自动创建,完成会话管理
+				Web中的session指的是用户在浏览某个网站的时,从进入网站到浏览器关闭所经过的这段时间,也就是用户浏览这个网站所花费的事时间
+				当一个客户访问一个服务器时,可能会在服务器的几个页面之间切换,服务器应当通过某种方法知道这是一个客户,就需要session对象(在服务器的内存中保存着不同用户的session)
+			常用方法: 
+				1: long getCreationTime(): 返回session创建时间
+				2: String getId(): 返回session创建是JSp引擎为它设的唯一ID号
+				3: void setAttribute(String name,Object value): 使用指定名称将对象绑定到此会话
+				4: Object getAttribute(String name): 返回此会话中的指定名称绑定在一起的对象,如果没有对象绑定在该名称下,则返回null
+				5: String[] getValueNames(): 返回一个包含此session中所有可用属性的数组
+				6: int getMaxInactiveInterval(): 返回两次请求间隔多长时间此session被取消(单位s)
+				7: void setMaxInactiveInterval(int interval): 设置两次请求间隔多长时间此session被取消(单位s)
+				8: void invalidate(): 销毁本次会话
+			session生命周期: 
+				创建: 当客户端第一次访问某个jsp或Servlet时,服务器会为当前会话创建一个SessionId,每次客户端向服务端发送请求的时,都会将此SessionId携带过去,服务端会对此SessionId进行校验
+				活动: 某次会话当中通过超链接打开的新页面属于同义词会话,
+					  只要当前会话页面没有全部关闭,重新打开新的浏览器窗口访问同一项目资源时属于同一次会话
+					  除非本次会话的所有页面都关闭后,再重新访问某个jsp或Servlet,将会创建新的会话
+				销毁: 1: 调用了session.invalidate()方法
+					  2: session过期(超时)
+							方法1: session.setMaxInactiveInterval(时间) //单位s
+							方法2: 在web.xml配置 //单位分钟
+									<session-config>
+										<session-timeout>30</session-timeout>  
+									</session-config>
+					  3: 服务器重启
+					注意: 创建新的会话,原有会话还存在,只是这个旧的SessionId存在于服务端,再也没有客户端会携带它然后交予服务端校验
+						
+		e: application 
+				实现了用户间数据的共享,可存放全局变量
+				开始于服务器的启动,终止于服务器关闭(服务器的启动和关闭决定了application对象的生命.)
+				在用户的前后连接或不同用户之间的连接中,可以对application对象的同一属性进行操作;在任何地方对application对象属性的操作,都将影响到其他用户对此的访问
+				是ServletContext类的实例
+			常用方法: 
+				1: void setAttribute(String name,Object value): 使用指定名称将对象绑定到此会话
+				2: Object getAttribute(String name): 返回此会话中的指定名称绑定在一起的对象,如果没有对象绑定在该名称下,则返回null
+				3: Enumeration getAttributeNames(): 返回所有可用属性的枚举
+				4: String getServerInfo(): 返回JSp(Servlet)引擎名及版本号
+		
+	其他内置对象: 
+		f: page
+				page对象就是值当前JSp页面本身,有点类似类中的this指针,他是java.lang.Object类的实例
+			常用方法: 
+				1: class getClass(): 返回此Object的类
+				2: int hashCode(): 返回此Object的hash码
+				3: boolean equals(Object obj): 判断此Object是否与obj相等
+				4: void copy(Object obj): 把此Object拷贝到指定对象obj中
+				5: Object clone(): 克隆此Object对象
+				6: String toString(): 把此Object对象转换为String类对象
+				7: void notify(): 唤醒一个等待的线程
+				8: void notifyAll():唤醒所有等待的线程
+				9: void wait(int timeout): 使一个线程处于等待直到timeout结束或者被唤醒
+				10: void wait(): 使一个线程处于等待直到被唤醒
+									
+		g: pageContext 
+				pageContext对象提供了对JSP页面内所有的对象及名字空间的访问(可以访问到本页所在的session,也可以取本页面所在的application的某一属性值)
+				pageContext对象相当于页面中所有功能的集大成者
+				pageContext对象的本类名也叫pageContext
+			常用方法: 
+				1: JspWriter getOut(): 返回当前客户端响应被使用的JsPWriter流(out)
+				2: HttpSession getSession(): 返回当前页中的HttpSession对象(session)
+				3: Object getPage(): 返回当前页的Object对象(page)
+				4: ServletRequest getRequest(): 返回当前页的ServletRequest对象(request)
+				5: ServletResponse getReponse(): 返回当前页的ServletResponse对象(reponse)
+				6: void setAttribute(String name,Object attribute): 设置属性及属性值
+				7: Obje getAttribute(String name): 返回某属性的作用范围
+				8: void forward(String relativeUrlPath): 使当前页面重导到另一页面
+				9: void include(String relativeUrlPath): 在当前页位置包含另一文件 	
+				
+		h: exception 
+				exception对象是一个异常对象,当一个页面在运行过程中发生了异常,就产生这个对象.
+				如果一个JSP页面要应用此对象,就必须把isErrorPage设为true,否则无法编译
+				他实际上是java.lang.Throwable的对象
+			常用方法: 
+				1: String getMessage(): 返回描述异常的消息
+				2: String toString(): 返回关于异常的简短描述信息
+				3: void printStackTrace(): 显示异常及其栈轨迹
+				4: Throwable FillInStackTrace(): 重写异常的执行栈轨迹 				
+		
+		i: config 
+				config对象是一个在Servlet初始化时,JSP引擎向他传递信息用的,
+				此信息包括Servlet初始化时所用到的参数(通过属性名和属性值构成)以及服务器的有关信息(通过传递一个ServletContext对象)
+			常用方法: 
+				1: ServletContext getServletContext(): 返回含有服务器相关信息的ServletContext对象
+				2: String getInitParameter(String name): 返回初始化参数的值
+	
+G: JavaBeans
+		Javabeans就是符合某种特定的规范的Java类.使用Javabeans的好处就是解决代码重复编写,减少代码沉余,功能区分明确,提高代码的维护性
+	a: JavabBeans的设计原则
+		1: 公有类
+		2: 无参的公有构造方法
+		3: 属性私有
+		4: getXxx()和setXxx()方法
+	b: 在JSP页面中Javabeans的使用
+		1: 像使用普通java类一样,创建javabean实例
+		2: 在JSP页面中通常使用JSP动作标签使用JavaBean
+			<jsp:useBean>: 作用: JSP页面中实例化或者在指定范围内使用javabean
+				<jsp:useBean id="标识符" class="java类名" scope="作用范围" />  //scope默认page
+			<jsp:setProperty>: 作用: 给已经实例化的JavaBean对象的属性赋值,一共有四种形式
+				<jsp:setProperty name="JavaBean实例名" property="*" /> (跟表单关联)
+				<jsp:setProperty name="JavaBean实例名" property="JavabBean属性名" /> (跟表单关联)
+				<jsp:setProperty name="JavaBean实例名" property="JavabBean属性名" value="属性值" /> (手工设置) 
+				<jsp:setProperty name="JavaBean实例名" property="JavabBean属性名" param="request对象中的参数名" /> (跟request参数关联)
+			<jsp:getProperty>: 作用: 获取指定JavaBean对象的属性值
+				<jsp:getProperty name="JavaBean实例名" property="JavabBean属性名" />
+	c: JavaBeans的四个作用域范围
+			使用useBean的scope属性可以用来指定JavaBean的作用范围
+		1: page: 仅在当前页面有效
+		2: request: 可以通过HttpRequest.getAttribute()方法获取JavaBean对象
+		3: session: 可以通过HttpSession.getAttribute()方法获取JavaBean对象
+				(可以获取其他页面保存到session中的对象,利用<jsp:useBean>动作,id绑定session中的key,创建的类自动绑定value)
+		4: application: 可以通过application.getAttribute()方法获取JavaBean对象
+	d: Model 1
+			JSP + JavaBean
+	
+H: JSP管理
+		http协议无状态性: http协议无法保存用户状态
+		保存用户状态的两大机制: Session和Cookie
+			Cookie是Web服务器保存在客户端的一系列文本信息
+			典型应用一: 判断注册用户是否已经登录网站
+			典型应用二: "购物车"的处理
+	a: Cookie的作用: 
+		1: 对特定对象的追踪
+		2: 保存用户网页浏览记录与习惯
+		3: 简化登录
+		安全风险: 容易泄露用户信息
+	b: Cookie的创建与使用
+		创建Cookie对象
+			Cookie newCookie = new Cookie(String key,Object value);
+		写入Cookie对象
+			response.addCookie(new Cookie);
+		读取Cookie对象
+			Cookie[] cookies = request.getCookies();
+		常用方法: 
+			void setMaxAge(int expiry): 设置cookie的有效期,单位s
+			int getMaxAge(): 获取cookie的有效期,单位s
+			void setValue(String value): 在cookie创建后,对cookie进行赋值
+			String getName(): 获取cookie的名称
+			String getValue(): 获取cookie的值
+	c: Cookie与Session的对比
+				  1: Session					│			2: Cookie		
+			  在服务器端保存用户信息			│		在客户端保存用户信息
+			  Session中保存Object类型			│	  Cookie保存的是String类型
+			随会话的结束而将其储存的数据销毁	│	  Cookie可以长期保存在客户端
+				保存重要的信息					│		保存不重要的用户信息
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

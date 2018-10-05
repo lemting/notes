@@ -1,0 +1,134 @@
+Maven是基于项目对象模型(POM),可以.通过一小段描述信息来管理项目的构建,报告和文档的软件项目管理工具
+
+完成的项目构建过程: 清理 -> 编译 -> 测试 -> 打包 -> 集成测试 -> 验证 -> 部署
+
+一: Maven生命周期: 
+	A: clean:   清理项目
+		a: pre-clean: 执行清理前的工作
+		b: clean: 清理上一次构建生成的所有文件
+		c: post-clean: 执行清理后的文件
+	B: default: 构建项目(最核心)
+		a: compile: 
+		b: test: 
+		c: package: 打包
+		d: install: 安装到库
+	C: site:	 生成项目站点
+		a: pre-site: 在生成项目站点前要完成的工作
+		b: site: 生成项目的站点文档
+		c: post-site: 在在生成项目站点后要完成的工作
+		d: site-deploy: 发布生成的站点到服务器上
+
+二: pom.xml:  用于管理项目依赖和构建过程
+		
+			<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+			  <modelVersion>4.0.0</modelVersion>
+			  
+			  <groupId>com.lemting</groupId>
+			  <artifactId>FirstMavenDemo</artifactId>
+			  <version>0.0.1-SNAPSHOT</version>
+			  <packaging>jar</packaging>          //本项目的groupId,artifactId,version,packaging
+
+			  <name>FirstMavenDemo</name>
+			  <url>http://maven.apache.org</url>
+
+			  <properties>	//参数列表
+				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+			  </properties>
+
+			  <dependencies>
+				<dependency>			//外部引入依赖的groupId,artifactId,version,scope
+				  <groupId>junit</groupId>
+				  <artifactId>junit</artifactId>
+				  <version>3.8.1</version>
+				  <scope>test</scope>	//依赖范围
+				</dependency>
+			  </dependencies>
+			</project>
+	a: 常用元素
+		1: groupId: 反写公司网址 + 项目名
+		2: artifactId: 项目名 + 模块名
+		3: version: 项目版本(eg: 0.0.1snapshot)
+			0.0.1: 大版本号.分支版本号.小版本号
+			snapshot: 快照
+			alpha: 内部测试
+			beta: 公测
+			Release: 稳定
+			GA: 正式发布
+	b: 依赖范围: <scope>范围</scope>
+		分类
+			1: compile: 默认的范围,编译测试运行都有效
+			2: provided: 在编译和测试时有效
+			3: runtime: 在测试和运行时有效
+			4: test: 只在测试时有效
+			5: system: 在编译和测试时有效,与本机系统相关联,可移植性差
+			6: import: 导入的范围,他只使用在 dependencyManagement 中.表示从其他的pom中导入 dependency 的配置
+	c: 依赖传递
+			有A,B,C三个Maven项目,A依赖B,B依赖C,则A依赖C
+	d: 排除依赖
+		在pom中配置,使项目排除依赖
+			eg: <exclusions>
+					<exclusion>
+						<groupId>要排除依赖的groupId</groupId>
+						<artifactId>要排除依赖的artifactId</artifactId>
+					</exclusion>
+				</exclusions>
+	e: 依赖冲突
+		1: 短路优先: 解析路径长度短的优先
+			eg: A -> B -> C -> X(jar)
+				A -> D -> X(jar) (优先)
+		2: (路径长度相同)先声明先优先
+			
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+////////////////////////////////////////////////////////////////////
+//                          _ooOoo_                               //
+//                         o8888888o                              //
+//                         88" . "88                              //
+//                         (| ^_^ |)                              //
+//                         O\  =  /O                              //
+//                      ____/`---'\____                           //
+//                    .'  \\|     |//  `.                         //
+//                   /  \\|||  :  |||//  \                        //
+//                  /  _||||| -:- |||||-  \                       //
+//                  |   | \\\  -  /// |   |                       //
+//                  | \_|  ''\---/''  |   |                       //
+//                  \  .-\__  `-`  ___/-. /                       //
+//                ___`. .'  /--.--\  `. . ___                     //
+//              ."" '<  `.___\_<|>_/___.'  >'"".                  //
+//            | | :  `- \`.;`\ _ /`;.`/ - ` : | |                 //
+//            \  \ `-.   \_ __\ /__ _/   .-` /  /                 //
+//      ========`-.____`-.___\_____/___.-`____.-'========         //
+//                           `=---='                              //
+//      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^        //
+//             Welcome to SpringBoot !!                           //
+////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+

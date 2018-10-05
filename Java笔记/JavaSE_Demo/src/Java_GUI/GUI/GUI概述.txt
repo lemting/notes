@@ -1,0 +1,61 @@
+GUI
+	Graphical User Interface(图形用户接口)
+	用图形的方式,来显示计算机操作的界面,这样更方便更直观
+  
+CLI
+	Command Line User Interface(命令行用户接口)
+	就是常见的Dos命令行操作
+	需要记忆一些常用的命令,操作不直观
+
+Java为GUI提供的对象都存在 java.awt 和  javax.swing 两个包中
+	java.awt: 
+		Abstract Window ToolKit(抽象窗口工具包)
+		需要调用本地系统方法实现功能,属重量级控件
+
+	javax.swing:
+		在awt的基础上,建立的一套图形界面系统,其中提供了更多的组件,而且完全由java实现,增强了移植性,属轻量控件
+
+
+GUI继承体系图
+				 (基本组件)			┌─ TextArea
+				 ┌── TextComponent ─┤
+				 │					└─ TextField
+				 ├── Button
+				 ├── Label
+				 ├── Checkbox
+				 │
+	Component ───┤
+	  (组件)		 │ 
+				 │			   ┌─ Panel
+				 │			   │
+				 └─	Container ─┤
+			     (容器组件) 	   │
+							   │		  ┌─ Frame (默认采用流式布局)
+							   └─ Window ─┤
+										  └─ Dialog ── FileDialog
+										  
+	Component: 是具有可以在屏幕上显示并且可以与用户交互的图形表示的对象.组件的示例是典型图形用户界面的按钮，复选框和滚动条
+	
+	Window: 一个Window对象是没有边框的顶级窗口，没有菜单栏
+	
+	窗体布局: 窗体中组件的排列方式(默认布局: 边界布局)
+		LayoutManager接口的实现类
+		可通过Container类的setLayout()方法调整布局方式
+		
+		流式布局: FlowLayout
+			流程布局将组件布置在定向流中，与段落中的文本行类似
+			当只有一个按钮时居中,它可以水平排列按钮，直到不再有按钮在同一行上
+		边界布局: BorderLayout
+			边界布局设置了一个容器，安排和调整其组件，以适应五个区域：北，南，东，西和中心			
+		网格布局: GridLayout
+			是一个布局管理器，它将一个容器的组件放在矩形网格中。 容器被分成等大小的矩形，并且每个矩形中放置一个组件
+		网格包布局: GridBagLayout
+			是一种灵活的布局管理器，可以垂直，水平或沿其基线对齐组件，而不需要组件的大小相同
+			每个GridBagLayout对象维护一个动态的，矩形的单元格网格，每个组件占据一个或多个单元格，称为其显示区域 
+		卡片布局: CardLayout
+			它将容器中的每个组件视为一张卡。 一次只能看到一张卡片，容器就是一堆卡片
+		自由布局: null
+			自由设定组件位置布局
+		
+	
+		

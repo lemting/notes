@@ -1,0 +1,456 @@
+一: Oracle的基本使用--基本命令
+
+	A: 连接命令
+		1.conn[ect]   
+			用法：conn 用户名/密码@网络服务名[as sysdba/sysoper]当用特权用户身份连接时,必须带上as sysdba或是as sysoper 	  
+		2.disc[onnect]  
+			说明: 该命令用来断开与当前数据库的连接 
+		3.psssw[ord]  
+			说明: 该命令用于修改用户的密码,如果要想修改其它用户的密码,需要用sys/system登录。
+		4.show user  
+			说明: 显示当前用户名
+		5.exit
+			说明: 该命令会断开与数据库的连接,同时会退出sql*plus
+	B: 文件操作命令
+		1.start和@  
+			说明: 运行sql脚本  
+			案例: sql>@ d:\a.sql或是sql>start d:\a.sql 
+		2.edit  
+			说明: 该命令可以编辑指定的sql脚本  
+			案例: sql>edit d:\a.sql,这样会把d:\a.sql这个文件打开
+		3.spool  
+			说明: 该命令可以将sql*plus屏幕上的内容输出到指定文件
+			案例: sql>spool d:\b.sql 并输入 sql>spool off
+	C: 交互式命令
+		1.&
+			说明:可以替代变量,而该变量在执行时,需要用户输入。
+			select * from emp where job='&job';
+		2.edit  
+			说明: 该命令可以编辑指定的sql脚本  
+			案例: sql>edit d:\a.sql,这样会把d:\a.sql这个文件打开
+		3.spool  
+			说明: 该命令可以将sql*plus屏幕上的内容输出到指定文件
+			案例: sql>spool d:\b.sql 并输入 sql>spool off
+	D: 显示和设置环境变量
+		概述：可以用来控制输出的各种格式,set show如果希望永久的保存相关的设置,可以去修改glogin.sql脚本  
+		1.linesize   
+			说明：设置显示行的宽度,默认是80个字符  show linesize  set linesize 90   
+		2.pagesize
+			说明：设置每页显示的行数目,默认是14  
+			用法和linesize一样   
+			至于其它环境参数的使用也是大同小异
+			
+二: Oracle用户管理
+
+	A: 创建用户
+		概述：在oracle中要创建一个新的用户使用create user语句,一般是具有dba(数据库管理员)的权限才能使用。   
+		create user 用户名 identified by 密码; 
+		(oracle有个毛病,密码必须以字母开头,如果不以字母开头,它不会创建用户)
+	B: 给用户修改密码   
+		概述：如果给自己修改密码可以直接使用  
+		password 用户名   
+		如果给别人修改密码则需要具有dba的权限,或是拥有alter user的系统权限  
+		SQL> alter user 用户名 identified by 新密码
+	C: 删除用户   
+		概述：一般以dba的身份去删除某个用户,如果用其它用户去删除用户则需要具有drop user的权限。   
+		比如 drop user 用户名 [cascade]  
+		在删除用户时,注意:	如果要删除的用户,已经创建了表,那么就需要在删除的时候带一个参数cascade;	
+	D: 解锁用户
+		需要管理员身份
+		alter user scott account unlock;
+		
+三: Oracle表的管理(数据类型,表创建删除,数据CRUD操作)
+	
+	表名和列的命名规则     
+		1: 必须以字母开头    
+		2: 长度不能超过30个字符       
+		3: 不能使用oracle的保留字    
+		4: 只能使用如下字符 A-Z,a-z,0-9,$,#等
+		
+	A: oracle支持的数据类型
+		a: 字符类
+			char    定长,最大2000个字符。   
+				例子：char(10)  如: „小韩‟ 前四个字符放 „小韩‟ ,后添6个空格补全  
+			varchar2(20)  变长,最大4000个字符。   
+				例子：varchar2（10） „小韩‟ oracle分配四个字符.这样可以节省空间.  
+			clob(character large object) 字符型大对象,最大4G   
+			
+			char 查询的速度极快浪费空间,查询比较多的数据用。   
+			varchar 节省空间
+		b: 数字型  
+			number	范围: -10^38~10^38  
+				可以表示整数,也可以表示小数  
+				number(5,2): 表示一位小数有5位有效数,2位小数  范围：-999.99~999.99  
+				number(5):   表示一个5位整数  范围: 99999~-99999
+		c: 日期类型   
+			date  包含年月日和时分秒   
+				oracle默认格式  1-1月-1999   
+			timestamp  这是oracle9i对date数据类型的扩展.可以精确到毫秒.
+			blob  二进制数据,可以存放图片/声音,最大4G   
+				一般来讲,在真实项目中是不会把图片和声音真的往数据库里存放,一般存放图片、视频的路径,如果安全需要比较高的话,则放入数据库
+	B: 表创建表删除
+		a: 创建表
+			create table 表名(列名 数据类型(大小),列名 数据类型(大小),...);
+				
+				eg: 创建学生表   
+						create table student (    ---表名             
+						ID number(4),   --学号            
+						name varchar2(20),   --姓名            
+						sex char(2),     --性别             
+						birthday date,         --出生日期            
+						sal number(7,2)   --奖学金  
+						);
+					创建班级表   
+						create table class(classId NUMBER(2),cName VARCHAR2(40)); 
+		b: 修改表
+			1: 添加一个字段
+				alter table 表名 add(列名 数据类型(大小));
+					eg: SQL>alter table student add (classId NUMBER(2));
+			2: 修改一个字段的长度
+				alter table 表名 modify(列名 数据类型(大小));
+					eg: SQL>alter table student modify (ID VARCHAR2(30));
+			3: 修改字段的类型/或是名字(不能有数据)不建议做
+			  	alter table 表名 modify(列名 新的数据类型(大小));
+					eg: SQL>ALTER TABLE student modify (name char(30));
+			4: 删除一个字段,不建议做(删了之后,顺序就变了.加就没问题,因为是加在后面)  
+				alter table 表名 drop column 列名;
+					eg: SQL>alter table student drop column sal;	
+			5: 修改表的名字,很少有这种需求  
+				rename 表名 to 新表名;
+					eg: SQL>rename student to stu;
+			6: 删除表   
+				drop table 表名;
+					eg: SQL>drop table student;		
+					
+	C: 数据CRUD操作
+		a: 添加数据
+			1: 所有字段都插入数据 
+				insert into 表名 values(数据1,数据2,...);  
+					eg: INSERT INTO student VALUES ('A001', '张三', '男', '01-5月-05', 10);  
+						oracle中默认的日期格式‘dd-mon-yy’,
+						修改日期的默认格式(临时修改,数据库重启后仍为默认;如要修改需要修改注册表): alter session set NLS_DATE_FORMAT ='yyyy-mm-dd';
+			2: 插入部分字段
+				insert into 表名(列名1,列名2,...) values(数据1,数据2,...);
+					eg: insert into student(ID, name, sex) values ('A003', 'JOHN', '女');
+		b: 修改数据
+			1: 修改一个字段    
+				update 表名 set 列名 = 数据 where 条件; 
+					eg: update student set sex = '女' where ID = 'A001';
+			2: 修改多个字段  
+				update 表名 set 列名1 = 数据1,列名2 = 数据2,... where 条件; 
+					eg: update student set sex = '男', birthday = '1984-04-01' where ID = 'A001';
+				
+				修改含有null值的数据,不要用 = null 而是用 is null;   
+					eg: select * from student where birthday is null;
+		c: 删除数据
+			1: 删除所有记录,表结构还在,写日志,可以恢复的,速度慢.
+				delete from 表名;
+					eg: delete from student;   	
+				delete的数据可以恢复.  
+				savepoint a; --创建保存点  
+				delete from student;   rollback to a;  --恢复到保存点   
+				一个有经验的DBA，在确保完成无误的情况下要定期创建还原点。
+			2: 删除表的结构和数据  
+				drop table 表名;
+			3: 删除指定的数据
+				delete from 表名 where 条件;  
+					eg: delete from student where ID = 'A001';   
+			4: 删除表中的所有记录,表结构还在,不写日志,无法找回删除的记录,速度快.
+				truncate table 表名;
+				
+四: Oracle表查询
+
+	oracle表基本查询
+	
+	A: 简单的查询语句  
+		a: 查看表结构 
+			desc 表名;
+		b: 查询所有列  
+			select * from 表名;
+		c: 查询指定列  
+			select 列名1,列名2,... from 表名;
+		d: 查询列取消重复行
+			select distinct 列名1,列名2,... from 表名;
+		e: 使用列的别名  
+			select 列名1 别名1,列名2 as 别名2,列名3 别名3,... from 表名;
+		f: 连接字符串(||)
+			eg: select name || '的学号' || ID from student; 
+		g: like操作符     
+			%：表示0到多个字符  
+			_：表示任意单个字符 
+				eg: 问题：如何显示首字符为S的员工姓名和工资?	select ename,sal from emp where ename like 'S%';
+					问题: 如何显示第三个字符为大写O的所有员工的姓名和工资？  select ename,sal from emp where ename like '__O%';
+		h: where子句的使用
+			条件判断: 大于: >,小于: <,不大于: <=,不小于: >=,等于: =;
+			连接符: 且: and,或: or;
+			两者随便一个: in(数据1,数据2);
+			两者之间: between 数据1 and 数据2;
+	B: 使用逻辑操作符号
+		a: order by 子句 (默认asc,从大到小)
+			order by 列名1 asc(从大到小)/desc(从小到大),列名2 asc/desc,...;
+				按照 列名1 以asc/desc方式排序;若值相同,则按照 列名2 排序;...
+			使用列的别名排序
+				eg: select ename, (sal+nvl(comm,0))*12 "年薪" from emp order by "年薪" asc;  别名需要使用“”号圈中,英文不需要“”号
+	C: Oracle表复杂查询
+		a: 数据分组: max(),min(),avg(),sum(),count()函数
+			max(): 最大值
+			min(): 最小值
+			avg(): 平均值
+			sum(): 数据总和
+			count(): 
+			eg: 显示所有员工中最高工资和最低工资: select max(sal),min(sal) from emp; 
+				最高工资那个人是谁   
+				错误写法: select ename, sal from emp where sal = max(sal);   
+				正确写法: select ename, sal from emp where sal = (select max(sal) from emp);   
+				注意: select ename,max(sal) from emp;这语句执行的时候会报错,说ORA-00937: 非单组分组函数。
+				因为max是分组函数，而ename不是分组函数.......
+				如果列里面有一个分组函数,其它的都必须是分组函数,否则就出错
+		b: group by 和 having子句   
+			group by用于对查询的结果分组统计,  
+			having子句用于限制分组显示结果。
+		
+		c: 对数据分组的总结   
+			1: 分组函数只能出现在选择列表、having、order by子句中(不能出现在where中)   
+			2: 如果在select语句中同时包含有group by, having, order by 那么它们的顺序是group by, having, order by   
+			3: 在选择列中如果有列、表达式和分组函数,那么这些列和表达式必须有一个出现在group by 子句中,否则就会出错
+		
+	D: 多表查询
+		
+
+五: Oracle的函数
+		
+		A: 字符函数  
+			a: lower(char c)：将字符串转化为小写的格式 
+			b: upper(char c)：将字符串转化为大写的格式  
+			c: length(char c)：返回字符串的长度
+			d: substr(char c,int m,int n)：从字符串的第m个开始,取n个字符组成的一个子字符串
+			e: replace(char c1,string search_string,string replace_string): 将字符串的指定子字符串用其他字符串替换
+			f: instr(char c1,char c2): 取子串在字符串的位置
+		B: 数学函数
+			a: max(列名/数据): 最大值
+			b: min(列名/数据): 最小值
+			c: avg(列名/数据): 平均值
+			d: sum(列名/数据): 数据总和
+			e: count(列名/数据): 
+			f: round(数据n [,int m]): 四舍五入.如果省掉m,则四舍五入到整数,如果m是正数,则四舍五入到小数点的m位后;如果m是负数,则四舍五入到小数点的m位前
+			g: trunc(数据n [,int m]): 截取数字.如果省掉m,就截去小数部分,如果m是正数就截取到小数点的m位后;如果m是负数,则截取到小数点的前m位 
+			h: mod(m,n): 
+			i: floor(数据n): 返回小于或是等于n的最大整数
+			j: ceil(数据n): 返回大于或是等于n的最小整数
+			k: abs(数据n)：绝对值 				|n|
+			l: acos(数据n)：反余弦值  			cos﹣¹(n)
+			m: asin(数据n)：反正弦值  			sin﹣¹(n)
+			n: atan(数据n)：反正切值 			tan﹣¹(n)
+			o: cos(数据n): 余弦值 				cos(n) 
+			p: exp(数据n): e的n次幂 			e^n
+			q: log(数据m,数据n)：对数值 		㏒m(n)
+			r: power(数据m,数据n): m的n次幂 	m^n
+		C: 日期函数
+			默认情况下日期格式是dd-mon-yy 即12-7月-78 
+			 
+			a: sysdate: 该函数返回系统时间  
+			b: add_months(date d,int n): 返回指定日期增加n个月后的日期  
+			c: last_day(d)：返回指定日期所在月份的最后一天的日期
+		D: 转换函数
+			转换函数用于将数据类型从一种转为另外一种。在某些情况下，oracle server允许值的数据类型和实际的不一样，这时oracle server会隐含的转化数据类型  
+				eg: create table t1(id int); insert into t1 values('10');-->这样oracle会自动的将'10' -->10
+			a: to_char(数据): 将数据转化为字符串形式
+				to_char(日期,'yyyy-mm-dd'): 将日期按照指定格式转化为字符串
+			b: to_date(字符串): 用于将字符串转换成date类型的数据
+		E: 系统函数
+			sys_context('USERENV','字段')
+			a: terminal: 当前会话客户所对应的终端的标示符  
+			b: host: 返回数据库所在主机的名称
+			c: db_name: 当前数据库名称   
+			d: nls_date_format: 当前会话客户所对应的日期格式  
+			e: session_user: 当前会话客户所对应的数据库用户名  
+			f: current_schema: 当前会话客户所对应的默认方案名  
+			
+				eg: select sys_context('USERENV','db_name') from dual;
+					select sys_context('USERENV','terminal') from dual;
+		 
+		在做oracle测试的时候，可以使用dual表  
+			eg: select mod(10,2) from dual;结果是0  
+				select mod(10,3) from dual;结果是1
+				
+六: Oracle权限
+	
+	A: 系统权限[非级联回收]
+		系统权限是指执行特定类型sql命令的权利.它用于控制用户可以执行的一个或是一组数据库操作.
+		比如当用户具有create table权限时,可以在其方案中建表,当用户具有create any table权限时,可以在任何方案中建表.
+		oracle提供了100多种系统权限
+		
+		常用的有：   
+		create session         		连接数据库          
+		create table        		建表   
+		create view          		建视图              
+		create public synonym   	建同义词   
+		create procedure          	建过程、函数、包   
+		create trigger       		建触发器  
+		create cluster            	建簇
+		
+		a: 显示系统权限   
+			oracle提供了100多种系统权限,而且oracle的版本越高,提供的系统权限就越多,我们可以查询数据字典视图system_privilege_map,可以显示所有系统权限   
+			select * from system_privilege_map order by name;
+		b: 授予系统权限 
+			一般情况,授予系统权限是由dba完成的,如果用其他用户来授予系统权限,则要求该用户必须具有 grant any privilege 的系统权限
+			在授予系统权限时,可以带有 with admin option 选项,这样,被授予权限的用户或是角色还可以将该系统权限授予其它的用户或是角色
+			
+			grant 权限名 to 用户名/角色名 [with admin option];
+				eg: 1: 创建两个用户ken,tom.初始阶段他们没有任何权限,如果登录就会给出错误的信息.   
+						create user ken identfied by ken; 	//创建用户
+					2: 给用户ken授权   
+						(1): grant create session, create table to ken with admin option;  
+						(2): grant create view to ken;  
+					3: 给用户tom授权  
+						我们可以通过ken给tom授权,因为with admin option是加上的.当然也可以通过dba给tom授权,我们就用ken给tom授权：  
+						(1). grant create session, create table to tom;  
+						(2). grant create view to ken;  //--ok吗？不ok,create view权限ken没有带with admin option 选项,则不能授予其它的用户或是角色
+		c: 回收系统权限     
+			一般情况下,回收系统权限是dba来完成的,如果其它的用户来回收系统权限,要求该用户必须具有相应系统权限及转授系统权限的选项(with admin option).
+			回收系统权限使用revoke来完成.
+			系统权限不会被级联收回(system->ken->tom,若回收ken的系统权限,则tom的系统权限不会被回收)
+			
+			revoke 权限名 from 用户名/角色名;
+				eg: revoke create session from Lemting;
+	B: 对象权限[级联回收]
+		指访问其它方案对象的权利.用户可以直接访问自己方案的对象,但是如果要访问别的方案的对象,则必须具有对象的权限
+		
+		常用的有：   
+			insert: 添加,delete: 删除, update: 修改, select: 查询, alter: 修改表结构, index: 索引, references: 引用, execute: 执行
+			
+		a: 授予对象权限
+			对象权限可以授予用户,角色,和public.在授予权限时,如果带有with grant option选项,则可以将该权限转授给其它用户.但是要注意with grant option选项不能被授予角色
+			
+			grant 权限名 on 表名[(列名)] to 用户名/角色名/public [with admin option];
+				eg: grant select,update,delete on emp to monkey; //希望monkey可以查询,修改,删除scott.emp表的数据
+					grant all on emp to monkey;  //一次把所有权限赋给monkey
+					授予列权限: grant select,update,delete on emp(sal) to monkey;
+		b: 回收对象权限
+			收回对象的权限可以由对象的所有者来完成,也可以用dba用户(sys,system)来完成
+			对象的权限会被级联收回(scott->blake->jones,若回收blake的对象权限,则jones的对象权限也会被回收)
+			
+			revoke 权限名 on 表名[(列名)] from 用户名/角色名/public;
+		
+七: 角色 
+			
+	角色就是相关权限的命令集合,使用角色的主要目的就是为了简化权限的管理
+	角色分为预定义和自定义角色两类
+	
+	A: 预定义角色
+		a: connect角色
+			connect角色具有一般应用开发人员需要的大部分权限,当建立了一个用户后,多数情况下,只要给用户授予connect和resource角色就够了,.
+			connect角色具有的系统权限: 
+				alter session  
+				create cluster   
+				create database link  
+				create session  
+				create table  
+				create view  
+				create sequence
+		b: resource角色     
+			resource角色具有应用开发人员所需要的其它权限,比如建立存储过程,触发器等.这里需要注意的是resource角色隐含了unlimited tablespace系统权限.   
+			resource角色包含以下系统权限：  
+				create cluster  
+				create indextype  
+				create table  
+				create sequence  
+				create type   
+				create procedure  
+				create trigger
+		c: dba角色   
+			dba角色具有所有的系统权限,及with admin option选项,默认的dba用户为sys和system,它们可以将任何系统权限授予其他用户.
+			但是要注意的是dba角色不具备sysdba和sysoper的特权(启动和关闭数据库)
+	B: 自定义角色
+		一般是dba来建立.如果用别的用户来建立,则需要具有create role的系统权限.在建立角色时可以指定验证方式(不验证,数据库验证等).
+		a: 建立角色(不验证)   
+			如果角色是公用的角色,可以采用不验证的方式建立角色.
+			
+			create role 角色名 not identified;
+		b: 建立角色(数据库验证)     
+			采用这样的方式时,角色名、口令存放在数据库中.
+			当激活该角色时,必须提供口令.在建立这种角色时,需要为其提供口令
+			
+			create role 角色名 identified by 密码;
+	C: 角色授权
+		当建立角色时,角色没有任何权限,为了使得角色完成特定任务,必须为其授予相应的系统权限和对象权限
+		
+		a: 给角色授权     
+			给角色授予权限和给用户授权没有太多区别,但是要注意,系统权限的unlimited tablespace和对象权限的with grant option选项是不能授予角色的.
+			
+			grant 权限名 to 角色名;
+		b: 分配角色给某个用户     
+			一般分配角色是由dba来完成的,如果要以其它用户身份分配角色,则要求用户必须具有grant any role的系统权限.
+			
+			grant 角色名 to 用户名 [with admin option];  //如果加了with admin option选项,被授予角色的用户可以把system分配给它的角色分配给别的用户
+		c: 删除角色    
+			使用drop role,一般是dba来执行,如果其它用户则要求该用户具有drop any role系统权限
+			
+			drop role 角色名;
+	D: 显示角色信息  
+		a: 显示所有角色   
+			select * from dba_roles;  
+		b: 显示角色具有的系统权限   
+			select privilege,admin_option from role_sys_privs where role = '角色名';   
+		c: 显示角色具有的对象权限     
+			通过查询数据字典视图dba_tab_privs可以查看角色具有的对象权限或是列的权限   
+		d: 显示用户具有的角色,及默认角色     
+			当以用户的身份连接到数据库时,oracle会自动的激活默认的角色,通过查询数据字典视图dba_role_privs可以显示某个用户具有的所有角色及当前默认的角色		
+			select granted_role,default_role from dba_role_privs where grantee = ‘用户名’;				
+			
+111:数据字典
+	数据字典记录了数据库的系统信息,它是只读表和视图的集合,数据字典的所有者为sys用户
+	用户只能在数据字典上执行查询操作(select语句),而其维护和修改是由系统自动完成的
+	
+	数据字典包括数据字典基表和数据字典视图
+	                  
+	A: 数据字典基表: 基表存储数据库的基本信息,普通用户不能直接访问数据字典的基表.
+	B: 数据字典视图
+		数据字典视图是基于数据字典基表所建立的视图,普通用户可以通过查询数据字典视图取得信息系统
+		主要包括user_xxx,all_xxx,dba_xxx三种类型
+		a: user_tables: 用于显示当前用户所拥有的所有表,它只返回用户所对应方案的所有表  
+			eg: select table_name from user_tables;   
+		b: all_tables: 用于显示当前用户可以访问的所有表,它不仅会返回当前用户方案的所有表,还会返回当前用户可以访问的其它方案的表 
+			eg: select table_name from all_tables;   
+		c: dba_tables: 它会显示所有方案拥有的数据库表.但是查询这种数据库字典视图,要求用户必须是dba角色或是有select any table系统权限  
+			eg: 当用system用户查询数据字典视图dba_tables时,会返回system,sys,scott...方案所对应的数据库表
+	C: 用户名,权限,角色   
+		在建立用户时,oracle会把用户的信息存放到数据字典中,当给用户授予权限或是角色时,oracle会将权限和角色的信息存放到数据字典
+		a: dba_users: 可以显示所有数据库用户的详细信息   
+		b: dba_sys_privs: 通过查询数据字典视图dba_sys_privs,可以显示用户所具有的系统权限  
+		c: dba_tab_privs: 通过查询数据字典视图dba_tab_privs,可以显示用户具有的对象权限  
+		d: dba_col_privs: 通过查询数据字典dba_col_privs可以显示用户具有的列权限  
+		e: dba_role_privs: 通过查询数据库字典视图dba_role_privs可以显示用户所具有的角色
+		
+			eg: select * from dba_sys_privs where grantee = 'Lemting'; //查询用户具有什么角色
+				select * from dict where comments like '%grant%'; //显示当前用户可以访问的所有数据字典视图   
+			
+11111: 数据库管理,表的逻辑备份与恢复
+	
+	一个数据库管理员的主要工作是:   
+		职责: 
+		1.安装和升级oracle数据库   
+		2.建库，表空间,表,视图,索引…  
+		3.制定并实施备份和恢复计划   
+		4.数据库权限管理,调优,故障排除   
+		5.对于高级dba,要求能参与项目开发,会编写sql语句、存储过程、触发器、规则、约束、包
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	

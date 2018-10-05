@@ -1,0 +1,268 @@
+验证码: 
+		Captcha,是一种区分用户是计算机还是人的公共全自动程序.
+	作用: 可以防止恶意破解密码,刷票,论坛灌水,有效防止某个黑客对某一个特定注册用户用特定程序暴力破解方式进行不断的登录尝试
+	
+	A: 验证码的组成: 
+		1: 输入框
+			<input type="text" id="verifyCode" name="verifyCode" size="6" />
+		2: 显示验证码的图片
+			<img alt="验证码" id="safecode" src="<%=request.getContextPath() %>/servlet/ImageServlet"></img>
+	B: 官方画图类实现验证码
+		生成图片用到的类: 
+			1: BufferedImage: 图像数据缓冲区
+			2: Graphics: 绘制图片
+			3: Color: 获取颜色
+			4: Random: 生成随机数
+			5; ImageIO: 输出图片
+		使用步骤: 
+			1: 创建BufferedImage对象
+				eg: BufferedImage bi = new BufferedImage(68,22,BufferedImage.TYPE_INT_RGB);
+			2: 获得Graphics对象
+				eg: Graphics graphics = bi.getGraphics();
+			3: 通过Color对象设置颜色
+				eg: graphics.setColor(new Color(200,150,255));
+			4: 通过Random产生随机验证码信息
+			5: 使用Graphics绘制图片
+			6: 记录验证码信息到session中
+			7: 使用ImageIO输出到图片
+	C: Jcaptcha组件实现验证码
+			一个用来生成图形验证码的Java开源组件.与Spring组合使用,可以产生多种形式的验证码	
+	D: Kaptcha主键实现验证码
+			一个非常实用的可配置的验证码生成工具
+		a: 配置web.xml添加servlet
+			<servlet>  
+					<servlet-name>Kaptcha</servlet-name>  
+					<servlet-class>com.google.code.kaptcha.servlet.KaptchaServlet</servlet-class>  
+			</servlet>  
+			<servlet-mapping>  
+					<servlet-name>Kaptcha</servlet-name>  
+					<url-pattern>/kaptcha.jpg</url-pattern>  
+			</servlet-mapping> 
+			当img中src="kaptcha.jpg"会被定位到servlet上
+			
+		c:Kaptcha参数设置: 
+			设置方法: 设置在web.xml的<init-param>中
+		d: 参数:
+			边框: 
+				1: kaptcha.border: 						图片边框,合法值: yes(默认),no
+				2: kaptcha.border.color: 				边框颜色,合法值:r,g,b(and optional alpha)或者white,black,blue...
+				3: kaptcha.border.thickness: 			边框厚度.合法值: >0,默认1
+			图片: 	
+				4: kaptcha.image.width:					图片宽,默认200
+				5: kaptcha.image.height:				图片高,默认50
+				6: kaptcha.producer.impl: 				图片实现类,默认: com.google.code.kaptcha.impl.DefaultKaptcha
+				7: kaptcha.obscurificator.impl: 		图片样式,
+					合法值: com.google.code.kaptcha.impl.WaterRipple(水纹,默认),com.google.code.kaptcha.impl.FishEyeGimpy(鱼眼),com.google.code.kaptcha.impl.ShadowGimpy(阴影)
+			字体
+				8: kaptcha.textproducer.impl: 			文本实现类,默认: com.google.code.kaptcha.text.impl.DefaultTextCreator
+				9: kaptcha.word.impl: 					文字渲染器,默认: com.google.code.kaptcha.text.impl.DefaultWordRenderer
+				10: kaptcha.textproducer.char.string: 	文本集合,验证码值从此集合中获取,默认值: abcde2345678gfynmnpwx
+				11: kaptcha.textproducer.char.length: 	验证码长度,默认: 5
+				12: kaptcha.textproducer.font.names: 	字体,默认: Arial,Courier
+				13: kaptcha.textproducer.font.size: 		字体大小,默认: 40px
+				14: kaptcha.textproducer.font.color: 	字体颜色,合法值: r,g,b 或者 white,black,blue.
+				15: kaptcha.textproducer.char.space: 	文字间隔,默认: 2 
+			背景,干扰
+				16: kaptcha.noise.impl:					干扰实现类,默认: com.google.code.kaptcha.impl.DefaultNoise
+				17: kaptcha.noise.color: 				干扰颜色。合法值： r,g,b 或者 white,black,blue.
+				18: kaptcha.background.impl: 			背景实现类,默认: com.google.code.kaptcha.impl.DefaultBackground
+				19: kaptcha.background.clear.from: 		背景颜色渐变,開始颜色,默认: light grey
+				20: kaptcha.background.clear.to: 		背景颜色渐变,结束颜色,默认: white
+			session: 
+				21: kaptcha.session.key: 				session key,默认: KAPTCHA_SESSION_KEY
+				22: kaptcha.session.date: 				session date,默认: KAPTCHA_SESSION_DATE		
+		e: Kaptcha会把验证码设置到session中,获取session中的参数	
+				eg: String kaptchaExpected = (String)request.getSession().getAttribute(com.google.code.kaptcha.Constants.KAPTCHA_SESSION_KEY);
+	
+	
+二维码
+		2-dimensional bar code,是某种特定的几何图形按一定规律在平面(二维方向上)分布的黑白相间的图形记录数据符号信息的图形
+	A: 二维码的分类
+			根据码制的编码原理分类
+		a: 线型堆叠式二维码
+			编码原理: 建立在一维条码基础之上,按需要堆积成两行或多行,如: PDF417,U1tracode,Code 49,Code 16K
+		b: 矩阵式二维码
+			编码原理: 在矩阵相应元素位置上,用点(方点,圆点或其他形状)的出现代表二进制"1",点的不出现表示二进制的"0",如: Data Matrix,Maxi Code,Aztec Code,QR Code(最常见)
+		c: 邮政码
+			编码原理: 通过不同长度的条进行编码,主要用于邮政编码,如: POSTNET,BPO 4-STATE
+		目前流行的三大国际标准
+			PDF417: 不支持中文
+			DM: 专利未公开,需支付专利费用
+			QR Code: 专利公开,支持中文
+			
+	B: 二维码的优缺点
+		a: 优点
+			1: 高密度编码,信息容量大
+			2: 编码范围广
+			3: 容错能力强
+			4: 译码可靠性高
+			5: 可引入加密措施
+			6: 成本低,易制作,持久耐用
+		b: 缺点
+			1: 二维码技术成为手机病毒,钓鱼网站传播的新渠道
+			2: 信息泄露
+			
+	C: QR Code
+			相比于其他二维码,具有识读速度快,数据密度大,占用空间小的优势
+			Quick Response Code,由日本Denso公司于1994年研制的一种矩阵二维码符号码
+		纠错等级
+			1: L级: 约可纠错7%的数据码字
+			2: M级: 约可纠错15%的数据码字
+			3: Q级: 约可纠错25%的数据码字
+			4: H级: 约可纠错30%的数据码字
+			
+	D: JSP生成二维码
+		a: zxing(第三方jar)
+			1: 设置二维码参数
+					Map<EncodeHintType,Object> hints = new HashMap<>();
+				EncodeHintType.CHARACTER_SET: 字符集
+				EncodeHintType.ERROR_CORRECTION: 纠错等级
+				EncodeHintType.MARGIN: 外边距
+			2: 根据设置的参数获取BitMatrix对象	
+				MultiFormatWriter对象: BitMatrix encode(String contents,BarcodeFormat format,int width,int height,Map<EncodeHintType,?> hints)
+					contents: 二维码数据;BarcodeFormat: 二维码类型;width: 二维码宽度;height: 高度;hints: 二维码参数
+						eg: BitMatrix bitMatrix = new MultiFormatWriter().encode("二维码数据",BarcodeFormat.QR_CODE,300,300,hints);
+			3: 根据BitMatrix对象生成二维码	
+				MatrixToImageWriter类静态方法: void writeToPath(BitMatrix matrix ,String format,Path file);				
+					matrix: BitMatrix对象;format: 二维码格式;file: 生成的文件目录
+						eg: MatrixToImageWriter.writeToPath(bitMatrix,"png",new File("D://img.png").toPath());
+						
+				eg: int width = 300,height = 300;//定义二维码宽高					
+					String format = "png";//定义生成图片的格式					
+					String content = "www.imooc.com";//设置二维码数据					
+					HashMap<EncodeHintType,Object> hints = new HashMap<>();//定义二维码参数					
+					hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");//设置字符集					
+					hints.put(EncodeHintType.ERROR_CORRECTION,ErrorCorrectionLevel.M);//设置纠错等级
+					hints.put(EncodeHintType.MARGIN,2);//设置外边距
+					BitMatrix bitMatrix =  new MultiFormatWriter().encode(content, BarcodeFormat.QR_CODE, width, height,hints); //获取BitMatrix对象
+					MatrixToImageWriter.writeToPath(bitMatrix,format,new File("D://img.png").toPath()); //生成二维码		
+		b: QRCode(第三方jar)
+			eg:
+				int width = 67 + 12 * (7 - 1),height = 67 + 12 * (7 - 1); //定义二维码宽高 //公式: 67+12*(版本号-1)
+				Qrcode qrcode = new Qrcode(); //创建Qrcode对象			
+				qrcode.setQrcodeErrorCorrect('M'); //设置纠错等级				
+				qrcode.setQrcodeEncodeMode('B'); //设置字符模式: N:数字;A代表a-Z;B代表其他字符				
+				qrcode.setQrcodeVersion(7); //设置QR Code二维码版本号: 1-40				
+				BufferedImage bufferedImage = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB); //创建BufferedImage对象				
+				Graphics2D gs = bufferedImage.createGraphics(); //获取Graphics2D对象				
+				gs.setBackground(Color.WHITE); //设置画板背景色				
+				gs.setColor(Color.BLACK); //设置画板颜色				
+				gs.clearRect(0, 0, width, height); //清除画板				
+				String qrData = "www.imooc.com"; //定义二维码数据				
+				byte[] d = qrData.getBytes(); //转成字节数组			
+				int pixoff = 2; //定义偏移量
+				//画出二维码
+				if(d.length > 0 && d.length < 120)
+				{
+					boolean[][] s = qrcode.calQrcode(d);
+					for(int i = 0;i < s.length;i++)
+					{
+						for(int j = 0;j < s.length;j++)
+						{
+							if(s[i][j])
+								gs.fillRect(j*3 + pixoff, i*3 + pixoff, 3, 3);
+						}
+					}
+				}
+				gs.dispose(); //结束画图
+				bufferedImage.flush();
+				ImageIO.write(bufferedImage,"png",new File("D://img_2.png")); //写入文件
+		c: jquery.qrcode.js(JavaScript)
+			1: 导入jquery插件和jquery.qrcode.min.js
+					eg: <script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery-3.3.1.min.js"></script>
+						<script type="text/javascript" src="<%=request.getContextPath()%>/js/jquery.qrcode.min.js"></script>
+			2: 预留放二维码的div
+					eg: <div id="qrcode"></div>
+			3: 用jQuery生成二维码
+					eg: <script type="text/javascript">
+							jQuert('#qrcode').qrcode("www.imooc.com");
+						</script>
+		
+	E: JSP解析二维码
+		a: zxing(第三方jar)
+			1: 设置二维码参数
+					Map<DecodeHintType,Object> hints = new HashMap<>();
+				DecodeHintType.CHARACTER_SET: 字符集
+					eg: Map<DecodeHintType,Object> hints = new HashMap<>();
+						hints.put(DecodeHintType.CHARACTER_SET, "UTF-8");	
+			2: 创建MultiFormatReader对象
+				eg: MultiFormatReader formatReader = new MultiFormatReader();
+			3: 读取二维码图片到BufferedImage对象中
+				ImageIO类: BufferedImage read(File file);
+					file: 二维码图片
+						eg: BufferedImage image = ImageIO.read(new File("D://img.png"));
+			4: 根据BufferedImage对象创建BinaryBitmap对象
+				BinaryBitmap类: BinaryBitmap(new HybridBinarizer(new BufferedImageLuminanceSource(BufferedImage image)));
+					image: BufferedImage对象
+						eg: BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(new BufferedImageLuminanceSource(image)));
+			5: 根据设置的参数,MultiFormatReader对象的decode()方法解析
+				MultiFormatReader类: Reslut decode(BinaryBitmap image,Map<DecodeHintType,?> hints);
+					image: BinaryBitmap对象;hints: 二维码参数
+						eg: Reslut reslut = formatReader.decode(binaryBitmap,hints);
+			6: 获取二维码信息
+				Reslut类: 
+					BarcodeFormat getBarcodeFormat(): 二维码格式类型
+						eg: syso("二维码格式类型: " + reslut.getBarcodeFormat());
+					String getText(): 二维码文本内容
+						eg: syso("二维码文本内容" + reslut.getText());
+	
+				eg: MultiFormatReader formatReader = new MultiFormatReader(); //创建MultiFormatReader对象
+					BufferedImage image = ImageIO.read(new File("D://img.png")); //读取二维码图片
+					BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(new BufferedImageLuminanceSource(image))); //创建BinaryBitmap对象
+					Map<DecodeHintType,Object> hints = new HashMap<>(); //设置二维码参数
+					hints.put(DecodeHintType.CHARACTER_SET, "UTF-8"); //设置字符集
+					Result result = formatReader.decode(binaryBitmap,hints); //解析
+					System.out.println(result.toString()); //输出结果
+					System.out.println("二维码格式类型: " + result.getBarcodeFormat());
+					System.out.println("二维码文本内容: " + result.getText());
+		b: QRCode
+				eg: final BufferedImage bufferedImage = ImageIO.read(new File("D://img_2.png")); //创建BufferedImage对象
+					QRCodeDecoder codeDecoder = new QRCodeDecoder();	//创建QRCodeDecoder对象
+					String result = new String(codeDecoder.decode(new QRCodeImage()	//解析二维码
+							{
+								@Override
+								public int getWidth()
+								{
+									return bufferedImage.getWidth();
+								}
+								@Override
+								public int getPixel(int arg0, int arg1)
+								{
+									return bufferedImage.getRGB(arg0, arg1);
+								}
+								@Override
+								public int getHeight()
+								{
+									return bufferedImage.getHeight();
+								}
+							}),"gb2312");
+					System.out.println("二维码数据: " + result);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

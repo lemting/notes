@@ -1,0 +1,379 @@
+JavaEE 三层之 dao 层框架
+
+Hibernate: 底层代码就是JDBC,对JDBC进行封装,不再需要写复杂的JDBC代码,不需要写SQL语句也能实现
+
+XML引入Hibernate约束: 
+	<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+	
+一: Hibernate
+	A: ORM 思想
+			Object Relational Mapping,对象关系映射,Hibernate使用ORM思想对数据库进行crud操作
+		a: 对象关系映射: 
+			1: 让实体类(实体类要有一个属性是唯一的)和数据库表进行一一对应关系: 让Bean首先和数据表对应,让Bean属性和表里面字段对应(使用配置文件完成)
+			2: 不需要直接操作数据库表,而操作表对应实体类对象
+	B: 搭建 Hibernate 环境 
+		a: 创建Hibernate项目步骤
+			1: 导入jar包
+			2: 创建实体类(使用Hibernate的时候,不需要自己手动创建表,Hibernate帮你把表创建)
+			3: 配置实体类和数据库表的映射
+				配置文件建议: 在实体类所在的包里面创建.文件名: 实体类名.hbm.xml
+			4: 在Hibernate核心配置文件(hibernate.cfg.xml)配置映射文件(实体类名.hbm.xml)
+		b: 实体类的编写规则
+			1: 所有属成员变量private修饰
+			2: 生成public的getXxx()/setXxx()方法
+			3: 有属性作为唯一值(一般使用id值)
+			4: 实体类属性建议不使用基本数据类型,使用基本数据类型的封装类
+		c: 实体类对象的状态
+			1: 瞬时态: 对象里面id值无效,对象与session没有关联. eg: 新创建的没有设置id值的实体类对象
+			2: 持久态: 对象里面id值有效,对象与session有关联.   eg: 通过查询获得的实体类
+			3: 托管态: 对象里面id值有效,对象与session没有关联. eg: 新创建的设置了id值的实体类对象
+		
+二: hibernate.cfg.xml
+		Hibernate核心配置文件(必须放在src下)
+	<?xml version='1.0' encoding='UTF-8'?>
+	<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN" "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+	<hibernate-configuration>
+		<session-factory>
+			//配置数据库方言(可选)(MySQL,Oracle,SqlService,...)	//注意: MySQL版本问题,该处应为"MySQL5InnoDBDialect"
+			<property name="dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
+			//配置数据库信息(必须)
+			<property name="connection.driver_class">com.mysql.cj.jdbc.Driver</property>	//JDBC驱动
+			<property name="connection.url">jdbc:mysql://localhost:3306/lemting?serverTimezone=GMT%2B8</property>	//url
+			<property name="connection.username">root</property>		//username
+			<property name="connection.password">lemting</property>		//password
+			//Hibernate会帮创建表(可选),需要该项配置;若不需要Hibernate创建,则不加该项配置
+			<property name="hibernate.hbm2ddl.auto">update</property>	//update: 如果已有该表,则更新表,如果没有,则创建新表
+			//配置Hibernate信息(可选)
+			<property name="hibernate.show_sql">true</property>		//输出底层SQL语句
+			<property name="hibernate.format_sql">true</property>	//格式化底层SQL语句
+			<property name="hibernate.current_session_context_class">thred</property>	//配置session绑定到本地线程
+			//把映射文件导入到核心配置文件中(必须)
+			<mapping resource="bean/User.hbm.xml" />	//resource: 文件路径(从src路径下开始) eg: resource="bean/User.hbm.xml" (src/bean/User.hbm.xml) 
+		</session-factory>
+	</hibernate-configuration>
+	
+三: Xxx.hbm.xml
+		实体类和数据库表的映射配置(一般放在实体类同路径)
+	<?xml version="1.0" encoding="UTF-8"?>
+	<!DOCTYPE hibernate-configuration PUBLIC
+			  "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+			  "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+			  
+	<hibernate-mapping>
+		/* class: 配置类和表的映射关系
+			属性: 1: name: 实体类全路径; 2: table: 数据库的表名 */
+		<class name="bean.User" table="t_user">
+			
+			/* id: 配置实体类和表的唯一属性(<id>标签只能有一个)
+				属性: 1: name: 实体类里作为id属性的名称; 2: column: 表的字段名称 */
+			<id name="uid" column="uid">
+				/* generator: 数据库表id增长策略,主键增长策略
+					属性: class: 
+						取值: 1: native: (最常用)根据底层数据库对自动生成标识符的能力来选择identity,sequence,hilo三种生成器的一种,适合跨数据库平台开发.适用于代理主键
+							  2: uuid: Hibernate曹勇128位的UUID算法来生成标识符.这种策略并不流行,因为字符串类型的主键比整数类型的主键占用更多的空间.适用于代理主键 */
+				<generator class="native"></generator>
+			</id>
+			
+			/* property: 实体类其他属性和表的字段映射(<property>标签个数不限制)
+				属性: 1: name: 实体类属性名; 2: column: 表的字段名称(该属性可以省略,省略时自动查找与name相同的表字段)
+					  3: type: 生成表字段的数据类型(一般不写,会自动生成对应的类型) */
+			<property name="username" column="username"></property>
+			<property name="password" column="password"></property>
+			...
+			
+			//一对多映射配置<many-to-one>和<set inverse="true">
+			//多对多映射配置<set [inverse="false"] table="第三张表表名">
+			/* many-to-one:  在一对多映射时,Many需要的配置项
+				属性: 1: name: 数据类型为One的成员名; 2: class: One类的全路径; 3: column: 外键字段名 */
+			<many-to-one name="" class="" column=""></many-to-one>
+			
+			/* set: 在多表映射时,需要的配置项;
+				属性: 1: name: 数据类型为Set<Many>的成员名; 
+					  2: cascade: 加上该属性级联操作可以简化,-取值: saveupdate(级联保存),delete(级联删除) 
+					  3: inverse: 放弃关系维护,一对多时建议为true,多对多为false,true: 放弃; false: 默认值 
+					  4: table: 多对多时配置的第三张表的表名	*/
+			<set name="" cascade="save-update" inverse="true">	  //cascade属性要取多个值时,可以用","隔开	eg: cascade="save-update,delete"
+				/* key: 外键,Hibernate中采用外键双向维护机制,可以在<set>标签中用inverse属性放弃One表维护
+					属性: column: 外键字段名 */
+				<key column=""></key>
+				
+				/* one-to-many: 一对多映射
+					属性: class: Many类的全路径 */
+				<one-to-many class="" />
+				
+				/* many-to-many: 多对多映射
+					属性: 1: class: 另一Many类全路径; 2: column: 第三张表中另一Many表的外键字段名 */
+				<many-to-many class="" column=""></many-to-many>
+			</set>
+		</class>
+	</hibernate-mapping>
+
+三: Hibernate 核心 API
+	A: Configuration
+			创建该对象,会在src下找 hibernate.cfg.xml 配置文件,并将该配置文件加载进对象中(加载核心配置文件)
+		1: Configuration(): 无参构造
+		2: Configuration configure(): 加载核心配置文件	
+		3: SessionFactory buildSessionFactory(): 构建SessionFactory对象,根据实体类和数据库表的映射创建表(需要配置开启该功能)
+			eg: Configuration cfg = new Configuration().configure();
+				SessionFactory sf = cfg.buildSessionFactory();
+	B: SessionFactory		//通过Configuration的buildSessionFactory()方法创建
+			Session 的工厂类,(创建该类比较耗资源,最好一个项目创建一次SessionFactory对象)
+		1: Session openSession(): 获取Session接口实例
+	C: Session			//通过SessionFactory的openSession()方法创建
+			类似 JDBC 中的 Connection.调用该接口的方法可以实现数据库的crud操作.Session 是单线程对象
+		1: Transaction beginTransaction(): 开启事务 
+		2: save(Object obj): 添加操作,将实体类添加到数据库表中 
+		3: update(Object obj): 修改操作,(要将其先查询出,再进行修改)将修改后的实体类替换原先的
+		4: saveOrUpdate(Object obj): 添加或修改,瞬时态的对象做添加操作,持久态或托管态的对象做修改操作
+		5: delete(Object obj): 删除操作,(可以先查询出实体类,作为参数传入方法)删除数据库表的指定实体类
+		6: T get(Class<T> arg0,Serializable id): 根据id查询,将查询结果放到一个实体类中.arg0: 实体类的Class; id: id的值
+				eg: User user = session.get(User.class,1); //查询id为1的User
+		7: T load(Class<T> arg0,Serializable id): 根据id查询,延迟查询,将查询结果放到一个实体类中.arg0: 实体类的Class; id: id的值
+								//一调用get()方法会马上发送语句查询数据库;调用load()方法只有获取对象里面的值的时候才会发送语句查询
+		8: Query createQuery(String hql): 根据HQL语句获取Query对象
+		9: Criteria createCriteria(Class arg0): 根据实体类获取Criteria对象,arg0: 实体类的Class
+		10: SQLQuery createSQLQuery(String sql): 根据SQL语句获取SQLQuery对象
+	D: Transaction:  	//通过Session的beginTransaction()方法创建
+			事务
+		1: commit(): 提交事务
+		2: rollback(): 回滚事务
+	E: SQLQuery			//通过Session的createSQLQuery()方法创建
+			使用Hibernate时,该对象可以调用底层SQL语句
+		1: List list(): 获取结果集,该结果集的每个元素默认都是数组的结构,可以使用addEntity()方法将每个元素都修改为实体类对象
+		2: addEntity(Class arg0): 添加实体类.当使用该方法后,再调用list()方法时,返回的list的元素就该实体类对象,arg0: 实体类.class
+			eg: SQLQuery sqlQuery = session.createSQLQuery("SQL语句");
+				sqlQuery.addEntity(User.class);
+				List<User> userList = sqlQuery.list();	
+	F: Query: 			//通过Session的createQuery(hql)方法创建
+			不需要写SQL语句,但是要写HQL语句(HQL: Hibernate Query Language,Hibernate提供的查询语言)
+		a: HQL语句和SQL语句的区别
+			使用SQL操作表和表字段,使用HQL操作实体类和属性
+		b: HQL语句
+			1: 查询所有: from 实体类名称;
+			2: 条件查询: from 实体类名称 [[as] 别名] where 属性名{=|like}? [ and 属性名{=|like}? ...];
+			3: 排序查询: from 实体类名称 [...] order by 属性名 {asc|desc};
+			4: 分页查询: 	//调用query.setFirstResult().setMaxResults()方法
+			5: 投影查询: select 列名 [,列名,...] from 实体类名称 [...];  //select 后不能用'*',HQL语句不支持
+			6: 聚合函数使用: select 聚合函数(...) from 实体类名称 [...];
+		c: 多表查询
+			1: 内连接: from 类名 别名 inner join 别名.Set集合名 [...];	//list()方法返回的List集合的元素是数组
+							eg: from One o inner join o.manySet;
+			2: 左外连接: from 类名 别名 left outer join 别名.Set集合名 [...];	//list()方法返回的List集合的元素是数组
+			3: 右外连接: from 类名 别名 right outer join 别名.Set集合名 [...];	//list()方法返回的List集合的元素是数组		
+			4: 迫切内连接: from 类名 别名 inner join fetch 别名.Set集合名 [...]; //list()方法返回的List集合的元素是对象		
+			5: 迫切左外连接: from 类名 别名 left outer join fetch 别名.Set集合名 [...]; //list()方法返回的List集合的元素是对象
+		d: 成员方法
+			1: List list(): 获取结果集,元素是实体类
+			2: Query setParameter(int num,Object obj): 为HQL语句设置参数,index: ?的索引(从0开始),obj: 参数值
+			3: Query setFirstResult(int firstResult): 设置分页的开始位置
+			4: Query setMaxResults(int maxResult): 设置分页每页最大记录数
+			5: Object uniqueResult(): 获取唯一结果(一般用于聚合函数)
+		
+			
+		
+	G: Criteria			//通过Session的createCriteria()方法创建
+			使用这个对象查询,不需要写语句,直接调用方法实现
+		1: List list(): 获取结果集,元素是实体类
+		2: Criteria add(Restrictions.{eq|like|...}(String 字段名,Object 值)): 设置各种条件
+		3: Criteria addOrder(Order.{asc|desc}(String 字段名)): 设置排序方式
+		4: Criteria setFirstResult(int firstResult): 设置分页的开始位置
+		5: Criteria setMaxResults(int maxResult): 设置分页每页最大记录数
+		
+四: Hibernate
+	A: 对数据库进行操作
+		a: 基本使用步骤
+			1: 加载hibernate核心配置文件
+				Configuration cfg = new Configuration().configure();
+			2: 创建 SessionFactory 对象(在这一步,会根据映射关系配置,在数据库里面把表更新或创建)
+				SessionFactory sf = cfg.buildSessionFactory();
+			3: 使用 SessionFactory 对象创建 Session 对象(Session类似数据库的连接)
+				Session session = sf.openSession();
+			4: 开启事务
+				Transaction tx = session.beginTransaction();
+			5: 写具体逻辑(crud)操作
+				.....
+			6: 提交或回滚事务
+				tx.commit();(或 tx.rollback();)
+			7: 释放资源
+				session.close();sf.close();
+			eg: //添加操作
+				Transaction tx = session.beginTransaction(); //开始事务
+				User user = new User(); //创建对象
+				user.setUsername("小王"); user.setPassword("250"); user.setAddress("China"); //设置属性
+				session.save(user); //调用session对象的添加方法 
+				tx.commit();  //提交事务
+		b: 代码规范写法
+			1: 代码结构
+				try{
+					开启事务
+					提交事务
+				}catch(){
+					回滚事务
+				}finally{释放资源}
+		
+	B: 一级缓存: 
+			缓存: 把数据存入内存中,不需要使用流方式,就可以直接读取内存中的数据.即把数据存入内存中,提高读取效率
+			Hibernate 框架提供了很多优化方式.缓存就是一个优化方式
+		a: Hibernate缓存特点
+			1: 一级缓存: 存储数据必须是持久态,默认就打开
+				缓存范围: session范围,从session创建到session关闭
+			2: 二级缓存: 目前不使用了,默认不打开.替代技术: redis
+				缓存范围: sessionFactory范围
+		b: 一级缓存的执行过程
+			1: 首次查询某条数据时,查询一级缓存发现没有数据,才会去发送SQL语句执行查询数据库,返回将查询的对象(持久态)放入一级缓存
+			2: 再次查询时,发现一级缓存中有数据,直接返回一级缓存中的数据,就不会发送执行SQL语句.
+		c: 一级缓存的特性
+			1: 持久态自动更新数据库
+				在一级缓存中的数据,对其进行修改后,他会自动更新数据库,可以不用手动更新
+	C: Hibernate 绑定 Session
+		a: 获取与本地线程绑定的session
+			1: 在hibernate核心配置文件中配置
+				<property name="hibernate.current_session_context_class">thred</property>
+			2: 调用SessionFactory里面的方法得到
+				getCurrentSession(): 创建一个和ThreadLoacl绑定的session
+		b: 获取与本地线程绑定的session时,关闭session会报错,此时不需要手动关闭session
+			
+五: 一对多和多对多映射
+	A: 一对多
+			在"多"的那一方创建字段作为外键,指向"一"的主键
+		a: 一对多映射配置
+			1: 创建两个实体类(One,Many)
+			2: 让这两个实体类之间互相表示(使用set集合表示时一定要new出来,还要生成getXxx()/setXxx()方法)
+				One有多个Many的对象: 在One的类里面用Set集合的对象表示有多个Many		eg: peivate Set<Many> manySet = new HashSet<>();  
+				Many只有一个One对象: 在Many的类里面用One的对象表示只有一个One		eg: private One one = new One();
+			3: 实体类配置映射
+				一个实体类一个配置文件,完成映射最基本的配置
+				在One的配置文件中,通过<set>标签完成映射;在Many的配置文件,通过<many-to-one>标签完成映射
+					eg: Many.hbm.xml: 	<many-to-one name="oneSet" class="oneToMany.One" column="clid"></many-to-one>
+						One.hbm.xml:	<set name="manySet" cascade="save-update,delete" inverse="true">
+											<key column="clid"></key>
+											<one-to-many class="oneToMany.Many" />
+										</set>
+			4: 核心配置文件
+				加载One和Many的配置文件
+		b: 一对多级联保存
+				添加One表数据,为这条One表数据添加多条Many表数据
+			1: 复杂方式
+				创建One和Many对象,One和Many对象建立关系,保存到数据库
+					eg: One o = new One(); Many m = new Many();	//创建One和Many对象
+						o.getManySet().add(m); m.setOne(o);		//两个对象建立关系
+						session.save(o); session.save(m);		//保存到数据库
+			2: 简化写法
+				需要在One配置文件中<set>标签添加cascade属性(save-update),该方式只需要One对Many建立联系,只需要保存One对象
+				即: 创建One和Many对象,在One的Set<Many>中添加Many,将One对象保存到数据库
+					eg: One o = new One(); Many m = new Many();	//创建One和Many对象
+						o.getManySet().add(m);	//在One的Set<Many>中添加Many
+						session.save(o); 		//将One对象保存到数据库
+		c: 一对多级联删除
+				删除One表数据,要删除对应的Many表数据(因为每个Many只属于一个One,One没有了,Many就没有存在的必要了)
+			1: 简化写法
+				需要在One配置文件中<set>标签添加cascade属性(delete),然后只需要删除One表数据,Many表数据自动会删除
+					eg: One o = session.get(One.class,1);	//获取id=1的One表数据
+						session.delete(o);					//删除该条数据
+		d: inverse 属性
+				在级联修改时,外键值可能会修改两次(Many修改一次,One修改一次),这会使性能降低,可以让One表不维护外键: One表配置文件<set inverse="true">
+			取值: 1: false: (默认值)不放弃关系维护; 2: true: 放弃关系维护
+	
+	B: 多对多
+			创建另一张表(至少两个字段),分别指向两个"多"的主键
+		a: 多对多映射配置
+			1: 创建两个实体类(Many1,Many2)
+			2: 让这两个实体类之间互相表示(使用set集合表示时一定要new出来,还要生成getXxx()/setXxx()方法)
+				Many1有多个Many2的对象,Many2有多个Many1的对象: 互相用Set集合表示关系
+			3: 实体类配置映射
+				一个实体类一个配置文件,完成映射最基本的配置
+				在Many1,Many2的配置文件中,通过<set>标签完成映射
+					eg: Many1.hbm.xml: 	<set name="many2Set" table="many1_many2" cascade="save-update,delete">
+											<key column="many1_id"></key>
+											<many-to-many class="manyToMany.Many2" column="many2_id"></many-to-many> </set>
+						Many2.hbm.xml: 	<set name="many1Set" table="many1_many2" cascade="save-update,delete">
+											<key column="many2_id"></key>
+											<many-to-many class="manyToMany.Many1" column="many1_id"></many-to-many> </set>
+			4: 核心配置文件
+				加载Many1和Many2的配置文件
+		b: 多对多级联保存
+				需要在One配置文件中<set>标签添加cascade属性(save-update)
+			1: 根据Many1保存Many2
+				创建Many1,Many2对象,在Many1的set集合中添加Many2,通过session的save()方法保存Many1对象
+			2: 根据Many2保存Many1
+				创建Many1,Many2对象,在Many2的set集合中添加Many1,通过session的save()方法保存Many2对象
+		c: 多对多级联删除(最好不要用,一般都是通过第三张表来维护)
+				需要在One配置文件中<set>标签添加cascade属性(delete)
+			删除Many1表数据,第三张表数据自动会删除,但是他会删除所有Many1,Many2,第三张表的所有相关数据!!!
+				eg: 删除数据前:  many1_id: 1 1 2 2	,删除Many1的id=1的数据后:	many1_id: 2  
+								 many2_id: 1 2 2 3								many2_id: 3
+						删除many1_id=1的数据,对应的就会删除many2_id=1,2的数据,所以只剩 2-3 这一条数据
+		d: 维护第三张表关系
+				多对多管喜的维护是通过第三张表来实现
+			1: 让Many1有某个Many2
+				根据id查询到Many1和Many2的数据,Many1通过Set集合添加Many2
+			2: 让Many1没有某个Many2
+				根据id查询到Many1和Many2的数据,Many1通过Set集合移除Many2
+
+六: Hibernate 查询
+	A: 查询方式
+		a: 对象导航查询
+				一对多或多对多,根据id查询One(|Many1)表数据时一并查询Many(|Many2)表数据
+			1: 根据id查询出One(|Many1)表数据
+				eg: One o = session.get(One.class,1);
+			2: 根据One(|Many1)对象Set集合的getXxx()方法获取Many(|Many2)表数据的集合
+				eg: Set<Many> manySet = o.getManySet();
+		b: OID查询
+				根据id查询某一条数据,返回对象
+			1: Session的get()方法
+				eg: One o = session.get(One.class,1);
+		c: HQL查询
+				利用Query对象,写HQL语句实现查询
+			1: 编写HQL语句
+				eg: String hql = "from One where id=?";
+			2: 通过Session的createQuery(hql)方法创建Query对象
+				eg: Query query = session.createQuery(hql);
+			3: 向HQL语句中设置参数,通过 Query的setParameter()方法
+				eg: query.setParameter(0,2);
+			4: 通过Query对象的list()方法获取结果集,元素是实体类
+				eg: List<One> os = query.list();
+		d: QBC查询
+			利用Criteria对象
+		e: SQL查询
+			利用SQLQuery对象
+	B: Hibernate 检索策略
+		a: 立即查询
+				根据id查询,调用get()方法,一调用方法马上发送语句查询数据库
+		b: 延迟查询
+				根据id查询,调用load()方法,调用load()方法只有获取对象里面的值的时候才会发送语句查询
+			1: 类级别的延迟
+			
+			1: 关联级别的延迟
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

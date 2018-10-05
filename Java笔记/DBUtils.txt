@@ -1,0 +1,132 @@
+DBUtils 是Java编程中的数据库操作的工具,简单实用.DBUtils 封装了对 JDBC 的操作,可以少写代码
+
+一: DBUtils的三个核心功能: 
+	A: DBUtils: 连接数据库对象,JDBC辅助方法的集合类,线程安全(用于控制连接,控制事务,控制驱动加载)
+		a: 成员方法: 
+			1: closeQuietly(connection conn): 关闭连接，如果有异常 try 后不抛
+			2: commitAndCloseQuietly(connection conn): 提交并关闭连接
+			3: rollbackAndCloseQuietly(connection conn): 回滚并关闭连接
+	B: QueryRunner: SQL语句的操作对象,可以设置查询结果集的封装策略,线程安全
+		a: 构造方法: 
+			1: QueryRunner(): 创建一个与数据库无关的 QueryRunner 对象,后期操作时再作数据库的会后
+								需要手动给一个Connection对象,他可以手动控制事务(Connection.setAutoCommit(false);),手动提交事务(Connection.commit();)
+			2: QueryRunner(DataSource ds): 提供数据源(连接池),DBUtils 底层自动维护连接 connection
+		b: 成员方法: 
+				1,2对应无参构造;	3,4对应提供数据源的带参构造.
+				update()方法返回受更新影响的信息条数
+			1: int update(Connection conn,String sql,Object... params): 指定Connection对象,执行更新数据(增删改)
+			2: Object query(Connection conn,String sql,ResultSetHandler<T> rsh,Object... params): 指定Connection对象,执行查询
+			3: int update(String sql,Object... params): 执行更新数据(增删改)
+			4: Object query(String sql,ResultSetHandler<T> rsh,Object... params): 执行查询	
+	C: ResultSetHandler(接口): 用于定义select 操作后,封装结果集
+		a: BeanHandler: 将结果集中第一条记录封装到一个指定的 javaBean中
+						配合查询语句使用: eg: new query("SQL语句",BeanHandler<User>(User.Class),参数);
+		b: BeanListHandler: 将结果集中的每一条记录封装到指定的 javaBean 中，将这些 javaBean 再封装到 List 集合中。
+						配合查询语句使用: eg: new query("SQL语句",BeanListHandler<User>(User.Class),参数);
+		c: ScalarHandler: 它是用于单数据,例如 select count(*) from 表操作
+		d: ColumnListHandler: 将查询结果的指定列的数据封装到List集合中
+		e: ArrayHandler: 将查询结果的第一行数据,保存到Object数组中
+		f: ArrayListHandler:  将查询结果的每一行数据,先封装到Object数组中,然后再存入List集合
+		g: MapHandler: 将查询结果的第一行数据封装到Map集合(key==列名,value=列值)
+		h: MapListHandler: 将查询结果的每一行数据封装到Map集合(key==列名,value=列值),再将Map存入List集合
+		i: BeanMapHandler: 将查询的结果的每一行数据,封装到Bean中,再存入Map集合中(key==列名,value==列值)
+		j: KeyedHandler: 将查询结果的每一行数据封装到Map集合(key==列名,value=列值)map1,然后将map1(有多个)存入map2(只有一个)中
+		
+二: 使用示例
+			ComboPooledDataSource ds = new ComboPooledDataSource(); //创建C3P0连接池数据源
+			ds.setDriverClass("com.mysql.cj.jdbc.Driver"); //设置jdbc驱动
+			ds.setJdbcUrl(url);		//设置url
+			ds.setUser(username);	//设置username
+			ds.setPassword(password);	//设置password
+			QueryRunner qr = new QueryRunner(ds); //创建QueryRunner类对象
+
+	A: 添加数据		
+		String sql = "insert into message values(null,?,?,?)";  //编写SQL语句
+		Object[] params = {"天哪","看天上","看个屁啊,天上有啥好看的"}; //为占位符设置参数
+		int rows = qr.update(sql, params); //执行添加操作
+		if(rows > 0) {System.out.println("添加成功!");} else {System.out.println("添加失败!");}
+	B: 删除数据
+		String sql = "delete from message where id=?";  //编写SQL语句
+		Object[] params = { 4 }; //为占位符设置参数
+		int rows = qr.update(sql, params); //执行删除操作
+		if(rows > 0) {System.out.println("删除成功!");} else {System.out.println("删除失败!");}
+	C: 修改数据
+		String sql = "update message set command=? description=? content=? where id=?";  //编写SQL语句
+		Object[] params = {"q","w","e", 4 }; //为占位符设置参数
+		int rows = qr.update(sql, params);  //执行修改操作
+		if(rows > 0) {System.out.println("修改成功!");} else {System.out.println("修改失败!");}
+	D: 查询数据
+		a: 查询所有信息
+			String sql = "select * from message";  //编写SQL语句
+			List<User> users = qr.query(sql,new BeanListHandler<User>(User.Class));  //执行查询操作
+		b: 根据id查询单个信息
+			String sql = "select * from message where id=?";  //编写SQL语句
+			Object[] params = { 4 }; //为占位符设置参数
+			User user = qr.query(sql,new BeanHandler<User>(User.Class),params);  //执行查询操作
+		c: 查询单数据
+			String sql = "select count(*) from message";  //编写SQL语句
+			Long count = (Long)qr.query(sql,new ScalarHandler());
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

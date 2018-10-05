@@ -1,0 +1,849 @@
+JavaEE 三层之 service 层框架
+
+加载Spring核心配置文件创建 ApplicationContext 对象: ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+
+Spring中为了避免 ApplicationContext 对象多次创建,封装了监听器: org.springframework.web.context.ContextLoaderListener
+		<web-app>
+			<listener>		//在web.xml中配置该监听器
+				<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+			</listener>
+			<context-param>		//配置 applicationContext.xml 文件位置
+				<param-name>contextConfigLocation</param-name>
+				<param-value>classpath:applicationContext.xml</param-value>
+			</context-param>
+		</web-app>
+	利用该监听器的 getCurrentWebApplicationContext()方法就可以获取 ApplicationContext 对象
+		eg: ApplicationContext context  = ContextLoaderListener.getCurrentWebApplicationContext();
+
+一一一: 框架整合
+	A: Struts2 和 Spring 整合
+		a: 把Struts2的 Action 对象创建交给 Spring 进行管理
+			eg: <bean id="myAction" class="MyAction" scope="prototype"></bean>	//注意scope="prototype",Action都是多实例的
+		b: 在 Struts2 的配置文件中,配置Action时: <action>标签的class属性,填的是Spring配置文件里的<bean>标签的id属性值(需要导入 struts2-spring-plugin.jar)
+			eg: <bean id="userAction" class="action.UserAction" scope="prototype"></bean>	//applicationContext.xml
+				<action name="userAction" class="userAction" method="execute"></action>		//struts.xml
+	B: Hibernate 和 Spring 整合
+		a: 把 Hibernate 核心配置文件里面的数据库配置,直接写在 Spring 配置文件中
+		b: 把 sessionFactory 对象创建交给 Spring 进行管理(服务器启动时就创建 sessionFactory 对象)
+			eg: //配置数据库数据源
+				<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">	
+					<property name="url" value="jdbc:mysql://localhost:3306/lemting?serverTimezone=GMT%2B8"></property>
+					<property name="username" value="root"></property>
+					<property name="password" value="lemting"></property>
+				</bean>
+				<!-- //c3p0数据源
+					<context:property-placeholder location="classpath:c3p0.properties" />
+					<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+						<property name="driverCLass" value="${c3p0.driverClass}"></property>
+						<property name="jdbcUrl" value="${c3p0.jdbcUrl}"></property>
+						<property name="user" value="${c3p0.user}"></property>
+						<property name="password" value="${c3p0.password}"></property>
+					</bean>
+				-->
+				<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">	//配置sessionFactory对象
+					<property name="dataSource"> <ref bean="dataSource" /> </property>		//注入数据源
+					<property name="configLocations" value="classpath:hibernate.cfg.xml"></property>	//注入Hibernate核心配置文件
+					<property name="hibernateProperties">
+						<props> 	//Hibernate参数
+							<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>	//设置数据库方言
+							<prop key="hibernate.hbm2ddl.auto">update</prop>	
+							<prop key="hibernate.show_sql">true</prop>
+							<prop key="hibernate.format_sql">true</prop>
+							<prop key="hibernate.current_session_context_class">thred</prop>
+						</props>
+					</property>
+				</bean>
+				<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">	//配置事务管理器
+					<property name="sessionFactory" ref="sessionFactory" />
+				</bean>
+				<tx:annotation-driven transaction-manager="transactionManager" />	//开启事务注解
+	
+		
+一: Spring 概念
+	A: Spring是开源的轻量级框架
+	B: Spring核心主要两部分
+		a: AOP: 面向切面编程,扩展功能不是修改源代码实现
+		b: IOC: 控制反转,把对象的创建不是通过new的方式实现,而是交给spring配置创建类对象
+	C: Spring是一站式框架
+		a: Spring在Javaee三层结构中,每一层都提供不同的解决技术
+			1: Web层: SpringMVC
+			2: Service层: Spring IOC
+			3: Dao层: Spring JdbcTemplate
+	D: Spring整合web项目原理
+		a: 在服务器启动的时候,加载Spring核心配置文件
+			ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+		b: 实现原理
+				使用技术: ServletContext 对象;监听器
+			1: 在服务器启动的时候,为每个项目创建 ServletContext 对象,
+			2: 在 ServletContext 对象创建的时候,使用监听器可以监听到在什么时候创建
+			3: 在监听器监听到 ServletContext 对象创建的时候,加载Spring的配置文件,将配置文件配置的对象创建
+			4: 把创建出来的对象放到 ServletContext 域对象里面(setAttribute()方法)
+			5: 获取对象的时候,到 ServletContext 域得到(getAttribute()方法)
+		
+二: Spring IOC 
+		控制反转,把对象的创建交给Spring进行管理,降低类之间的耦合度
+	A: IOC 操作的两种方式
+		a: 配置文件方式
+		b: 注解方式
+	B: IOC底层原理
+		a: IOC底层使用技术
+			1: XML配置文件
+			2: DOM4J解析XML
+			3: 工厂设计模式
+			4: 反射
+		b: IOC底层过程
+			1: 在xml文件中配置<bean>
+			2: 创建工厂类,使用DOM4J解析XML+反射
+			3: 通过工厂类获取类对象
+	C: IOC 和 DI 
+		a: DI: 依赖注入,向类里面的属性设置值 
+		b: 区别: 依赖注入不能单独存在,需要在IOC基础之上完成操作
+	D: Spring的bean管理(XML)
+		a: bean 实例化的三种方式
+			1: 使用类的无参构造创建
+				eg: <bean id="bean" class="bean类">
+			2: 通过属性注入,使用带参构造创建
+			3: 使用静态工厂创建
+				创建工厂类,通过静态方法创建对象
+					eg: <bean id="bean" class="bean的工厂类" factory-method="获取bean对象的静态方法">
+			4: 使用实例工厂创建
+				创建工厂类,通过非静态方法创建对象
+					eg: <bean id="beanFactory" class="bean的工厂类">
+						<bean id="bean" factory-bean="beanFactory" factory-method="获取bean对象的非静态方法">
+		b: <bean>标签的常用属性
+			1: id: 名称,唯一标识,根据id值得到配置的对象
+			2: class: 创建对象所在类的全路径
+			3: name: 与id功能一样(现在不用),在id属性中不能包含特殊符号,但是name里可以使用
+			4: scope: Bean作用范围
+				singleton: (默认值)单例,指一个Bean容器中只存在一份
+				prototype: 每次请求(每次使用)创建新的实例,destory方式不生效
+				request: 每次http请求创建一个实例,且仅在当前request内有效
+				session: 同上,每次http请求创建,当前session内有效
+				global session: 基于protlet的web中有效(protlet定义了global session),如果是在web中,同session
+		c: 属性注入
+				用到的属性: name: 在bean中的成员变量名;ref: 可以引用其他bean设值;value: 可以用具体的值设值
+			1: 设值注入
+				<bean><property name="成员变量名" ref="id引用"  value="成员变量值" /></bean> 		//设值注入
+			2: 构造注入
+				<bean><constructor-arg name="成员变量名"  ref="id引用"  value="成员变量值" /></bean>	//构造注入
+			3: 利用p名称空间注入
+				<bean id="" class="" p:成员变量名="成员变量值" ></bean>		//p名称空间注入
+			4: 复杂类型的注入
+				<bean>		//只适用于给字符串赋值
+					<property name="成员变量名">
+						<list>  <!-- 注入数组和List集合方式 -->
+							<value>值</value><value>值</value><value>值</value>
+						</list></property>
+					<property name="成员变量名">
+						<map>  <!-- 注入Map集合方式 -->
+							<entry key="" value=""></entry><entry key="" value=""></entry><entry key="" value=""></entry>
+						</map></property>
+					<property name="成员变量名">
+						<props>  <!-- 注入Properties集合方式 -->
+							<prop key="">值</prop><prop key="">值</prop><prop key="">值</prop>
+						</map></property>
+				</bean>
+	E: Spring的bean管理(注解)
+			通过基于XML的Spring配置如下标签(请注意包含上下文命名空间)
+				[http://www.springframework.org/schema/context]和[http://www.springframework.org/schema/context/spring-context.xsd]
+		a: 开启注解扫描
+				<context:component-scan>: 会扫描类,方法,属性上的注解
+				<context:annotation-config>: 只会扫描属性上的注解
+			1: <context:component-scan base-package="要自动扫描的包"></context:component-scan>
+			2: <context:annotation-config></context:annotation-config>
+		b: 注解创建对象
+				在创建对象的类上添加注解(@Component,@Repository,@Service,@Controller)
+				属性: value: bean的id.不加该属性,则id值默认为首字母小写的类名		eg: @Component([value=]"user")public class User{}
+			1: 添加注解创建对象
+				@Component: 是一个通用注解,可用于任何bean
+				@Repository: 通常用于注解DAO类,即持久层
+				@Service: 通常用于注解Service类,即服务层
+				@Controller: 通常用于注解Controller类,即控制层(MVC)
+			2: 添加作用范围注解
+				@Scope([value=]"作用范围"). 作用范围取值: singleton,prototype,request,session,global session
+					eg: @Session("user")@Scope("session")public class User{}
+		c: 注解属性注入
+			1: @Autowired: 自动装配
+				注解在成员变量上: (通过类名装配,与设置的id无关)成员变量可以不用声明setXxx()方法,会自动装配bean对象
+			2: @Resource(name="bean的id"): 通过id注入
+				注解在成员变量上: 通过name属性值注入指定id的bean
+	F: Spring的bean管理(配置文件和注解混合使用)
+			创建对象操作使用配置文件实现;注入属性操作使用注解方式实现
+		
+三: Spring AOP
+		Aspect Oriented Programming,面向切面,通过预编译方式和运行期动态代理实现程序功能的统一维护的一种技术.AOP采取横向抽取机制,取代了传统的纵向继承体系重复性代码
+		主要功能: 日志记录,性能统计,安全控制,事务处理,异常处理等等
+		注意: 所有基于配置文件的Aspects,只支持单例模式(singleton model)
+	A: AOP实现方式
+		a: 预编译
+			AspectJ
+		b: 运行期动态代理(JDK动态代理,CGLib动态代理)
+				SpringAOP,JbossAop
+			1: JDK动态代理,针对有接口情况: 
+				创建接口实现类代理对象,实现方法完成增强
+			2: CGLib动态代理,没有接口情况:
+				创建子类的代理对象,在子类里调用父类的方法完成增强
+	B: AOP的几个相关概念
+		a: Aspect(切面): 一个关注点的模块化,这个关注点可能会横切多个对象(理解: 把增强应用到具体方法上面的过程)
+		b: Joinpoint(连接点): 程序执行过程中的某个特定的点(理解: 类里面可以增强的方法)
+		c: Advice(通知/增强): 在切面的某个特定的连接点上执行的动作(理解: 对切入点方法增强)
+			 Advice的类型:
+				1: Before Advice(前置通知): 在某连接点之前执行的通知,但不能阻止连接点前的执行(除非他抛出一个异常)
+				2: After returning Advice(返回后通知): 在连接点正常完成后执行的通知
+				3: After throwing Avice(抛出异常后通知): 在方法抛出异常退出时执行的通知
+				4: After(finally) Advice(后通知): 在某连接点退出的时候执行的通知(不论是正常返回还是异常退出)
+				5: Around Advice(环绕通知): 包围一个连接点的通知(在方法之前,方法之后都通知)
+		d: Pointcut(切入点): 匹配连接点的断言,在AOP中通知和一个切入点表达式关联(理解: 要增强的方法)
+			1: execution: 用于匹配方法执行的连接点;
+				语法: execution(<访问修饰符>?<返回值类型><方法名>(<参数>)<异常>)
+				execution(public * *(..)): 切入点为执行所有public方法时
+				execution(* set*(..)): 切入点为执行所有set开始的方法时
+				execution(* com.xyz.service.AccountService.*(..)): 切入点为执行AccountService类中的所有方法时
+				execution(* com.xyz.service..(..)): 切入点为执行com.xyz.service包下的所有方法时
+				execution(* com.xyz.service...(..)): 切入点为执行com.xyz.service包及其子包下的所有方法时
+			2: winthin: 用于匹配指定类型内的方法执行;(only in Spring AOP)
+				within(com.xyz.service.*)(only in Spring AOP): 
+				within(com.xyz.service..*)(only in Spring AOP)
+			3: this: 用于匹配当前AOP代理对象类型的执行方法;(only in Spring AOP)
+				this(com.xyz.service.AccountService)(only in Spring AOP)
+			4: target: 用于匹配当前目标对象类型的执行方法;(only in Spring AOP)
+			5: args: 用于匹配当前执行的方法传入的参数为指定类型的执行方法;(only in Spring AOP)		
+		e: Introduction(引入): 在不修改类代码的前提下,为类添加新的方法和属性
+		f: Target Object(目标对象): 被一个或者多个切面所通知的对象
+		g: Proxy(代理): AOP框架创建的对象,用来实现切面契约(aspect contract)(包括通知方法执行等功能)
+		h: Weaving(织入): 把切面连接到其他的应用程序类型或者对象上,并创建一个被通知的对象,分为: 编译时织入,类加载时织入,执行时织入
+	C: AspectJ 实现AOP(XML)(需导入AOP约束)(aspectjweaver.jar)
+				<beans><aop:config>
+					/* aop:pointcut: 切入点声明
+						属性: 1: id: 唯一声明; 2: expression: 切入点 */
+					<aop:pointcut id="qwe" expression="execution(* com.xyz.service.AccountService.*(..))" />
+					
+					/* aop:aspect: 切面
+						属性: 1: ref: Bean的id引用; 2: id: 唯一标识 */
+					<aop:aspect id="e" ref="Bean Id">
+						/* aop:before: 前置通知 
+							属性: 1: method: 通知方法; 2: pointcut: 切入点,类似<aop:pointcut>的expression属性 ; 3: pointcut-ref: 切入点引用 */
+						<aop:before method="beforeMethod" pointcut-ref="qwe" />
+					</aop:aspect>
+					/* */
+					<aop:advisor advice-ref=""/>
+				</aop:config></beans>
+		a: Spring所有的切面和通知器都必须放在一个<aop:config>内(可以配置包含多个<aop:config>元素),
+			每一个<aop:config>可以包含<aop:pointcut>,<aop:advisor>和<aop:aspect>元素(必须按照这个顺序进行声明)
+			<aop:config>风格的配置大量使用了Spring的自动代理机制
+		b: <aop:aspect>: 切面
+			属性: id: 唯一标识;ref: (作为切面的)Bean引用;
+			子标签: 
+				1: <aop:before>: Before Advice(前置通知)
+					属性: method: 通知方法; pointcut: 切入点; pointcut-ref: 切入点引用
+				2: <aop:after-returning>: After returning Advice(返回后通知)
+					属性: returning: 指定可被传递的返回值的参数名称 
+				3: <aop:after-throwing>: After throwing Avice(抛出异常后通知)
+					属性: throwing: 指定可被传递的异常的参数名称
+				4: <aop:after>: After(finally) Advice(后通知)
+				5: <aop:around>: Around Advice(环绕通知)
+					该标签指定的通知方法的第一个参数必须是 ProceedingJoinPoint 类型,该类型的 proceed() 方法会执行真正的方法
+				6: <aop:declare-parents>: Introduction(简介),用于声明所匹配的类型拥有一个新的 parent
+					简介允许一个切面声明一个实现指定接口的通知对象,并且提供了一个接口实现类来代表这些对象
+					属性: types-matching: 匹配类型;implement-interface: 具体使用的接口;default-impl: 接口实现类;
+		c: <aop:pointcut>: 切入点
+				属性: id: 唯一标识;expression: 切入点执行条件
+		d: <aop:advisor>: 只有一个advice
+			切面自身通过一个bean(必须实现某个advice接口)表示,同时,advisor也可以很好的利用AspectJ的切入点表达式
+			Spring通过配置文件中<aop:advisor>元素支持advisor,实际使用中,大多数情况下他会和 transactional advice 配合使用
+			为了定义一个advisor的优先级以便让advice可以有序,可以使用order属性来定义advisor的顺序
+	D: AspectJ 实现AOP(注解)
+			开启AOP代理: 需要在配置文件中添加 <aop:aspectj-autoproxy> 标签,或者在AOP类上添加 @EnableAspectJAutoProxy 注解, 
+		1: @Aspect: AspectJ切面注解,拥有@Aspect的任何bean将被Spring自动识别并应用
+				用其注解的类可以有方法和字段,他们也可能包括切入点(pointcut),通知(advice)和引入(introduction)声明
+				该注解是不能通过类路径自动检测发现的,所以需要配合使用 @Component 注解或者在xml配置bean
+				一个类的@Aspect注解标识他为一个切面,并且将自己从自动代理中排除
+		2: @Pointcut: 切入点注解,通过注解一个普通的方法定义来实现,方法返回值类型必须为void
+				支持 execution,within,this,target,args,
+					@target: 限定匹配特定连接点的类执行对象的具有给定类型的注解,
+					@args: 限定匹配特定连接点实际传入参数的类型具有给定类型的注解,
+					@within: 限定匹配到内具有给定的注解类型的连接点,
+					@annotation: 限定匹配特定连接点的主体具有给定的注解
+				组合pointcut: 
+					切入点表达式可以通过&&,||和!进行组合,也可以通过名字引用切入点表达式
+		3: Advice: @Before,@AfterReturning,@AfterThrowing,@After,@Around
+			@Before(pointcut="可使用表达式指定,也可以引用已经定义好的@Pointcut")
+			@AfterReturning(pointcut="",returning="存储返回值的变量")
+			@AfterThrowing(pointcut="",throwing="存储异常的变量")
+			@After(pointcut=""),通常用于释放资源
+			@Around(pointcut=""),通知方法的第一个参数必须是 ProceedingJoinPoint 类型
+				eg: @Component
+					@EnableAspectJAutoProxy
+					@Aspect
+					public class AroundDemo{
+						@Around("com.xyz.myapp.asd.businessService()")
+						public Object doBasicProfiling(ProceedingJoinPoint pjp) throws Throwable{
+							Object retVal = pjp.proceed();
+							return retVal;
+						}
+					}
+		4: @DeclareParents: Introduction(简介),该注解用来定义匹配的类型拥有一个新的parent
+
+三: Spring JdbcTemplate
+			org.springframework.jdbc.core.JdbcTemplate
+	A: 构造连接池(需导入数据库驱动jar包,连接池jar包)
+			jdbc模板依赖连接池获得数据库连接
+		a: 直接获取
+			//org.springframework.jdbc.datasource.DriverManagerDataSource;
+			org.springframework.jdbc.datasource.DriverManagerDataSource dataSource = new DriverManagerDataSource();  //获取数据源
+			dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+			dataSource.setUrl("jdbc:mysql://localhost:3306/lemting" + "?serverTimezone=GMT%2B8");
+			dataSource.setUsername("root"); 
+			dataSource.setPassword("lemting");
+			//设置数据源,获取 JdbcTemplate 对象
+			JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		b: Spring 配置 C3P0 连接池(c3p0.jar)
+			1: 配置文件
+				eg: <beans>
+						//配置c3p0连接池
+						<bean id="dataSource" class="com.mchange.v2.c3p0.ComopooledDataSouce">
+							//参数
+							<property name="driverClass" value="com.mysql.cj.jdbc.Driver"></property>
+							<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/lemting?serverTimezone=GMT%2B8");"></property>
+							<property name="user" value="root"></property>
+							<property name="password" value="lemting"></property>
+						</bean>
+					</beans>
+			2: 在dao层通过属性注入,为 JdbcTemplate 对象的 dataSource 成员变量设置为c3p0连接池
+	B: JdbcTemplate
+		a: 成员方法 
+			1: int update(String sql [,Object... args]): 执行sql语句,返回受影响的行数.args: sql语句中的参数(?)
+					eg: int rows = jdbcTemplate.update("select * from user where id=? order by ?",1,"username");
+			2: T queryForObject(String sql,Class<T> requiredType [,Object... args]): 执行sql语句,返回指定类型的数据
+					eg: syso("user表中共有 " + jdbcTemplate.queryForObject("select count(*) from user",Integer.class) + " 条记录");  
+			3: T queryForObject(String sql,RowMapper<T> rowMapper [,Object... args]): 执行sql语句,返回指定类型的对象.rowMapper: 实现 RowMapper<bean> 接口的类对象
+					eg: syso("根据id查询结果: " + jdbcTemplate.queryForObject("select * from user where id=?",new MyRowMapper(),1).toString());
+			4: List<T> query(String sql,RowMapper<T> rowMapper [,Object... args]): 执行sql语句,返回指定类型对象的List集合
+					eg: List<User> jdbcTemplate.query("select * from user",new MyRowMapper());
+		b: RowMapper<T>
+				创建 MyRowMapper 类实现 RowMapper<bean> 接口,实现 mapRow()方法
+			eg: public class MyRowMapper implement RowMapper<User>{
+					public User mapRow(ResultSet rs,int num) throws SQLException{
+						User user = new User();
+						//将数据从结果集中获取,并封装到对象中
+						user,setUsername(rs.getString("username"));
+						user.setPassword(rs.getString("password"));
+						return user;
+					}
+				}
+	C: JdbcTemplate 实现 crud 操作
+		a: 增删改
+			使用 JdbcTemplate 的 update()方法
+		b: 查
+			创建 MyRowMapper 类实现 RowMapper<bean> 接口,实现 mapRow()方法
+			使用 JdbcTemplate 的 queryForObject()方法
+	D: HibernateTemplate API
+		1: Serializable save(Object entity)
+		2: void update(Object entity)
+		3: void dalete(Object entity)
+		4: T get(Class<T> entityClass,Serializable id)
+		5: T load(Class<T> entityClass,Serializable id)
+		6: List<T> find(String sql,Object... args)
+			
+四: Spring 的事务管理
+	A: Spring事务管理的两种方式
+		a: 编程式事务管理(不用)
+		b: 声明式事务管理
+			1: 基于xml配置文件实现
+			2: 基于注解实现
+	B: Spring事务管理API
+		a: PlatformTransactionManager: 事务管理器
+				Spring 为不同的持久化框架提供了不同的 PlatformTransactionManager 接口实现的变动不影响各层间的调用
+			1: org.springframework.jdbc.datasource.DataSourceTransactionManager: 使用SpringMVC或iBatis进行持久化数据时使用
+			2: org.springframework.orm.hibernate5.HibernateTransactionManager: 使用Hibernate5版本进行持久化数据时使用
+			3: org.springframework.orm.jpa.JpaTransactionManager: 使用JPA进行持久化数据时使用
+			4: org.springframework.orm.jdo.JdoTransactionManager: 当持久化机制是Jdo时使用
+			5: org.springframework.transaction.jta.JtaTransactionManager: 使用一个JTA实现来管理事务,在一个事务跨越多个资源时必须使用
+		b: TransactionDefinition: 事务定义信息(隔离,传播,超时,只读)
+		c: TransactionStatus: 事务具体运行状态
+	C: 声明式事务管理
+		a: XML
+				需引入aop和tx约束
+			//1: 配置事务管理器
+			<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+				<property name="dataSource" ref="dataSource"></property>	//注入数据源
+			</bean>
+			//2: 配置事务(通知)增强
+			<tx:advice id="txAdvice" transaction-manager="transactionManager">
+				<tx:attributes>
+					/* name: 通知方法; propagation: 传播行为*/
+					<tx:method name="tranfer" propagation="REQUIRED">
+				</tx:attributes>
+			</tx:advice>
+			//3: 使用AspectJ的XML配置切面
+			<aop:config>
+				<aop:pointcut expression="execution(* service.tranfer(..)") id="pointcut1">
+				<aop:advisor advice-ref="tx" />
+			</aop:config>	
+		b: 注解
+			1: 配置事务管理器
+				<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+					<property name="dataSource" ref="dataSource"></property>	//注入数据源
+				</bean>
+			2: 开启事务注解
+				<tx:annotation-driven transaction-manager="transactionManager" />
+			3: 在要使用事务的方法所在类上添加注解
+				@Transactional
+				public class A{...}
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+
+
+
+
+
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+		
+		
+Spring: 是一个轻量级的控制反转(IoC)和面向切面(AOP)的容器框架
+	1: 从大小与开销两方面而言Spring都是轻量级的
+	2: 通过控制反转(IoC)的技术达到松耦合的目的
+	3: 提供了面向切面编程的丰富支持,允许通过分离应用的业务逻辑与系统服务进行内聚性的开发
+	4: 包含并管理应用对象的配置和生命周期,这个意义上是一种容器
+	5: 将简单的组件配置,组合成为复杂的应用,这个意义上是框架
+	Spring作用
+		1: 容器
+		2: 提供了对多种技术的支持
+			JMS
+			MQ支持
+			UnitTest
+			...
+		3: AOP(事务管理,日志等)
+		4: 提供了众多方便应用的辅助类(JDBC Template等)
+		5: 对主流应用框架(Hibernate等)提供了良好的支持
+	适用范围
+		1: 构建企业应用(SpringMVC + Spring + Hibernate/Myibatis)
+		2: 单独使用Bean容器(Bean管理)
+		3: 单独使用AOP进行切面处理
+		4: 其他Spring功能,eg: 对消息的支持等
+		5: 在互联网中的应用...
+
+		
+Spring项目构建过程
+	1: 创建web项目
+	2: 对着项目右键  ->  [properties](属性)
+	3: 搜索[spring]找到 [Project Facets](项目构面)
+	4: 勾选[Spring] ,点击OK完成
+	
+	
+一: IOC及Bean容器
+	A: 面向接口编程
+		a: 结构设计送,分清层次及调用关系,每层只向外(上层)提供一组功能接口,各层之间仅依赖接口而非实现类
+		b: 接口实现的变动不影响各层间的调用,这一点在公共服务中尤为重要
+		c: "面向接口编程"中的"接口"是用于隐藏具体实现和实现多态性的组件
+	B: IOC
+		a: IOC: 控制反转
+			控制权的转移,应用程序本身不负责依赖对象的创建和维护,而是由外部容器负责创建和维护
+		b: DI(依赖注入)
+			是其一种实现方式
+		c: 目的: 创建对象并且组装对象之间的关系
+			IOC理解: 
+				房屋中介					IOC
+					找中介			->>			找IOC容器
+					中介介绍房子	->>			容器返回对象	
+					租房,入住		->>			使用对象
+	C: Spring的Bean配置
+			<?xml versio="版本号" encoding="UTF-8" ?>
+			<beans>
+				<bean id="唯一标识" class="Bean的路径">
+					<constructor-arg name="成员变量名" ref="id引用"/>	//构造注入
+					<property name="成员变量名" ref="id引用" /> 		//设值注入
+				</bean>
+				...
+			</beans>
+	D: Bean容器初始化
+		a: 基础: 两个包
+				org.springframework.beans
+				org.springframework.context
+			1: BeanFactory提供配置结构和基本功能,加载并初始化Bean
+			2: ApplicationContext保存了Bean对象并在Spring中被广泛使用
+		b: 方式: ApplicationContext
+			1: 本地文件 	eg: "F://workspace//appcontext.xml"
+			2: Classpath	eg: "classpath: spring-context.xml"
+			3: Web应用中依赖servlet或Listener
+	E: Spring注入
+			Spring注入是指再启动Spring容器加载bean配置的时候,完成对变量的赋值行为
+		a: 常用的两种注入方式
+			1: 设值注入
+			2: 构造注入
+
+二: Bean
+	A: Bean配置项
+		a: id: 唯一标识
+		b: class: 具体实例化的类
+		c: scope: Bean作用范围
+		d: Constructor-arguments: 构造器参数
+		e: Properties: 设值注入参数
+		f: AutoWiring mode: 自动装配模式
+		g: Lazy-initialization mode: 懒加载模式
+		h: Initialization/destruction method: 初始化/销毁的方法	
+	B: Bean的作用域
+		a: singleton: 单例,指一个Bean容器中只存在一份
+		b: prototype: 每次请求(每次使用)创建新的实例,destory方式不生效
+		c: request: 每次http请求创建一个实例,且仅在当前request内有效
+		d: session: 同上,每次http请求创建,当前session内有效
+		e: global session: 基于protlet的web中有效(protlet定义了global session),如果是在web中,同session
+	C: Bean的生命周期
+		a: 定义
+		b: 初始化(三种方式)
+			1: 实现 org.springframework.beans.factory.InitializingBean 接口,覆盖 destory() 方法
+			2: 配置 init-method
+			3: 配置全局默认初始化方法
+				<beans default-init-method=""></beans>
+		c: 使用
+		d: 销毁(三种方式)
+			1: 实现 org.springframework.beans.factory.DisposableBean 接口,覆盖 afterPropertiesSet() 方法
+			2: 配置 destory-method
+			3: 配置全局默认销毁方法
+				<beans default-destory-method=""></beans>
+	D: Aware接口(需在配置文件中配置)
+			Spring中提供了一些以Aware结尾的接口,实现了Aware接口的bean在被初始化之后,可以获取相应资源
+			通过Aware接口,可以对Spring相应资源进行操作(一定要慎重)
+			为对Spring进行简单的扩展提供了方便的入口
+		a: ApplicationContextAware: IOC上下文信息
+		b: BeanNameAware: 
+		c: ApplicationEventPublisherAware
+		d: BeanClassLoaderAware
+		e: BeanFactoryAware
+		....
+	E: Bean的自动装配(AutoWiring)
+		a: No: 不做任何操作
+		b: byName: 根据属性名称自动装配.此选项将检查容器并根据名字查找与属性完全一致的bean,并将其与属性自动装配
+		c: byType: 如果容器中存在一个与指定属性类型相同的bean,那么将与该属性自动装配;
+				   如果存在多个该类型的bean,那么抛出异常,并指出不能使用byType方式进行自动装配;
+				   如果没有找到相匹配的bean,则什么事都不会发生
+		d: Constructor: 与byType方式类似,不同之处在于他应用于构造参数.如果容器中没有找到与构造器参数类型一致的bean,那么抛出异常
+	F: Resources:  针对资源文件的同一接口
+		a: Resources: 
+			1: UrlResources: URL对应的资源,根据一个URL地址即可构建
+			2: ClassPathResources: 获取类路径下的资源文件
+			3: FileSystemResources: 获取文件系统里的资源
+			4: ServletContextResources: ServletContext封装的资源,用于访问ServletContext环境下的资源
+			5: InputStreamResources: 针对于输入流封装的资源
+			6: ByteArrayResources: 针对于字节数组封装的资源
+		b: ResourcesLoader: 对Resources加载的类
+			1: classpath: 	eg: "classpath:cc.txt"
+			2: file:	 eg: "file: D:\\aa\\bb\\cc.txt"
+			3: http: 	eg: "http:"
+			4: (none): 
+
+三: Bean管理的注解实现
+				<?xml version="1.0" encoding="UTF-8"?>
+				<beans xmlns="http://www.springframework.org/schema/beans"
+					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					xmlns:p="http://www.springframework.org/schema/p"
+					xmlns:context="http://www.springframework.org/schema/context"
+					xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+				
+					 <context:component-scan base-package="要扫描注解的包" annotation-config="true"> 
+						
+					 </context:component-scan>
+				</beans>
+
+	A: Classpath扫描与组件管理
+			从Spring3.0开始,Spring JavaConfig项目提供了很多特性,包括使用java而不是XML定义bean	B: 类的自动检测
+				eg: @Configuration,@Bean,@Impoet,@DependsOn
+		a: 元注解(Meta-annotations)
+			1: 许多Spring提供的注解可以作为自己的代码,即"元数据注解",元注解是一个简单的注解,可以应用到另一个注解
+			2: 除了value(),元注解还可以有其他的属性,允许定制
+		b: 类的自动检测及Bean的注册
+			Spring可以自动检测类并注册Bean到ApplicationContext中
+	B: <context:component-scan> 和 <context:annotation-config>
+		a: 通过基于XML的Spring配置如下标签(请注意包含上下文命名空间)
+			[http://www.springframework.org/schema/context]和[http://www.springframework.org/schema/context/spring-context.xsd]
+		b: <context:annotation-config>仅会查找在同一个applicationContext中的bean注解
+		c: 为了能够检测这些类并注册相应的bean,需要下面内容
+			1: <context:component-scan (具有annotation-config属性)> 包含 <context:annotation-config>,通常在使用前者后,不用再使用后者
+			2: AutowiredAnnotationBeanPostProcessor 和 CommonAnnotationBeanPostProcessor也会被包含进来
+		d: 使用过滤器进行自定义扫描
+			1: 默认情况下,类被自动发现并注册bean的条件是: 使用@Component,@Repository,@Service,@Controller注解,或使用@Component的自定义注解
+			2: 可以通过过滤器修改上面的行为
+			3: 还可以使用 use-default-filters="false" 禁用自动发现与注册
+		e: @Component,@Repository,@Service,@Controller: bean注解
+			1: @Component: 是一个通用注解,可用于任何bean
+			2: @Repository,@Service,@Controller 是针对性的注解
+				@Repository: 通常用于注解DAO类,即持久层
+				@Service: 通常用于注解Service类,即服务层
+				@Controller: 通常用于注解Controller类,即控制层(MVC)
+	C: 定义Bean	
+		a: 扫描过程中主键被自动检测,那么bean名称是由BeanNameGenerator生成的(@Component,@Repository,@Service,@Controller都会有一个name属性用于显式设置Bean Name)
+			eg: @Component("bean")
+				public class BeanDemo{...}
+		b: 可自定义bean命名策略,实现 BeanNameGenerator 接口,并且一定要提供一个无参构造
+			eg: <context:component-scan  name-generator="MyNameGennerator" >
+	D: @Scope: 作用域(Scope)
+		a: 通常情况下自动查找的Spring组件,其scope是singleton,Spring2.5提供了一个标识scope的注解: @scope
+			eg: @Scope("request")
+				@Component("bean")
+				public class BeanDemo{...}
+		b: 可以自定义scope策略,实现 ScopeMetadataResolver 接口并提供一个无参构造
+			eg: <context:component-scan  scope-resolver="MyScopeMetadataResolver" >
+	E: 代理方式
+		a: 可以使用 scoped-proxy 属性指定代理,有三个值可选: no,interfaces,targetClass
+			eg: <context:component-scan  scoped-proxy="no" >
+	F: @Required
+			@Required注解适用于bean属性的setXxx()方法.这个注解仅仅标表示,受影响的bean属性必须在配置时被填充,通过在bean定义或通过自动装配一个明确的属性值
+	G: @Autowired
+			与@Required类似,可以将@Autowired注解为"传统"的setXxx()方法,也可用于构造器或成员变量
+		a: 默认情况下,如果因找不到合适的bean将会导致autowiring失败抛出异常,可以通过下面的方式避免
+			@Autowired(required=false)
+		b: 每个类只能有一个构造器被标记为 required=true ,@Autowired的必要属性,建议使用 @Required 注解
+		c: 可以使用@Autowired注解那些众所周知的解析依赖接口,eg: BeanFactory,ApplicationContext,Environment,ResourceLoader,ApplicationEventPublisher,MessageSource,...
+		d: 可以通过添加注解给需要该类型的数组的字段或方法,以提供ApplicationContext中的所有特定类型的bean
+		e: 可以用于装配key为String的Map
+		f: 如果希望数组(Array,List)有序,可以让bean实现 org.springframework.core.Ordered 接口或使用 @Order 注解
+		注意: @Autowired是由 Spring BeanPostProcessor 处理的,所以不能再自己的BeanPostProcessor或BeanFactoryPostProcessor类型应用这些注解,这些类型必须通过XML或者Spring的@Bean注解加载
+	G: @Qualifier
+		a: 按类型自动装配可能多个bean实例的情况下,可以使用Spring的@Qualifier注解缩小范围(或指定唯一)
+		b: 也可以用于单独的构造器参数或方法参数
+		c: 可用于注解集合类型变量
+		d: 自定义 qualifier 注解
+			CustomAutowireConfigurer 是 BeanFactoryPostProcessor 的子类,通过他可以注册自己的qualifier注解类型(即使没有使用Spring的@Qualifier注解)		
+	H: @Resource
+		a: @Resource注解适用于变量或setXxx()方法
+		b: 通过独特的名称(id)进行注解注入(这是一个与所声明的类型无关的匹配过程),@Resource有一个name属性,并且默认Spring解释该值作为被注入bean的名称
+		c: 因语义差异,集合或Map类型的bean无法通过@Autowired来注入,因为没有类型匹配到这样的bean,为这些bean使用@Resource注解,通过唯一名称引用集合或Map的bean
+		d: 如果没有显式的指定 @Resource 的name,默认的名称是从属性名或setXxx()方法得出
+		e: 注解提供的名字被解析为一个bean的名称,这是由 ApplicationContext 中的 CommonAnnotationBeanPostProcessor 发现并处理的
+	I: 使用场景
+		a: @Autowired 适用于 fields(字段),constructors(构造器),multi-argument methods(多参数方法) 这些允许在参数级别使用 @Qualifier 注解缩小范围的情况
+		b: @Resource 适用于成员变量,只有一个参数的setXxx()方法,所以在目标是构造器或一个多参数方法时,最好的方式是使用 qualifiers
+	J: 基于java的容器注解
+		a: @Bean 注解标识一个用于配置和初始化一个由SpringIoC容器管理的新对象的方法,类似XML配置文件的<bean>
+		b: 可以在Spring的 @Component 注解的类中使用 @Bean 注解任何方法(仅仅是可以)
+		c: 上一点中,通常使用的是 @Configuration
+			eg: @Configuration
+				public class AppConfig{
+					@Bean											<beans>
+					public MyService myService(){		====>>			<bean id="myService" class="services.MyServiceImpl" >
+						return new MyServiceImpl();		====>>			</bean>
+					}												</beans>
+				}
+	K: @Bean
+		a: 自定义 Bean name: @Bean(name="自定义名称")
+			eg: @Bean(name="qwer")
+		b: 自定义 init-method 和 destory-method: @Bean(init-method="", destory-method="")
+			注解的类要创建自定义指定的两个方法
+		c: 代理方式: @Bean(proxyMode=ScopedProxyMode.字段)
+		d: 作用域: 添加 @Scpoe 注解			
+	L: @ImportResource 和 @Value 
+		@ImportResource注解用于加载资源文件
+		@Value注解用于对资源文件的配置
+			eg: @Configuration
+				@ImportResource("calsspath: properties-config.xml")
+				public class AppConfig{
+					@Value("$(jdbc.url)")
+					private String url;
+					@Value("$(jdbc .username)")
+					private String username;
+					@Value("$(jdbc.password)")
+					private String password;
+					@Bean
+					public DataSource dataSource(){
+						return new DriverManagerDataSource(url,username,password);
+					}
+				}
+	M: @PostConstruct 和 @PreDestroy
+		初始化回调和销毁回调注解,使用前提是 CommonAnnotationBeanPostProcessor 是Spring的ApplicationContext中注册的
+
+四: AOP
+		Aspect Oriented Programming,面向切面,通过预编译方式和运行期动态代理实现程序功能的统一维护的一种技术
+		主要功能: 日志记录,性能统计,安全控制,事务处理,异常处理等等
+		Spring框架中AOP的用途
+			提供了声明式的企业服务,特别是EJB的替代服务的声明
+			允许用户定制自己的切面,以完成OOP与AOP的互补使用
+		注意: 所有基于配置文件的Aspects,只支持单例模式(singleton model)
+	A: AOP实现方式
+		a: 预编译
+			AspectJ
+		b: 运行期动态代理(JDK动态代理,CGLib动态代理)
+			SpringAOP,JbossAop
+	B: AOP的几个相关概念
+		a: Aspect(切面): 一个关注点的模块化,这个关注点可能会横切多个对象
+		b: Joinpoint(连接点): 程序执行过程中的某个特定的点
+		c: Advice(通知): 在切面的某个特定的连接点上执行的动作
+			 Advice的类型:
+				1: Before Advice(前置通知): 在某连接点之前执行的通知,但不能阻止连接点前的执行(除非他抛出一个异常)
+				2: After returning Advice(返回后通知): 在连接点正常完成后执行的通知
+				3: After throwing Avice(抛出异常后通知): 在方法抛出异常退出时执行的通知
+				4: After(finally) Advice(后通知): 在某连接点退出的时候执行的通知(不论是正常返回还是异常退出)
+				5: Around Advice(环绕通知): 包围一个连接点的通知
+		d: Pointcut(切入点): 匹配连接点的断言,在AOP中通知和一个切入点表达式关联
+			1: execution: 用于匹配方法执行的连接点;
+				execution(public * *(..)): 切入点为执行所有public方法时
+				execution(* set*(..)): 切入点为执行所有set开始的方法时
+				execution(* com.xyz.service.AccountService.*(..)): 切入点为执行AccountService类中的所有方法时
+				execution(* com.xyz.service..(..)): 切入点为执行com.xyz.service包下的所有方法时
+				execution(* com.xyz.service...(..)): 切入点为执行com.xyz.service包及其子包下的所有方法时
+			2: winthin: 用于匹配指定类型内的方法执行;(only in Spring AOP)
+				within(com.xyz.service.*)(only in Spring AOP): 
+				within(com.xyz.service..*)(only in Spring AOP)
+			3: this: 用于匹配当前AOP代理对象类型的执行方法;(only in Spring AOP)
+				this(com.xyz.service.AccountService)(only in Spring AOP)
+			4: target: 用于匹配当前目标对象类型的执行方法;(only in Spring AOP)
+			5: args: 用于匹配当前执行的方法传入的参数为指定类型的执行方法;(only in Spring AOP)		
+		e: Introduction(引入): 在不修改类代码的前提下,为类添加新的方法和属性
+		f: Target Object(目标对象): 被一个或者多个切面所通知的对象
+		g: AOP Proxy(AOP代理): AOP框架创建的对象,用来实现切面契约(aspect contract)(包括通知方法执行等功能)
+		h: Weaving(织入): 把切面连接到其他的应用程序类型或者对象上,并创建一个被通知的对象,分为: 编译时织入,类加载时织入,执行时织入
+	C: Spring AOP
+		a: 纯Java实现,无需特殊的编译过程,不需要控制类加载器层次	
+		b: 目前只支持方法执行连接点(通知Spring Bean的方法执行)
+		c: 不是为了提供最完整的AOP实现(尽管他非常强大);而是侧重于提供一种AOP实现和Spring IoC容器之间的整合,用于帮助解决企业应用中的常见问题
+		d: Spring AOP不会与AspectJ竞争,从而提供综合全面的AOP解决方案
+		e: 有接口和无接口的实现区别
+			1: Spring AOP 默认使用标准的JavaSE动态代理作为AOP代理,这使得任何接口(或者接口集)都可以被代理
+			2: Spring AOP 中也可以使用 CGLIB 代理(如果一个业务对象并没有实现一个接口)
+	D: 基于配置的AOP实现
+			<aop:config>
+				<aop:pointcut id="qwe" expression="execution(* com.xyz.service.AccountService.*(..))" />
+				<aop:aspect id="e" ref="Bean Id">
+					<aop:before method="beforeMethod" pointcut-ref="qwe" />
+				</aop:aspect>
+			</aop:config>
+		a: Spring所有的切面和通知器都必须放在一个<aop:config>内(可以配置包含多个<aop:config>元素),
+			每一个<aop:config>可以包含<aop:pointcut>,<aop:advisor>和<aop:aspect>元素(必须按照这个顺序进行声明)
+			<aop:config>风格的配置大量使用了Spring的自动代理机制
+		b: <aop:aspect>: 切面
+			属性: id: 唯一标识;ref: (作为切面的)Bean引用;
+			子标签: 
+				1: <aop:before>: Before Advice(前置通知)
+					属性: method: 通知方法;pointcut: 切入点;pointcut-ref: 切入点引用
+				2: <aop:after-returning>: After returning Advice(返回后通知)
+					属性: returning: 指定可被传递的返回值的参数名称 
+				3: <aop:after-throwing>: After throwing Avice(抛出异常后通知)
+					属性: throwing: 指定可被传递的异常的参数名称
+				4: <aop:after>: After(finally) Advice(后通知)
+				5: <aop:around>: Around Advice(环绕通知)
+					该标签指定的通知方法的第一个参数必须是 ProceedingJoinPoint 类型,该类型的 proceed() 方法会执行真正的方法
+				6: <aop:declare-parents>: Introduction(简介),用于声明所匹配的类型拥有一个新的 parent
+					简介允许一个切面声明一个实现指定接口的通知对象,并且提供了一个接口实现类来代表这些对象
+					属性: types-matching: 匹配类型;implement-interface: 具体使用的接口;default-impl: 接口实现类;
+		c: <aop:pointcut>: 切入点
+			属性: id: 唯一标识;expression: 切入点执行条件
+		d: <aop:advisor>: 只有一个advice
+			切面自身通过一个bean(必须实现某个advice接口)表示,同时,advisor也可以很好的利用AspectJ的切入点表达式
+			Spring通过配置文件中<aop:advisor>元素支持advisor,实际使用中,大多数情况下他会和 transactional advice 配合使用
+			为了定义一个advisor的优先级以便让advice可以有序,可以使用order属性来定义advisor的顺序
+		
+五: Spring对 AspectJ 的支持(要有aspectjweaver.jar)
+	A: AspectJ 的配置
+			@AspectJ的风格类似纯Java注解的普通Java类;Spring可以使用AspectJ来做切入点解析;AOP的运行时仍旧是纯的Spring AOP,对AspectJ的编译器或者织入无依赖性
+		a: 使用XML配置
+			<aop:aspectj-autoproxy>
+		b: Java注解方式
+				@EnableAspectJAutoProxy
+			1: @Aspect: AspectJ切面注解,拥有@Aspect的任何bean将被Spring自动识别并应用
+					用其注解的类可以有方法和字段,他们也可能包括切入点(pointcut),通知(advice)和引入(introduction)声明
+					该注解是不能通过类路径自动检测发现的,所以需要配合使用 @Component 注解或者在xml配置bean
+					一个类的@Aspect注解标识他为一个切面,并且将自己从自动代理中排除
+			2: @Pointcut: 切入点注解,通过注解一个普通的方法定义来实现,方法返回值类型必须为void
+					支持 execution,within,this,target,args,
+						@target: 限定匹配特定连接点的类执行对象的具有给定类型的注解,
+						@args: 限定匹配特定连接点实际传入参数的类型具有给定类型的注解,
+						@within: 限定匹配到内具有给定的注解类型的连接点,
+						@annotation: 限定匹配特定连接点的主体具有给定的注解
+					组合pointcut: 
+						切入点表达式可以通过&&,||和!进行组合,也可以通过名字引用切入点表达式
+			3: Advice: @Before,@AfterReturning,@AfterThrowing,@After,@Around
+				@Before(pointcut="可使用表达式指定,也可以引用已经定义好的@Pointcut")
+				@AfterReturning(pointcut="",returning="存储返回值的变量")
+				@AfterThrowing(pointcut="",throwing="存储异常的变量")
+				@After(pointcut=""),通常用于释放资源
+				@Around(pointcut=""),通知方法的第一个参数必须是 ProceedingJoinPoint 类型
+					eg: @Component
+						@Aspect
+						public class AroundDemo{
+							@Around("com.xyz.myapp.asd.businessService()")
+							public Object doBasicProfiling(ProceedingJoinPoint pjp) throws Throwable{
+								Object retVal = pjp.proceed();
+								return retVal;
+							}
+						}
+			4: @DeclareParents: Introduction(简介),该注解用来定义匹配的类型拥有一个新的parent
+						
+						
+看完关于ioc,bean装载和aop之后的思考，不知道对不对?
+	IOC即DI,不必调用者自己去new被调用对象,而是通过spring IOC容器把配置好的bean对象注入,可以通过设置注入即setter方法和构造器注入.
+	bean装载可以通过xml配置设定,也可以同过设定扫描路径,然后通过注解来让容器识别到要装载的bean.
+	aop面向切面编程,切面与业务是垂直的,不同业务往往都要做一些公共的类似的额外操作,在业务之前做,或在业务之后做,或在业务出了异常时做,或者在业务前后都要做,
+		甚至这些要做的额外操作要用到业务本身的输入参数和业务完成的输出结果.比如业务一般都得记录日志,比如涉及数据更新的业务完成后都得伴随数据库操作,
+		账户各种操作前都要验证用户权限,这些业务伴随的操作往往大致相似,如果每个业务都要写这些操作,特别繁琐,把这些操作提出来就成了切面,与业务分离.
+		xml和API方式都可以实现aop配置,pointcut是业务,aspect是切面,它俩怎么交互执行,怎么传参和调用结果,都可以通过xml和API方式实现.
+	另外还有配置代理这一块比较蒙逼.最牛逼的是,之前看得傻了眼那么繁琐和复杂的xml,api方式用简单直观的aspectj方式竟然能等效实现,用的纯Java标签,
+		在xml 里设一下自动代理.不过仅仅@Aspect容器不识别,要加上@Component 才识别.我觉得标签简直就是福音,差点我就被吓的放弃了.
+		我以为一辈子就只能写xml了.orz,求指正不对的地方,小白求指教......
+
+
+
+

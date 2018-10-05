@@ -1,0 +1,114 @@
+Tomcat容器等级
+	Tomcat的容器分为四个等级,Servlet的容器管理Context容器,一个Context对应一个Web工程
+		Tomcat {Container容器 {Engine引擎容器 {HOST主机容器 [Servlet的容器(Context)(Context).. ] } } }
+	
+创建Servlet类: 	
+	1: 继承HttpServlet类
+	2: 重写doGet()或doPost()方法
+	3: 在web.xml中注册Servlet	
+
+Servlet生命周期
+		Servlet被装载后,Servlet容器创建一个Servlet实例并且调用Servelt的init()方法进行初始化.在Servlet的整个生命周期内.init()方法只被调用一次
+			构造方法 -> 初始化方法init() -> service()方法 -> doGet()/doPost() -> 销毁destory()方法
+	1: 初始化阶段: 
+	2: 加载阶段
+	3: 实例化阶段 
+	4: 服务和销毁阶段
+		响应客户请求,调用service()方法.由service()方法根据提交方法选择执行doGet()或者doPost()方法
+		销毁时调用destory()方法
+		
+Servlet容器装载Servlet时机: 
+	1: Servlet容器启动时自动装载某些Servlet
+		实现它只需要在web.xml文件中<Servlet></Servlet>之间添加如下代码: <load-on-startup>1</load-on-startup>	//整数数字越小表示优先级别越高
+	2: 在Servlet容器启动后,客户首次向Servlet发送请求
+	3: Servlet类文件被更新后,重新装载Servlet
+	
+	
+Servlet与九大内置对象
+	  JSP对象	│			怎样获得
+		out		│	response.getWriter()方法
+	  request	│	service方法中的request参数
+	  response	│	service方法中的response参数
+	  session	│	request.getSession()方法
+	application	│	this.getServletContext()方法(或session.getServletContext())
+	 exception	│	Throwable
+		page	│	this
+	pageContext	│	PageContext
+	   Config	│	this.getServletConfig()方法
+	
+Servlet获取表单数据
+	获取文本密码等的值
+		String request.getParameter(String name);
+			eg: String username = request.getParameter("username");
+	获取复选框的值
+		String[] request.getParameterValues(String name);
+	
+Servlet路径跳转
+		/src/servlet/MyServlet.java
+		/WebRoot/index.jsp
+	web.xml配置文件路径(/servlet/HelloServlet 的第一个代表项目根目录,不可去除)
+		<url-pattern>/servlet/HelloServlet</url-pattern>
+	jsp跳转到Servlet
+		相对路径: "servlet/MyServlet"
+			eg: <a href="servlet/MyServlet"></a>
+		绝对路径: "<%=path%>/servlet/MyServlet"	//path变量表示项目的根目录
+			eg: <a href="<%=path%>/servlet/MyServlet"></a>
+	Servlet跳转到jsp
+		请求重定向: request.getContextPath() + "/index.jsp"
+			eg: response.sendRedirect(request.getContextPath() + "/index.jsp");
+		请求转发: "/index.jsp"或"../index.jsp" 
+			eg: request.getRequestDispatcher("/index.jsp").forward(request,response);
+		
+	
+Servlet高级
+	a: 获取初始化参数
+		1: 在web.xml中配置Servlet时,可以配置一些初始化参数.
+			<init-param><param-name>属性名</param-name><param-value>属性值</param-value></init-param>
+				eg: <init-param>
+						<param-name>username</param-name>
+						<param-value>admin</param-value>
+					</init-param>
+					<init-param>
+						<param-name>password</param-name>
+						<param-value>admin</param-value>
+					</init-param>
+		2: 而在Servlet中可以通过ServletConfig接口提供的方法获取这些参数
+			String getInitParameter(String name): 获取指定属性名的属性值 
+				eg: this.getInitParameter("username");
+			
+	b: MVC设计模式
+		MVC模式: MVC(Model,View,Controller),是软件开发过程中比较流行的设计思想.旨在分离模型(JavaBean),控制(servlet),视图(JSP).是一种分层思想的体现
+	c: Model 2简介
+		JavaWeb的Model2开发模型就是MVC思想的体现
+		
+							  2: 实例化调用
+			 JavaBean(M)  <====================>   Servlet(C)
+				 │									  │	┌┘
+		  3: 读取│							   4: 跳转│	│1: 提交
+				┌┘									 ┌┘	│
+				DB								    JSP(V)
+	
+	
+@WebServlet
+	用于将一个类声明为Servlet,该注解将会在部署时被容器处理,容器将根据具体的属性配置将相应的类部署为Servlet
+	@WebFilter的常用属性:
+		........
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

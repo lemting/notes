@@ -1,0 +1,511 @@
+JavaScript: 小型的,轻量级的,面向对象的,跨平台的客户端脚本语言,基于浏览器的脚本语言
+
+JavaScript功能:
+	表单验证: JS最基本的功能
+	动态HTML: 实现一些动态的,重复的效果
+	交互式: 人机交互,通过键盘或鼠标,与网页中的元素进行交互
+
+JavaScript最初叫"LiveScript",是网景公司(Netscape)开发的,为自己的浏览器Navigator开的客户端语言.想借助Java的名气快速成长起来,因此改名JavaScript
+	
+<script></script>标记
+	网页通过<script></script>标记来引入JS程序代码
+		<script type="text/javascript">JS代码</script>
+	引入外部JS代码
+		<script language="javascript" src=路径></script>
+	
+
+一: 变量
+	A: 语法: var 变量名 = 值;
+		var系统内部的关键字用于声明变量
+		注意: a. 变量名不能以数字开头;
+			  b. 变量名只能包含数字字母下划线
+			  c. 区分大小写
+			  d. 变量名不能与系统关键字相同
+		建议: a. 变量名取的有意义
+		
+		弹出强制要点击操作的窗口: alert(显示的数据);
+		
+	B: 数据类型 
+		基本数据类型
+			a: 数字类型:  Number(整型和浮点型)
+					特殊值: NaN: 不是一个数字,强制转化为数字单转不过来时,将返回一个NaN的值
+			b: 字符类型:  String,char(用''或""引起)
+			c: 布尔类型:  boolean	
+		引用数据类型
+			f: 数组: array
+				eg: var arr = [10,20,30,40];	arr[0] == 10;
+			g: 对象: object
+			h: 方法: function
+		特殊数据类型
+			d: 未定义型:  undefined
+			e: 空型:	  null(可以给变量赋值,清除其数据)
+	
+	C: 运算符
+		a: 计算: -(负值),+,-,*,/,%,++,--
+		b: 逻辑: !,<,>,<=,>=,==,!=,&&,||,?:,===(严格相等),!==(非严格相等)
+		c: 位运算: ~,&,|,!,<<(按位左移),>>(按位右移),>>>(无符号右移)
+		d: 赋值: =,/=,+=,-=,*=,%=,&=(按位与),|=(按位或),^=(按位异或),<<=(左移),>>=,>>>=(无符号右移) 
+		e: 杂项: void,instanceof,in
+				new: 创建一个对象. eg: var today = new Date();
+				delete: 删除数组的元素,或对象的属性(delete 数组的元素后,那个数据变为 undefined)
+				typeof: 一元运算符,获取变量的数据类型.	eg: typeof name(<=> typeof(name)) == "String";
+				.: 主要应用在对象中,通过.去调用对象的属性和方法. eg: window.alert("...");
+				[]: 主要用于访问数组元素.	eg: arr[0] = 100;
+				
+		运算符优先级: (.,[],new,())  >  (!,++,--)	>  (*,/,%)  >  (+,-)  >  (<,>,>=,<=)  >  (==,!=,===,!==)  >  (&&,||,?:)  >  (=,+=,-=,*=,/=,%=)
+					   特殊运算符						算术运算法						 比较运算法				 逻辑运算符			赋值运算符
+二: 控制程序的流程
+	A: 选择结构: 
+		a: if(){}else if{}else{}
+		b: switch(){}
+		c: ?:
+	B: 循环结构
+		a: while(){}
+		b: do{}while();
+		c: for(;;){}
+		d: for(.. in ..){}	(类似于Java增强for)
+			遍历一个对象的所有用户定义的属性或者一个数组的所有元素,for...in 循环中的循环计数器是一个字符串
+				eg: 	// 创建具有某些属性的对象var myObject = new Object();myObject.name = "James";
+						myObject.age = "22";myObject.phone = "555 1234";// 枚举（循环）对象的所有属性
+						for (var prop in myObject){    // 显示 "The property 'name' is James"，等等。
+							window.alert("The property '" + prop + "' is " + myObject[prop]);}
+		
+函数
+	格式: function 函数名(参数列表){[return 语句]}
+		注意: arguments对象
+			在函数代码中,使用特殊对象arguments,开发者无需明确指出参数名,就能访问它们
+	拷贝传值: 将实参值拷贝一份,传给形参
+	引用传值: 将实参的引用传给形参
+			数组赋值,则被赋值的数组将成为要赋值的数组的引用,类似于C中指针赋值,两个指针指向同一内存
+	匿名函数: var 变量名 = function(参数列表){[return 语句]}	//该变量就是一个函数,数据类型是 function,即typeof(变量名) = function;
+		没有函数名,不能单独定义,也不能单独调用,一般是做为数据给其他变量赋值.
+			
+		
+三: 方法
+	常用客户端输出方法	
+		1: document.write(Object obj): 在网页的body标记中输出obj;
+				document 是一个文档对象,代表整个网页
+				eg: document.write("输出");
+					document.write('<h1 style="color: blue;">输出</h1>');
+		2: window.alert(Object obj): 在当前窗口中弹出一个人警告对话框,对话框显示obj;
+				window 是一个窗口对象,代表当前浏览器窗口
+		3: typeof(Object obj): 返回变量的数据类型(String)
+				对于null,对象,数组,将返回"Object"
+		4: Boolean(Object obj): 将数据强制转换为 boolean 型
+		5: String(Object obj): 将数据强制转换为 String 型
+		6: parseInt(String str [,Number radix]): 在str中从左往右提取整型数据,若遇到非整型的内容,则停止提取,并返回结果(第二个参数代表提取出radix(2-36)进制的数)
+		7: parseFloat(String str): 在str中从左往右提取浮点型数据,若遇到非浮点型的内容,则停止提取,并返回结果
+		8: window.prompt(String text [,defaultText]): 弹出一个输入框,让用户输入;text为提示信息,defaultText是输入框中的默认内容   
+
+对象: 
+	JavaScript对象的分类:
+		A: JS内置对象: Array,Date,String,Math,...
+			a: String: 字符串对象
+			b: Array: 数组对象
+			c: Date: 日期时间对象
+			d: Boolean: 布尔对象
+			e: Number: 数值对象 
+			f: Math: 数学对象
+			
+		B: BOM对象(浏览器各组件对象): window,document,location,history,...
+		C: DOM对象(文档对象): 所有的HTML标记,每一个HTML标记否是一个对象
+		D: 自定义对象: 根据自己需要自己定义的对象
+			1: 使用new创建对象
+				a: 使用new关键字结合构造函数Object()来创建一个空的对象
+						var obj = new Object();
+				b: 添加成员变量
+						obj.name = "张三";obj.sex = "男";obj.age = "18";obj.edu;
+				c: 添加成员方法
+						obj.show = function(){document.write("姓名: " + obj.name + "<br />性别: " + obj.sex + "<br />年龄: " + obj.age);}
+				d: 用过对象调用方法
+						obj.show();
+			2: 使用{}创建对象
+					var obj = {
+								name: "张三",sex: "男",age: 18,edu: undefined,
+								show: function(){document.write("姓名: " + obj.name + "<br />性别: " + obj.sex + "<br />年龄: " + obj.age);};
+							};
+							
+	
+一一一: JavaScript内置对象
+
+	A:	String: 字符串对象
+			构造方法: 
+				String(String str): 一字符串创建字符串
+			成员方法:
+				charAt(index): 返回指定位置的字符
+				toString(): 返回该字符串
+				toLowerCase(): 字符串转小写
+				toUpperCase(): 字符串转大写
+				indexOf(searchvalue [,fromindex]): 返回某个指定的字符串值在字符串中首次出现的位置,searchvalue: 需检索的字符串值,fromindex: 在字符串中开始检索的位置
+				lastIndexOf(searchvalue [,fromindex]): 从后向前搜索字符串
+				sub(): 用于把字符串显示为下标
+				substr(start [,length]): 在字符串中抽取从start下标开始的length(若未给length则默认抽取到末尾)长度的字符,返回一个新的字符串
+				substring(start [,stop]): 提取字符串中介于两个指定下标之间的字符,返回一个新的字符串(若未给stop则默认抽取到末尾)
+				sup(): 用于把字符串显示为上标
+				split(separator [,howmany]): 把一个字符串分割成字符串数组.separator: 字符串或正则表达式,howmany: 指定返回的数组的最大长度	
+		
+	B:	Array: 数组对象
+			构造方法: 
+				Array(): 默认构造
+				Array(size): 参数size是期望的数组元素个数.返回的数组,length字段将被设为size的值
+				Array(element0,element0,...,elementn): 新创建的数组的元素就会被初始化为这些值.它的length字段也会被设置为参数的个数
+				
+				var arr = [element0,element1,...,elementX];
+			成员方法:		
+				增: 
+					a: unshift(element1,element2,....,elementX): 向数组的开头添加一个或更多元素,并返回新的长度
+					b: push(element1,element2,....,elementX): 向数组的末尾添加一个或更多元素,并返回新的长度
+					c: concat(arrayX,arrayX,......,arrayX): 连接两个或多个数组,并返回结果
+				删: 
+					d: shift(): 删除并返回数组的第一个元素
+					e: pop(): 删除并返回数组的最后一个元素
+				改: 
+					f: splice(index,howmany [,element1,.....,elementX]): 插入,删除或替换数组的元素.
+						index: 规定从何处添加/删除元素;
+						howmany: 规定应该删除多少元素;
+						element1~elementX: 要添加到数组的新元素,从index开始顺序插入;
+				查: 
+					g: slice(start [,end]): 返回一个新的数组,包含从start到end(若只有start则默认到选取到末尾)的元素
+				其他: 
+					h: join([separator]): 把数组中的所有元素放入一个字符串.separator: 指定要使用的分隔符(如果省略该参数,则使用逗号作为分隔符)
+							未加参数则等同于 toString()方法
+					i: reverse(): 数组元素颠倒
+					j: sort([sortby]): 对数组的元素进行排序(没带参数,则默认是字典顺序排序).sortby: 规定排序顺序,必须是函数
+					k: toString(): 把数组转换为字符串,并返回结果
+		
+	C:	Date: 日期时间对象
+			构造方法: 
+				Date(): 以当前时间毫秒值创建对象
+				Date(dateVal): 如果是数字值,dateVal表示指定日期与1970年1月1日午夜间全球标准时间的毫秒数.如果是字符串,则dateVal按照parse方法中的规则进行解析.
+								dateVal 参数也可以是从某些 ActiveX(R) 对象返回的 VT_DATE 值
+				Date(year, month, date[, hours[, minutes[, seconds[,ms]]]]): 年,月,日[,时[,分[,秒]]]
+			成员方法: 
+				a: Date(): 返回当日的日期和时间
+				b: getFullYear(): 以四位数字返回年份
+				c: getMonth(): 返回月份(0~11)	
+				d: getDate(): 返回一个月中的某一天(1~31)
+				e: getDay(): 返回一周中的某一天(0~6)
+				f: getHours(): 返回小时(0~23)
+				g: getMinutes(): 返回分钟(0~59)
+				h: getSeconds(): 返回秒(0~59)
+				i: getMilliseconds(): 返回毫秒(0~999)
+				j: getTime(): 返回1970年1月1日至今的毫秒数
+				k: toString(): 把日期转换为字符串,并返回结果
+
+	D:	Math: 数学对象
+			静态成员变量:
+				E: 算术常量e,自然对数的底数(约2.718).
+				LN2: 2 的自然对数(约0.693)
+				LN10: 10 的自然对数(约2.302)
+				LOG2E: 以 2 为底的e的对数(约1.414)
+				LOG10E: 以 10 为底的e的对数(约0.434)
+				PI: 圆周率(约3.1415926).
+				SQRT1_2: 2 的平方根的倒数(等于0.707)
+				SQRT2: 2 的平方根(约1.414)
+			静态成员方法: 	
+				三角函数:
+					sin(x): 正弦
+					cos(x): 余弦
+					tan(x): 正切
+					acos(x): 反余弦
+					asin(x): 反正弦
+					atan(x): 反正切
+					atan2(y,x): 从x轴到点(x,y)之间的角度
+				取整: 
+					abs(x): 绝对值
+					ceil(x): 向上取整
+					floor(x): 向下取整
+					round(x): 四舍五入取整
+				比较值: 
+					max(x,y): 两数的最大值
+					min(x,y): 两数的最小值
+				指数对数: 
+					exp(x): e的x次幂
+					log(x): e为底x的自然对数
+					pow(x,y): x的y次幂 
+					sqrt(x): 根号x
+				随机数: 
+					random(): (0~1)间的随机数
+					
+	E: 	Number: 数值对象
+			构造方法: 
+				Number(value): value是要创建的 Number 对象的数值,或是要转换成数字的值
+			成员方法: 
+				toFixed([num]): 把数字转换为字符串,结果的小数点后有指定位数的数字(未带参数,则默认是小数点后0位)
+				valueOf(): 返回基本数字值的字符串形式(相当于toString(10))
+				toString([radix]): 以radix进制转换为一个字符串(未带参则默认是10进制)
+			
+二二二: BOM对象(浏览器各组件对象)	
+
+	A: 	window(浏览器窗口): JS中最大的对象,其他所有的对象都是window的子对象
+			静态成员变量
+				a: closed: 返回窗口是否已被关闭(boolean)
+				b: name: 设置或返回窗口的名称.	eg: window.name = "asdsa"; var winname = window.name;
+				c: top: 返回最顶层的先辈窗口	
+				d: parent: 返回父窗口
+				e: self: 返回对当前窗口的引用
+				f: innerWidth: 返回窗口的文档显示区的宽度(部分IE浏览器不支持)
+					在IE下, 使用 document.documentElement.clientWidth 来代替
+						document.documentElement 就是<html>标记对象
+				g: innerHeight: 返回窗口的文档显示区的高度(部分IE浏览器不支持) 	
+					在IE下, 使用 document.documentElement.clientHeight 来代替
+			静态成员函数
+				a: alert(message): 显示带有一段message消息和一个确认按钮的警告框
+				b: prompt([text][,defaultText]): 显示可提示用户输入的对话框.txt: 要在对话框中显示的纯文本,defaultText: 默认的输入文本
+				c: confirm(message): 显示带有一段消息以及确认按钮和取消按钮的对话框.message: 要在对话框中显示的纯文本
+						如果用户点击确定按钮,则返回 true,如果点击取消按钮,则返回 false
+				d: close(): 关闭浏览器窗口
+				e: open([URL][,name][,features][,replace]): 打开一个新的浏览器窗口或查找一个已命名的窗口,返回一个window对象的引用
+						URL: 声明了要在新窗口中显示的文档的路径,若省略了这个参数,或者它的值是空字符串,那么新窗口就不会显示任何文档
+						name: 新窗口的名称,若该参数指定了一个已经存在的窗口,那么该方法就不再创建一个新窗口,而只是返回对指定窗口的引用,在这种情况下,features将被忽略
+						features: 新窗口要显示的标准浏览器的特征,若省略该参数,新窗口将具有所有标准特征
+								width: 新窗口的宽度
+								height: 新窗口的高度
+								left: 新窗口距屏幕左边的距离
+								top: 新窗口距屏幕上边的距离
+								menubar: 是否显示菜单栏,取值: yes,no,1,0
+								toolbar: 是否显示工具栏
+								status: 是否显示状态栏
+						replace: 取值: true: 替换浏览历史中的当前条目;false: 在浏览历史中创建新的条目	
+					eg: window.open("src/a.html","win2","width: 400,height: 300");
+				e: print():	打印当前窗口的内容
+				f: blur(): 可把键盘焦点从顶层窗口移开 
+				g: focus(): 把键盘焦点给予一个窗口
+延时器:			h: setTimeout(code,millisec): 在指定的毫秒数后调用函数或计算表达式.code: 要执行的JavaScript代码串,millisec: 在执行代码前需等待的毫秒数。				
+				i: clearTimeout(id_of_settimeout): 取消由 setTimeout()方法设置的timeout,id_of_settimeout: 由 setTimeout()返回的ID值
+定时器:			j: setInterval(code,millisec[,"lang"]): 按照指定的周期(以毫秒计)来调用函数或计算表达式.code: 要调用的函数或要执行的代码串,millisec: 周期性执行或调用 code 之间的时间间隔，以毫秒计
+				k: clearInterval(id_of_settimeout): 取消由 setInterval()方法设置的timeout,id_of_settimeout: 由 setInterval()返回的ID值
+	B: 	location(地址栏): 对地址栏操作
+			静态成员变量: 
+				a: href: 设置或返回完整的 URL.可以实现JS网页跳转
+				b: host: 设置或返回主机名和当前 URL 的端口号
+				c: hostname: 设置或返回当前 URL 的主机名
+				d: pathname: 设置或返回当前 URL 的路径部分
+				e: search: 设置或返回从问号(?)开始的 URL(查询部分)
+				f: protocol: 设置或返回当前 URL 的协议
+				g: hash: 设置或返回从井号(#)开始的URL(锚)
+			静态成员方法:
+				a: reload(force): 重新加载当前文档.force: 为true时,强制刷新
+				b: assign(): 加载新的文档
+				c: replace(): 用新的文档替换当前文档
+	C: 	history(浏览历史): 对历史记录进行操作
+			静态成员变量: 
+				length: 返回浏览器历史列表中的URL数量
+			静态成员方法:
+				a: go(number|URL): 加载历史列表中的某个具体的页面.number: 访问的URL在 history 的URL列表中的相对位置,URL: 要访问的URL或URL的子串
+					history.go(0): 刷新网页;history.go(-1): 后退一步;history.go(2): 前进两步; 
+				b: forward(): 方法可加载历史列表中的下一个URL
+				c: back(): 加载 history 列表中的前一个 URL				
+	D:	screen(显示器屏幕): 获取屏幕的相关信息
+			静态成员变量: 
+				a: width: 屏幕的宽度
+				b: height: 屏幕的高度
+				c: availWidth: 屏幕的有效宽度.不含任务栏
+				d: availHeight: 屏幕的有效高度		
+	E: 	navigator(浏览器软件): 主要用来判断客户端用的是什么浏览器,可以解决兼容性问题
+			静态成员变量:
+				a: appName: 返回浏览器的名称.取值: Netscape(Firefox),Microsoft Intenet Explorer(IE),...
+				b: appVersion: 返回浏览器的平台和版本信息
+				c: systemLanguage: 返回 OS 使用的默认语言
+				d: userLanguage: 返回 OS 的自然语言设置
+				e: platform: 返回运行浏览器的操作系统平台			
+	F: 	document(网页)
+			
+			
+三三三: DOM对象(文档对象)	
+		
+		节点树
+			document: 文档节点,代表整个网页,不代表任何HTML标记.但他是html节点的父节点
+			element: 元素节点,指任何HTML标记.每一个HTML标记就称为一个元素节点.他可以文本节点和属性节点
+			attribute: 属性节点.指HTML标记的属性
+			text: 文本节点.是节点树的最底节点
+	
+		主要提供了访问和操作HTML标记的方式.DOM可以使用脚本
+		document.documentElement 就是<html>标记对象
+		
+	A: 核心DOM: 提供了同时操作HTML文档和XML文档的公共的属性和方法
+			核心DOM中查找节点(标记),都是从根节点(html标记)开始的
+		a: 节点属性(查看<html>标记: document.documentElement)
+			nodeName: 节点名称
+			nodeValue: 节点值,只有文本节点才有值.只能是纯文本,不能带有HTML标记
+			firstChild: 第一个子节点
+			lastChild: 最后一个子节点
+			childNodes: 子节点列表,返回一个数组
+			parentNode: 父节点
+		b: 对节点属性操作
+			setAttribute(name,value): 给某个节点添加一个属性.name: 属性名,value: 属性值
+			getAttribute(name): 获取某个节点属性的值
+			removeAttribute(name): 删除某个节点的属性
+		c: 节点的创建
+			createElement(tagName): 创建一个指定的标记.tagName: 不带"<>"的标记名
+			appendChild(elementObj): 将创建的节点追加到某个父节点下,elementObj: 创建的一个子节点
+					eg: document.body.appendChild(document.createElement("img"));
+			removeChild(elementObj): 删除节点
+			
+	B: HTML DOM: 针对HTML文档提供的专用的属性方法
+			如果在核心DOM中,网页中节点层次很深时,访问这个节点时将十分麻烦;HTML DOM中就提供了通过id直接找节点的方法,而不再HTML根节点开始
+		每一个HTML标记,都对应一个元素对象;每一个HTML标记的属性,与对应的元素对象的属性,一一对应.
+			eg: document.getElementById("id_1").style = "color: red";
+				document.getElementById("id_1").parentNode.title = "qwer";
+		a: 访问HTML元素
+			getElementById(ID): 返回一个指定id的元素.ID: 元素的ID值
+			getElementsByTagName(tagName): 返回一个指定标记的元素数组.tagName: 不带"<>"的标记名
+			getElementsByClassName(): 返回一个指定类的元素数组.
+		b: 元素对象的属性
+			tagName: 标记名称,与核心DOM中的nodeName一样
+			className: 类的名称
+			id: 同HTML的id属性一样
+			title: 同HTML的title属性一样
+			style: 同HTML的style属性一样
+			innerHTML: 包含HTNL标记中的所有内容,包括HTML标记等.
+			offsetWidth: 元素对象的宽度(不带px单位)
+			offsetHeight: 元素对象的高度(不带px单位)
+			scrollWidth: 元素对象的总宽度,包括滚动条中的内容(不带px单位)
+			scrollHeight: 元素对象的总高度,包括滚动条中的内容(不带px单位)
+			scrollTop: 指内容向上滚动上去了多少距离
+			scrollLeft: 指内容向左滚动上去了多少距离
+		c: HTML DOM Table对象
+			Table对象集合: 
+				rows[]: 返回包含表格中所有行的一个数组
+				cells[]: 返回包含表格中所有单元格的一个数组
+					eg: 表的第二行的所有单元格: tableObj.row[1].cells;
+		d: HTML DOM Form对象
+			获取表单元素
+				1: 通过网页元素的id获取对象: document.getElementById(表单元素id);
+				2: 通过HTML标记名获取对象: fromObj.getElementsByTagName(标记名);
+				3: 通过name属性来获取: document.fromObj.elementObj.(fromObj: 表单对象,elementObj: 表单元素对象)
+						
+			Form对象集合:
+				elements[]: 返回包含表单中所有元素的数组
+			Form对象属性:
+				name: 设置或返回表单的名称
+				action: 设置或返回表单的action属性(action属性定义了当表单被提交时数据被送往何处)	
+				length: 返回表单中的元素数目
+				method: 设置或返回用于表单提交的 HTTP 方法,取值: get,post
+				enctype: 设置或返回表单用来编码内容的 MIME 类型
+			Form对象方法: 
+				reset(): 可把表单中的元素重置为它们的默认值
+				submit(): 把表单数据提交到 Web 服务器
+			Form对象事件句柄
+				onreset: 在重置表单元素之前调用 
+				onsubmit: 在提交表单之前调用
+				事件返回值: false: 阻止默认动作的执行,true: 默认动作继续执行 
+			
+			表单验证提交
+				1: 提交按钮 + 表单 onsubmit 事件验证
+				2: 提交按钮 + 提交按钮 onclick 事件验证
+				3: 普通按钮 + submit()方法验证提交
+		e: HTML DOM Input对象 
+			Input对象属性		
+				name: 设置或返回表单元素的名称
+				value: 设置或返回表单元素的值
+				size: 设置或返回表单元素的长度
+				maxLength: 设置或返回表单元素中的最大字符数		
+			Input对象方法
+				focus(): 获取焦点
+				blur(): 失去焦点
+				select(): 选中文本
+			Input对象事件
+				onfocus: 当元素获得焦点时运行脚本 
+				onblur: 当元素失去焦点时运行脚本
+		f: HTML DOM Select对象		
+			Select对象集合: 
+				options[]: 返回包含下拉列表中的所有选项的一个数组
+			Select对象属性:
+				selectedIndex: 设置或返回下拉列表中被选项目的索引号(默认选中)
+				length: 返回下拉列表中的选项数目
+				name: 设置或返回下拉列表的名称
+			Select对象方法:
+				add(option,before): 向下拉列表添加一个选项.option: 要添加选项元素,before: 在选项数组的该元素之前增加新的元素.如果该参数是null,元素添加到选项数组的末尾
+						eg: try{x.add(y,null); /*standards compliant*/}
+							catch(ex){x.add(y); /*IE only*/}
+				remove(index): 从下拉列表删除选项.index: 要删除的选项的索引值
+							
+		g: HTML DOM Option对象
+			Option对象属性:
+				text: 设置或返回某个选项的纯文本值 
+				value: 设置或返回被送往服务器的值 
+				selected: 若值为true,默认选中该选项
+			
+	C: XML DOM: 针对XML文档提供的专用的属性方法
+	D: CSS DOM: 针对操作CSS提供的专用的属性方法
+			使用JS操作CSS中的个属性.JS只能操作或修改行内样式,对于类样式,可以通过className来赋值
+		每个HTML标记都有一个style属性.这个style属性又是一个style对象.这个style对象的属性与CSS中的属性一一对应.
+		style对象属性名与CSS属性名的转换
+			若属性名是一个单词,style对象属性与CSS属性一样;若属性名是多个单词,则第一个单词小写,后面每个单词的首字母大写,并去掉"-".
+				eg: imgObj.style.border = "1px solid red";	divObj.style.backgroundColor = "red";	divObj.style.fontSize = "18px";	
+			
+	E: Event DOM: 事件对象模型. eg: onclick,onload 等
+		
+		Event对象
+			Event对象代表事件的状态,比如事件在其中发生的元素,键盘按键的状态,鼠标的位置,鼠标按钮的状态.事件通常与函数结合使用,函数不会在事件发生前被执行！
+			a: DOM(标准浏览器)中引入Event对象
+				1: 通过HTML标记的事件属性来传递 event 对象
+					在DOM中,event 对象是作为事件调用函数时的实参,传递给函数.
+					该 event 参数,是系统固定写法: 全小写,不能加引号.
+						eg: <img src="" onclick="get_xy(event)" />  <script> function get_xy(e){return e.clientX + "," + e.clientY;} </script>
+				2: 使用元素对象的事件属性来传递 event 对象
+					不能传 event 参数,但形参必须接收 event.函数形参第一个参数是 event 对象
+						eg: <img src="" id="img_1" />  
+							<script> 
+								window.onload = function(){document.getElementById("img_1").onclick = get_xy;}
+								function get_xy(e){window.alert("(" + e.clientX + "," + e.clientY + ")");} 
+							</script>
+			b: 事件句柄属性(具体事件详见HTML事件)
+				HTML标记都有相应的事件属性.每一个HTML标记,都对应一个元素对象.元素对象也具有相应的事件属性
+				但是,元素对象的事件属性应该全小写	
+			c: 标准Event属性
+				bubbles: 返回布尔值，指示事件是否是起泡事件类型
+				cancelable: 返回布尔值，指示事件是否可拥可取消的默认动作
+				currentTarget: 返回其事件监听器触发该事件的元素
+				eventPhase: 返回事件传播的当前阶段 
+				target: 返回触发此事件的元素(事件的目标节点)
+				timeStamp: 返回事件生成的日期和时间
+				type: 返回当前Event对象表示的事件的名称
+			d: 鼠标/键盘属性
+				altKey: 返回当事件被触发时，"ALT" 是否被按下
+				button: 返回当事件被触发时，哪个鼠标按钮被点击
+				clientX: 返回当事件被触发时，鼠标指针的水平坐标(相对于浏览器页面)
+				clientY: 返回当事件被触发时，鼠标指针的垂直坐标(相对于浏览器页面)
+				ctrlKey: 返回当事件被触发时，"CTRL" 键是否被按下 
+				metaKey: 返回当事件被触发时，"meta" 键是否被按下	
+				relatedTarget: 返回与事件的目标节点相关的节点
+				screenX: 返回事件发生时鼠标指针相对于屏幕的x坐标
+				screenY: 返回事件发生时鼠标指针相对于屏幕的y坐标
+				shiftKey: 返回当事件被触发时，"SHIFT" 键是否被按下 
+			e: IE属性(除了上面的鼠标/事件属性,IE 浏览器还支持下面的属性)
+				cancelBubble: 如果事件句柄想阻止事件传播到包容对象，必须把该属性设为 true。 
+				fromElement: 对于 mouseover 和 mouseout 事件，fromElement 引用移出鼠标的元素。 
+				keyCode: 对于keypress事件,该属性声明了被敲击的键生成的Unicode字符码.对于keydown和keyup事件，它指定了被敲击的键的虚拟键盘码.虚拟键盘码可能和使用的键盘的布局相关 
+				offsetX: 发生事件的地点在事件源元素的坐标系统中的x坐标
+				offsetY: 发生事件的地点在事件源元素的坐标系统中的y坐标
+				returnValue: 如果设置了该属性，它的值比事件句柄的返回值优先级高。把这个属性设置为 fasle，可以取消发生事件的源元素的默认动作。 
+				srcElement: 对于生成事件的 Window 对象、Document 对象或 Element 对象的引用。 
+				toElement: 对于 mouseover 和 mouseout 事件，该属性引用移入鼠标的元素。 
+				x,y: 事件发生的位置的x坐标和y坐标,它们相对于用CSS动态定位的最内层包容元素
+		IE中Event对象
+			IE中的Event对象,是window对象的一个属性,可以通过window对象调用,而不需要传参数.
+				eg: window.event.screenX;
+			
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		

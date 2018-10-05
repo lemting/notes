@@ -1,0 +1,246 @@
+AJAX: Asynchronous JavaScript and XML(异步的JavaScript和XML)
+
+Ajax 不是某种编程语言,是一种在无需重新加载整个网页的情况下能够 更新部分网页的技术
+
+Ajax 异步
+	运用HTML和CSS来实现页面,表达信息
+	运用XMLHttpRequest和web服务器进行数据的异步交换
+	运用JavaScript 操作DOM,实现动态局部刷新
+	
+HTTP请求
+	1: 创建TCP连接
+	2: Web浏览器向Web服务器发送请求命令
+	3: Web浏览器发送请求头信息
+	4: Web服务器应答
+	5: Web服务器发送请求应答头信息
+	6: Web服务器向Web浏览器发送数据
+	7: Web服务器关闭TCP连接
+HTTP状态码
+		HTTP状态码由3位数字构成,其中首位数字定义了状态码的类型
+	1XX: 信息类,表示收到Web浏览器请求,正在进一步处理中
+	2XX: 成功,表示用户请求被正确接收,理解和处理,eg: 200 OK
+	3XX: 重定向,表示请求没有成功.客户必须采取进一步的动作
+	4XX: 客户端错误,表示客户端提交的请求有错误,eg: 404 NOT Found,意味着请求中所引用的文档不存在
+	5XX: 服务器错误,表示服务器不能完成对请求的处理, eg: 500
+	
+	
+Ajax
+	a: 创建XMLHttpRequest对象
+		var request = new XMLHttpRequest();
+		IE6及以下: var request = new ActiveXObject("Microsoft.XMLHTTP");
+		
+		var request;
+		if(window.XMLHttpRequest)
+			request = new XMLHttpRequest(); //IE7+,Firefox,Chrome,Opera,Safari...
+		else
+			request = new ActiveXObject("Microsoft.XMLHTTP"); //IE6,IE5
+	b: XMLHttpRequest发送请求
+		1: open(method,url,async): 调用请求
+					method: 请求方式,
+					url: 请求地址, 
+					async: 请求同步还是异步,取值: true(默认),false
+		2: sand(String string): 发送请求到服务器
+					string: GET方式时不填,POST的方式时的不填就没有意义
+		3: setRequestHeader(String,String): 设置HTTP头					
+			eg: xmlhttprequest.open("GET","get.php",true); xmlhttprequest.sand();
+			eg:	xmlhttprequest.open("POST","post.php",true); 
+				xmlhttprequest.setRequestHeader("Context-type","application/x-www-from-urlencoded"); 
+				xmlhttprequest.sand("name=王二狗&sex=男");
+	c: XMLHttpRequest获取响应
+		1: responseText: 获取字符串形式的响应数据
+		2: responseXML: 获取XML形式的响应数据
+		3: status,statusText: 以数字和文本形式返回HTTP状态码
+		4: getAllResponseHeader(): 获取所有的响应报头
+		5: getResponseHeader(String name): 查询响应中的某个字段的值
+		6: readyState: 值: 
+							0: 请求未初始化,open还没有调用
+							1: 服务器连接已建立,open已经调用了
+							2: 请求已接收,也就是接收到头信息了
+							3: 请求处理中,也就是接收到响应主体了
+							4: 请求已完成,且响应已就绪,也就是响应完成了						
+		利用onreadystatechange事件来监听readyState属性的值的变化
+			eg: var xmlhttprequest = new XMLHttpRequest();
+				xmlhttprequest.open("POST","get.php",true); 	
+				xmlhttprequest.setRequestHeader("Context-type","application/x-www-from-urlencoded");
+				xmlhttprequest.sand("name=王二狗&sex=男");
+				xmlhttprequest.onreadystatechange = function()
+				{
+					if(xmlhttprequest.readyState === 4 && xmlhttprequest.status === 200){/*做一些事情*/}
+				}
+	d: jQuery实现Ajax		
+		1: jQuery插件中获取DOM: 
+			根据ID: $("#ID")
+		2: DOM的value: 
+			获取value: $("#ID").val();
+			设置value: $("#ID").val(数据);
+		3: DOM的innerHTML: 
+			获取innerHTML: $("#ID").html();
+			设置innerHTML: $("#ID").html(HTML内容);
+		4: jQuery.ajax({settings})
+			设定值: 
+				1: type: 类型,取值: "GET"(默认)或"POST"
+				2: url: 发送请求的地址
+				3: data: 一个对象,连同请求发送到服务器的数据
+				4: dataType: 预期服务器返回的数据类型.如果不指定,jQuery将自动根据HTTP包MIME信息来智能判断,一般我们采用json格式,可以设置为"json"
+				5: success: 一个方法,请求成功后的回调函数.传入返回后的数据,以及包含成功代码的字符串
+				6: error: 一个方法,请求失败时回调此函数,回调函数会传入XMLHttPRequest对象
+					eg: $.ajax({
+						  url: "/api/getWeather",
+						  data: {
+							zipcode: 97201,
+							name: "张三"
+						  },
+						  success: function(result) {$("#weather-temp").html("<strong>" + result + "</strong> degrees");}
+						  error: function(jqXHR) {alert("发生错误: " + jqXHR.status);}
+						});
+	e: 跨域
+			一个域名地址的组成
+				http://   www   .  xxx.com  :   8080  / script/jquery.js
+				 协议    子域名    主域名      端口号     请求资源地址
+			当协议,子域名,主域名,端口号中任意一个不同时,都算作不同域
+			不同域之间互相请求资源,就算作"跨域"
+			JavaScript出于安全方面的考虑,不允许跨域调用其他页面的对象
+		处理跨域方法
+			1: 代理
+					北京服务器(域名: www.beijing.com)
+					上海服务器(域名: www.shanghai.com)
+				北京服务器要想获取上海服务器的数据,通过在同域名的web服务器端创建一个代理: 						
+				比如在北京的web服务器的后台(www.beijing.com/aaa.php)来调用上海服务器(www.shanghai.com/bbb.php)的服务,
+				然后再把响应结果返回给前端,这样前端调用北京同域名的服务就和调用上海的服务器效果相同了
+			2: JSONP(不支持POST请求)
+					可用于解决主流浏览器的跨域数据访问的问题
+				在www.aaa.com页面中: 
+					<script>
+						function jsonp(json){alert(json["name"]);}
+					</script>
+					<script src="http:// www.bbb.com/jsonp.js"></script>
+				在www.bbb.com页面中
+					jsonp({'name':"洪七",'age':24});
+			3: XHR2
+				HTML5提供的XMLHttpRequest Level2已经实现了跨域访问以及其他的一些新功能(IE10以下版本不支持)
+				在服务器做一些改动: (PHP方法)
+					header('Access-Control-Allow-Origin:*');	(*代表可以访问所有的域名,可以改为指定域名)
+					header('Access-Control-Allow-Methods:POST,GET');
+				
+				
+				
+JSON
+		JavaScript Object Notation, JSON是一种与开发语言无关的,轻量级的数据格式
+		易于人的阅读和编写,易于程序解析和产生	
+		json可以使用JavaScript内建的方法直接进行解析,转换成JavaScript对象,非常方便
+	a: JSON数据的书写格式: 名称/值对
+		名称/值对组合中的名称写在前面(在双引号中),值写在后面,中间用冒号隔开
+			eg: "name":"郭靖"
+	b: JSON数据类型
+		1: number: 数字(整数或浮点数)
+		2: String: 字符串
+		3: true/false: 布尔值
+		4: Array: 数组
+			使用中括号[]来起始,并用逗号","来分隔元素
+		5: Object: 对象
+			使用花括号{}包含的键值对结构,Key必须是String类型,value任意,每个键值对用逗号","隔开
+		6: null: 空
+			eg: {
+					"staff":[
+						{"name": "洪七", "age": 70},
+						{"name": "郭靖", "age": 35},
+						{"name": "黄蓉", "age": 30}
+					]
+				}
+	c: JavaScript解析JSON
+			在代码中使用eval是很危险的!特别是用它执行第三方的JSON数据(其中可能包含恶意代码)时,
+			尽可能使用JSON.parse()方法解析字符串本身,该方法还可以捕捉JSON中的语法错误
+		1: eval()
+				解析后返回一个对象
+			eg: var jsonData = '{"staff":[{"name": "洪七", "age": 70},{"name": "郭靖", "age": 35},{"name": "黄蓉", "age": 30}]}';
+				var jsonObj = eval('(' + jsonData + ')');	
+				alert(jsonObj.staff[0].name);
+		2: JSON.parse()
+				解析后返回一个对象
+			eg: var jsonData = '{"staff":[{"name": "洪七", "age": 70},{"name": "郭靖", "age": 35},{"name": "黄蓉", "age": 30}]}';
+				var jsonObj = JSON.parse(jsonData);	
+				alert(jsonObj.staff[0].name);
+	d: Java构建JSON文件(JSONObject) 
+		1: 通过put()构建JSON
+			创建JSONObject对象,通过put()方法添加元素,通过toString()方法转化为JSON格式的字符串
+				eg: JSONObject jsonObj = new JSONObject();
+					jsonObj.put("name","王小二"); jsonObj.put("age", 23.2); jsonObj.put("birthday","1990-01-01");
+					syso(jsonObj.toString());
+		2: 通过Map构建JSON
+			创建Map对象并添加键值对,通过Map对象创建JSONObject对象,调用toString()方法转化为JSON格式的字符串
+				eg: HashMap<String,Object> hm = new HashMap<String, Object>();
+					hm.put("name","王小二"); hm.put("age", 23.2); hm.put("birthday","1990-01-01");
+					JSONObject jsonObj = new JSONObject(hm); syso(jsonObj.toString());
+		3: 使用JavaBean构建JSON
+			通过JavaBean(成员变量为JSON元素的键,变量值为JSON元素的值)对象创建JSONObject对象,通过toString()方法转化为JSON格式的字符串
+				eg: JavaBean: AAA(String name,int age,String birthday);
+					JSONObject jsonObj = new JSONObject(new AAA("王小二",23,"1990-01-01"));
+					syso(jsonObj.toString());
+	e: Java解析JSON(JSONObject)
+		1: 通过 String FileUtils.readFileToString(File file) 方法解析JSON文件,获取JSON格式的字符串,根据字符串创建JSONObject对象,通过对象的getXxx()方法获取数据
+			eg: File file = new File("src//wangxiaoer.json");
+				String content = FileUtils.readFileToString(file);
+				JSONObject jsonObj = new JSONObject(content);
+	f: Java生产JSON文件(GOSN)
+		1: 通过JavaBea构建
+			创建Gson对象,通过toJson()方法转换为JSON格式的字符串
+				eg: JavaBean: AAA(String name,int age,String birthday);
+					Gson g = new Gson();
+					syso(g.toJson(new AAA("王小二",23,"1990-01-01")));
+	e: Java解析JSON(GOSN)
+		1: 通过 String FileUtils.readFileToString(File file) 方法解析JSON文件,获取JSON格式的字符串,根据字符串调用Gson对象的fromJson()方法生成JavaBean              
+			eg: File file = new File("src//wangxiaoer.json");
+				String content = FileUtils.readFileToString(file);
+				AAA a = new GsonBuilder().setDataFormat("yyyy-MM-dd").create().fromJson(content,AAA.class);	//可以转换日期对象		
+		
+	Gson: 
+		构造方法: 
+			Gson()
+		成员方法; 
+			1: String toJson(Object bean): 将JavaBean对象转换为JSON格式的字符串
+			2: T fromJson(String json,Class<T> classOfT): 将JSON格式的字符串转换为JavaBean对象(集合和数组之间会自动无缝转换)
+			3: T fromJson(Reader json,Class<T> classOfT)
+	GsonBuilder: 
+		成员方法: 
+			1: void setPrettyPrinting(): 设置自动换行美化
+			2: Gson create(): 创建Gson对象
+			3: GsonBuilder setDataFormat(String format): 设置日期的格式 
+		
+	JSONObject: (需要导入JSON的jar包)
+		构造方法: 
+			1: JSONObject(): 创建空键值对的JSONObject对象
+			2: JSONObject(Map<?,?> m): 通过map的键值对创建JSONObject对象
+			3: JSONObject(Object bean): 通过JavaBean对象创建JSONObject对象
+			4: JSONObject(String source): 通过字符串创建JSONObject对象
+		成员方法: 
+			添加元素: 
+				1: void put(String key,value): 添加元素(键值对,key相同会覆盖)
+			转换为JSON格式的字符串: 
+				1: String toString(): 转换为JSON格式的字符串 (当value==null时，json会自动屏蔽此value对应的key)
+			获取元素: 
+				1: Object get(String key): 获取指定key的元素值
+				2: String getString(String key): 获取指定key的元素值
+				3: Double getDouble(String key): 获取指定key的元素值
+				4: JSONObject getJSONObject(String key): 获取指定key的元素值
+				5: Number getNumber(String key): 获取指定key的元素值
+				其他类似: getInt(),getFloat(),getLong(),getBoolean(),getJSONArray()
+			判断: 
+				1: boolean isNull(String key): 判断JSONObject对象中是否存在指定key
+			
+	JSONArray: (需要导入JSON的jar包)
+		成员方法: 
+			1: int length(): 获取数组长度
+			2: Object get(int index): 获取指定索引的元素
+		
+
+	
+
+
+
+
+
+
+
+
+
+

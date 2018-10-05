@@ -1,0 +1,554 @@
+字体: Unicode->Consolas
+
+HTML: Hypertext Markup Langusge,超文本标注语言
+
+	HTML代码: 主要控制网页结构
+	CSS代码: 主要控制网页外观
+	JavaScript代码: 主要控制网页的行为
+
+HTML文件结构
+
+	<html> 
+		<head>
+			<title>标题</title>
+		</head>
+		<body>
+			网页正文
+		</body>
+	</html>
+
+	文件结构说明: 
+		a: <html> </html>标记的含义: 告诉浏览器,其中的代码用什么格式(图片,视频)来编译 
+		b: <head> </head>标记的含义: 告诉浏览器,网页中的汉字用什么字符集(GB2312简体,BIG5繁体,JIS日文)显示.
+		c: <body> </body>标记的含义: 是网页主要内容的显示区域.网页中99%的内容都必须放在<body>中.只有放在<body>中,最终浏览器翻译以后,才能看见结果
+		   <body>的常用属性
+				bgcolor: 网页背景色. eg: <body bgcolor="red">
+				background: 网页背景图片地址. eg: <body background="images/bg.gif">	
+	
+HTML标记
+		
+	A: 双边标记
+		指有开始和结束标记,内容放在开始和结束标记之间
+		语法格式: <标记 属性1 = 值1 属性2 = 值2...>  内容 </标记>
+		
+		HTML文本修饰标记: <b>: 加粗,<i>: 斜体,<u>: 下划线,<s>: 删除线,<sup>: 上标文本,<sub>: 下标文本,<font>: 字体
+		<b></b>: 将内容加粗
+		<font></font>: 修改内容字体 <font size = "10" color = "red" face = "楷体"></font>: 字体大小(1-7),颜色,字体
+	
+	B: 单边标记
+		只有开始标记,没有结束标记,单边标记一般是没有内容的
+		语法格式: <标记 属性1 = 值1 属性2 = 值2...>
+	
+	C: HTML标记编写规范
+		a: HTML标记不区分大小写.
+		b: HTML标记的属性可有可无
+		c: 双边标记的内容在开始和结束标记之间,单边标记一般是没有内容的
+		d: HTML标记可以互相嵌套,但是一定要注意是顺序嵌套,外层套内层,一层套一层
+		
+	D: 排版标记
+		a: <p></p>: 一个段落
+			属性: align: 水平对齐方式,取值: left,center,right 
+		b: <br>: 换行标记
+		c: <hr>: 水平线标记
+			属性: size: 水平线的粗细
+				  color: 水平线的颜色
+				  width: 水平线的宽度
+				  noshade: 去掉水平线的阴影(在HTML中noshade是没有值的属性)
+		d: <pre></pre>: 预排版标记,将保留所有的空白字符
+		e: <h1></h1>...<h6></h6>: 标题.<h1>定义最大的标题,<h6>定义最小的标题
+			属性: align: 水平对齐方式,取值: left,center,right 
+		f: <div>和<span>标记、块元素和行内元素
+			<div>: 是没有任何意义的标记,但又是使用最多的标记之一.<div>一般要与CSS配合使用.<div>是块元素
+			<span>: 是没有任何意义的标记,但又是使用最多的标记之一.<span>一般要与CSS配合使用.<span>是行内元素
+			块元素: 一般是单独占一行,不管内容的多少,总是占一行
+				eg: <div>,<p>,<h1>-<h6>,<pre>等
+			行内元素: 行内元素不会单独占一行,多个行内元素会排在同一行
+				eg: <span>,<font>,<b>,<i>,<u>,<s>,<sub>,<sup>等
+			
+			结论: 在标记嵌套时,一般是块元素中嵌套行内元素
+			
+		HTML字符实体: 
+			空格: &nbsp;
+			<: &lt;
+			>: &gt;
+			&: &amp;
+			￥: &yen;
+			×: &times;
+			÷: &divide;
+		
+	F: HTML项目符号
+	
+		<ul>
+			<li>内容1</li>
+			<li>内容2</li>
+			<li>内容3</li>
+			...
+		</ul>
+			<ul>或<li>的常用属性: type: 项目符号的型号,取值: disc(小黑点),circle(空心圆),square(实心方块);
+		
+		注意: 在HTML标记中,内容应该放在最底层标记中
+		
+	G: 编号列表(有序列表)
+		
+		<ol>
+			<li>内容1</li>
+			<li>内容2</li>
+			<li>内容3</li>
+			...
+		</ol>
+			<ol>或<li>的常用属性: 
+				type: 编号类型,取值: a,A,1,i(i,ii,iii,...),I(I,II,III,IV,...)
+				start: 从第几个开始编号,取值: 1,2,3,...
+		
+	H: 滚动字幕标记
+	
+		<marquee>滚动的内容</marquee>
+			
+		常用属性： 
+			direction: 滚动方向,取值: up,down,left,right;
+			width: 滚动宽度
+			height: 滚动高度
+			bgcolor: 滚动背景色
+			scrollAmount: 滚动步长值
+			scrollDelay: 两步之间停留的时间
+			loop: 循环滚动的次数
+		
+	I: 图片标记
+		<img src=路径 属性=值>
+		
+			常用属性: 
+				width: 图像的宽度
+				height: 图像的高度 
+				border: 图像周围的边框粗细
+				src: 要显示的图像的路径。 
+				align: 规定如何根据周围的文本来对齐图像,取值: left,right,center,top
+				hspace: 图片与左右文字之间的距离(水平距离)
+				vspace: 图片与上下文字之间的距离
+			
+			注意事项: 
+				如果图片想要等比例缩放,只需要指定width和height中的一个就可以了
+				align属性只能在文本中居中,不能让图片单独居中
+				align可以实现"图文混排"的效果
+				
+	J: <meta>标记
+		主要作用是提供网页的元信息.比如: 指定网页的搜索关键字
+			
+		属性: 
+			a: http-equiv: 模拟http协议文件头信息,当信息从服务器传到客户端时,告诉浏览器如何正确的显示网页内容,取值: content-type,refresh,..
+					一般与content属性配合使用
+					1: 设置网页的字符集	<meta http-equiv="content-type" content="text/html;charset=utf-8">
+					2: 网页自动刷新: <meta http-equiv="refresh" content="2">	(每隔2秒自动刷新网页一次)	
+								<meta http-equiv="refresh" content="2;url=http://....."> 	(过2秒后自动跳转到指定网页)
+			b: content: 定义与 http-equiv 或 name 属性相关的元信息
+			c: name: 主要用于设置网页的搜索关键字,版权信息,作者等,取值: keyworlds,description
+					1: 设置网页搜索关键字	<meta name="keyworlds" content="网站建设,自助建站,...">
+					2: 网页描述信息	  	<meta name="description" content="灵帆科技是一家专业提供企业网站建设,商城网站建设,微信网站建设,..."/>
+
+超链接
+	<a href=链接>内容</a>
+		
+	A:常用属性: 
+		href: 链接文件的地址,"../"代表上一级
+		target: 链接文件的显示窗口,取值: 
+									_blank(在新窗口中打开)
+									_self(在当前窗口中打开)
+									_parent(在父级窗口中打开)
+									_top(在顶级窗口中打开)
+		name: 定义锚点链接的名称	
+			
+	B: 特殊链接: 
+		邮箱链接: href="mailto:1373107390@qq.com"	
+		下载链接: href="路径/winrar.rar"
+		普通空连接: href="#" 
+		关闭窗口: href="javascript:window.close()"
+			filefox的关闭选项: 搜索about:config,找到dom.allow_scripts_to_close_windows,修改值为true,然后就可以使用javascript:window.close()关闭窗口了
+	C: 锚点链接
+		含义: 是在一个网页的不同区域进行跳转.
+		定义锚点(做个记号): <a name="锚点名称"></a>
+		跳转到锚点(记号): <a href="#锚点名称">内容</a>
+					若要跳转到另一个网页的不同部分,则需要加上文件目录
+					
+表格标记
+		
+	A: 表格的结构: 
+		<table>						-->表格
+			<caption></caption>		-->表格标题
+			<tr>					-->行
+				<th>内容</th>		-->标题单元格(自动居中加粗)
+				<th>内容</th>	
+				...
+			</tr>
+			<tr>					-->行
+				<td>内容</td>		-->单元格
+				<td>内容</td>	
+				...
+			</tr>
+			<tr>
+				<td>内容</td>
+				<td>内容</td>
+				...
+			</tr>
+			...
+		</table>
+		
+	B: <table>的属性:
+		border: 边框的粗细 
+		bordercolor: 边框颜色
+		width: 表格宽度 
+		height: 表格高度
+		align: 水平对齐方式
+		cellpadding: 单元格边线到内容间的距离(填充距离)
+		cellspacing: 单元格与单元格之间的距离(单元格间距)
+		bgcolor: 表格背景色
+		background: 表格背景图片路径
+		frame: 规定外侧边框的哪个部分是可见的,取值: void,above,below,hsides,lhs,rhs,vsides,box,border
+		rules: 规定内侧边框的哪个部分是可见的,取值: none,groups,rows,cols,all
+	
+	C: <caption>表格标题
+		<caption>是<table>的子标记.放在<table>内容的开始处
+	
+	D: <tr>的属性:
+		bgcolor: 行的背景色
+		height: 行的高
+		align: 行的水平对齐方式
+		valign: 行的垂直对齐方式,取值: top,middle(中),bottom(下)
+			
+	E: <td>或<th>的属性: <td>是普通单元格,<th>是标题单元格,自动居中加粗
+		width: 单元格宽度
+		height: 单元格高度
+		bgcolor: 单元格背景色
+		background: 单元格背景图片
+		align: 单元格内容的水平对齐方式
+		valign: 单元格内容的垂直对齐方式	
+		colspan: 左右单元格合并
+			合并属性要放在第一个单元格中,多余的单元格要删掉
+			合并时,有增就有减,要保证每一行的单元格的个数不变
+		rowspan: 上下单元格合并.取值: number
+	
+表单
+	注意: 如果某个表单元素,不想往服务器传递数据,那么,我们可以不给他加name属性.传递到服务器的数据,如果没有name,则无法获取他的值
+	
+	A: 表单的概念
+		表单主要用来获取客户端用户数据的.eg: 注册表单,查询表单,登录表单等.
+	B: 表单的工作原理
+		a: 浏览有表单的网页,填写一些必要的信息,然后点击某个按钮进行提交
+		b: 这些表单数据,通过互联网,传递到服务器上
+		c: 服务器上有专门的程序,对表单数据进行验证.如果验证成功,将数据存入数据库,返回一个验证成功的信息;如果验证失败,将返回一个错误信息
+	C: 表单的制作分两个部分,一个是前台页面的制作,二是后台的对表单数据的处理
+	D: 表单的结构
+		<form name=表单的名字>
+			<input type="text" name=文本框名字 /> 
+			<input type="password" name=密码框名字 />
+			<input type="submit" value=按钮上显示的内容 name=按钮框的名字 />
+			[
+				<select name=下拉列表名字>
+					<option value=值> 内容1 </option>
+					<option value=值> 内容2 </option>
+					...
+				</select>
+			]
+			[<textarea name=文本域名字 cols=宽度 rows=高度>默认内容</textarea>]
+			...
+		</form>
+	E: <form></form>标记的属性--块元素
+		a: name: 表单的名字,这个名字主要给JavaScript来用,JS主要用来做客户端表单验证
+		b: method: 表单的数据提交方式,取值: get(默认传输方式,但基本不用),post
+			get: get方式,是将表单数据追加到action指定的处理程序的地址的后面,然后向服务器发送请求
+				get方式的特点: 
+					1: get方式不能提交敏感数据
+					2: get方式只能提交少量数据.因为地址栏的长度有限制
+					3: et方式不能上传附件
+			post: post方式,直接将表单数据传递给处理程序
+				post方式的特点:
+					1: post提交的数据相对安全
+					2: post方式可以提交海量数据
+					3: post方式可以上传附件
+		c: action: 指定向何处发送表单数据.如果值为空,则跳转到当前地址
+			
+		d: enctype: 指定表单数据的编码方式(解密方式),这个属性只能用在 method="post" 的情况下
+			取值:  "application/x-www-form-urlencoded": 默认的加密方式
+				   "multipart/form-data": 如果要上传文件,enctype值必须是这个
+	F: <input type=值 />	单行文本域,单行密码域,单选按钮,复选框,提交按钮,重置按钮,普通按钮,上传文件域...	
+		语法格式: <input type=值 属性=值/>
+		常用属性: 
+			a: name: 元素的名字
+			b: type: 元素的类型,取值: text,password,radio,checkbox,submit,file,...
+			c: value: 元素的值
+			d: size: 元素的长度,以字符为单位
+			e: maxLength: 最多可以输入多少个字符,超出的就输不进去
+			f: readonly: 只读属性,可以选中但不能修改,取值: readonly --> readonly="readonly"
+			g: disabled: 禁用属性,进禁止选中修改,取值: disabled
+		type属性值: 
+			type="text": 单行文本框 
+				eg: <input type="text" name="username">
+			type="password": 单行密码域
+				eg: <input type="password" name="userpassword">
+			type="radio": 单选按钮 		
+				属性: checked: 默认选择哪一项,取值: checked
+					eg: <input type="radio" name="sex" value="man"/> 男
+						<input type="radio" name="sex" value="women" checked="checked" /> 女
+			type="checkbox": 复选框(多选)
+				属性: checked: 默认选择哪一项,取值: checked
+					eg: <input type="checkbox" name="爱好" value="打球"/> 打球
+						<input type="checkbox" name="爱好" value="玩游戏" checked="checked" /> 玩游戏
+						<input type="checkbox" name="爱好" value="听音乐"/> 听音乐
+						<input type="checkbox" name="爱好" value="看电影" /> 看电影
+			type="submit": 提交按钮,提交表单	eg: <input type="submit" value="搜索" />
+			type="reset": 重置按钮,数据清零		eg: <input type="reset" value="重置" />
+			type="images": 图片按钮,提交表单	eg: <input type="images" src=图片路径 />,与submit功能一样
+			type="button": 普通按钮(本身不具备功能,一般要与JS程序配合使用,实现相应的功能)
+				属性: onclick: 单击按钮,值为要执行的代码
+					eg: <input type="button" onclick="javascript:window.close()" value="关闭窗口" />
+			type="file": 上传文件域
+				属性: value: 只读,不能设置默认值,只能有用户选择的文件路径决定值
+					eg: <input type="file" />
+			type="hidden": 隐藏域:
+				eg: <input type="hidden" name=名称 value=默认值 />
+				
+	H: <select name=名字></select> 	下拉列表
+		a: 语法格式: 	
+			<select name=名字>
+				<option value=值> 内容1 </option>
+				<option value=值> 内容2 </option>
+				...
+			</select>
+		
+		b: <select></select>标记的属性只有一个 name
+		c: <option></option>标记的属性有两个: value属性,selected属性(默认选中,值为selected)
+	I: 文本区域
+		a: 语法格式:
+			<textarea name=名字 cols=宽度 rows=高度>默认内容</textarea>
+		b: 常用属性: 
+			name: 元素名称
+			cols: 宽度,指多少个字符宽
+			rows: 高度,指几行高
+	
+图片热点(图像地图)
+	图像热点: 给一张图片加多个链接,默认情况下只能加一个链接
+	
+	A: 标记结构: 
+		<img src=图片路径 usemap="#图片热区" />
+		<map id=图片热区>
+			<area shape=热区形状 coords=热区坐标 href=链接地址 />
+			<area shape=热区形状 coords=热区坐标 href=链接地址 />
+			...
+		</map>
+	
+	B: <area />标记的常用属性:
+		a: shape: 热区的形状,取值: rect(矩形),circle(圆形),polygon(多边形)
+		b: coords: 热区的坐标(位置):	
+			1: 当shape="circle"时:  coords="x,y,r"
+			2: 当shape="rect"时: 	coords="x1,y1,x2,y2"
+		c: href: 此区域的链接
+		c: target: 规定在何处打开链接,取值: _blank,_parent,_self,_top
+
+框架
+	框架技术: 将一个浏览器窗口划分成若干个小窗口,每个小窗口显示一个独立的网页
+	
+	A: 框架集和框架页
+		框架集: <frameset>: 主要用来划分窗口
+		框架页: <frame>: 主要用来指定窗口中默认显示的网页地址
+	
+		a: <frameset></frameset>的常用属性: 
+			cols: 划分左右型框架,	eg: cols="200,*": 左框架的宽度为200px,剩下都是右框架的
+			rows: 划分上下型框架
+			frameborder: 是否显示框架的边框线,取值: 1,0,yes,no
+			border: 边框线的粗细
+			bordercolor: 边框颜色
+		
+		b: <frame></frame>的常用属性: 
+			src: 该小窗口中,默认显示的网页属性
+			noresize: 不能调整小窗口的大小,取值: noresize
+			scrolling: 是否显示滚动条,取值: auto(自动),yes,no,1,0
+			name: 当前小窗口的名字.这个name就是给<a>标记的target属性用的.
+		B: <noframes>: 当浏览器不支持框架的时候,显示的提示信息.
+			语法: <noframes>提示信息</noframes>	
+				
+		C: 左右型框架
+			<frameset cols="200,*" frameborder="yes" border="5">
+				<frame src=网页路径 />
+				<frame src=网页路径 />
+			</frameset>
+		D: 上下型框架
+			<frameset rows="200,*" frameborder="yes" border="5">
+				<frame src=网页路径 />
+				<frame src=网页路径 />
+			</frameset>
+	B: 内嵌框架(行内框架)
+		内嵌框架: 相当于在现有的网页中,挖了一个"窟窿",透过这个"窟窿"可以看到里面的内容
+		
+		a: 语法格式: <iframe 属性=值>当浏览器不支持框架的时候,显示的提示信息</iframe>
+		b: 与普通框架的区别
+			<iframe>是<body>的子标记,他应该放在<body>中
+		c: 常用属性
+			src: 引入的文件路径
+			width: 框架的宽度
+			height: 框架的高度
+			frameborder: 是否显示框架的边框线,取值: 1,0,yes,no
+			border: 边框粗细
+			name: 边框的名字
+			align: 框架在网页中的对齐方式,取值: left(左),rigth(有),top(顶),middle(中),bottom(底)
+	
+事件
+	事件主要用于实现"用户与网页的交互"
+	onclick ,onsubmit 的事件返回值: false: 阻止默认动作的执行,true: 默认动作继续执行 
+			(常用于表单判断是否可以提交,若不能则阻止提交: onsubmit="return false;",onsubmit="return function(){return false;}")
+	
+	A: 窗口事件(Window Events)(仅在<body>元素中有效)
+		onafterprint: 在打印文档之后运行脚本 
+		onbeforeprint: 在文档打印之前运行脚本 
+		onbeforeonload: 在文档加载之前运行脚本 
+		onblur: 当窗口失去焦点时运行脚本 
+		onerror: 当错误发生时运行脚本 
+		onfocus: 当窗口获得焦点时运行脚本 
+		onhaschange: 当文档改变时运行脚本 
+		onload: 当文档加载时运行脚本 
+		onmessage: 当触发消息时运行脚本 
+		onoffline: 当文档离线时运行脚本 
+		ononline: 当文档上线时运行脚本 
+		onpagehide: 当窗口隐藏时运行脚本 
+		onpageshow: 当窗口可见时运行脚本 
+		onpopstate: 当窗口历史记录改变时运行脚本 
+		onredo: 当文档执行再执行操作（redo）时运行脚本 
+		onresize: 当调整窗口大小时运行脚本 
+		onstorage: 当文档加载加载时运行脚本 
+		onundo: 当文档执行撤销操作时运行脚本 
+		onunload: 当用户离开文档时运行脚本
+	B: 表单事件(Form Element Events)(仅在表单元素中有效)
+		a: onblur: 当元素失去焦点时运行脚本 
+		b: onchange: 当元素改变时运行脚本 
+		c: oncontextmenu: 当触发上下文菜单时运行脚本 
+		d: onfocus: 当元素获得焦点时运行脚本 
+		e: onformchange: 当表单改变时运行脚本 
+		f: onforminput: 当表单获得用户输入时运行脚本 
+		g: oninput: 当元素获得用户输入时运行脚本 
+		h: oninvalid: 当元素无效时运行脚本 
+		i: onreset: 当表单重置时运行脚本(HTML 5 不支持) 
+		j: onselect: 当选取元素时运行脚本 
+		k: onsubmit: 当提交表单时运行脚本 	
+	C: 图像事件	(Image Events)(该属性可用于<img>元素)
+		onabort: 当图像加载中断时执行脚本	
+	D: 键盘事件(Keyboard Events)(在下列元素中无效: <base>,<bdo>,<br>,<frame>,<frameset>,<head>,<html>,<iframe>,<meta>,<param>,<script>,<style>,<title>元素)
+		a: onkeydown: 当键盘被按下时执行脚本
+		b: onkeypress: 当键盘被按下后又松开时执行脚本
+		c: onkeyup: 当键盘被松开时执行脚本
+	E: 鼠标事件(Mouse Events)(在下列元素中无效: <base>,<bdo>,<br>,<frame>,<frameset>,<head>,<html>,<iframe>,<meta>,<param>,<script>,<style>,<title>元素)
+		a: onclick: 当单击鼠标时运行脚本 
+		b: ondblclick: 当双击鼠标时运行脚本 
+		c: ondrag: 当拖动元素时运行脚本 
+		d: ondragend: 当拖动操作结束时运行脚本 
+		e: ondragenter: 当元素被拖动至有效的拖放目标时运行脚本 
+		f: ondragleave: 当元素离开有效拖放目标时运行脚本 
+		g: ondragover: 当元素被拖动至有效拖放目标上方时运行脚本 
+		h: ondragstart: 当拖动操作开始时运行脚本 
+		i: ondrop: 当被拖动元素正在被拖放时运行脚本 
+		j: onmousedown: 当按下鼠标按钮时运行脚本 
+		k: onmousemove: 当鼠标指针移动时运行脚本 
+		l: onmouseout: 当鼠标指针移出元素时运行脚本 
+		m: onmouseover: 当鼠标指针移至元素之上时运行脚本 
+		n: onmouseup: 当松开鼠标按钮时运行脚本 
+		o: onmousewheel: 当转动鼠标滚轮时运行脚本 
+		p: onscroll: 当滚动元素滚动元素的滚动条时运行脚本 
+		
+开发网站流程
+	1: 业务员与客户进行沟通,包括: 网站风格,网站功能(论坛,留言板,支付,用户登录注册),...
+	2: 业务员与美工沟通.制作网页效果图(首页,列表页,内容页).
+	3: 制作人员开始切图排版,排成网页形式
+	4: 后台程序员开始写程序
+	5: 前台和后台合并在一起,整站就完成了
+	
+HTML颜色表示
+
+	网页中的颜色有三种表示方法
+		a: 颜色单词: red,green,blue,...
+		b: 十进制表示: rgb(255,0,0),rgb(0,255,0),rgb(0,0,255),...
+		c: 十六进制表示: #FF0000(红),#00FF00(绿),#0000FF(蓝),...
+
+XHTML编写规范
+	a: 所有的标记和属性必须全小写
+	b: 单边标记必须关闭	eg: <br /> 
+	c: 所有的属性值都必须加引号
+	d: 所有的属性都必须要有值. eg: <hr noshade="noshade" />
+	e: 标记之间要顺序嵌套,外层套内层,一层套一层
+	f: XHTML网页必须要有(DTD文档类型定义)代码 eg: <!DOCTYPE html>
+		DTD文档类型定义的目的: 是一种验证机制,也就是说检验一下你写的XHTML标记语法是否合法
+			一共有三大分类:
+				1: 严格型(Strict): 在严格型的DTD中,不能在使用HTNL中的表现的写法(<b>,<font>,...),必须使用CSS来取代各种表现标记
+						<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+				2: 过渡型(Transitional): 在过渡型的DTD中,可以继续使用HTML中的表现的写法
+						<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+				3: 框架型(Frameset):  
+						<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Frameset//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-frameset.dtd">
+		
+HTML5
+	主要应用于手机端,是由W3C和WHATWG合作的结果
+	页面结构标记: 
+		<header>: 页眉,
+		<nav>: 导航栏,菜单栏,
+		<footer>: 页脚
+	文章相关标记:
+		<article>: 代表一篇文章
+		<aside>: 侧边栏
+		<section>: 区块.主要用于排版网页,功能与<div>一样
+		<details>: 一个标题的简介
+		<summary>: 标题的内容,与<details>配合使用
+	音频标记: 
+		<audio>不支持该音频时显示的内容</audio>
+			属性: 
+				src: 要播放的音频的 URL.支持格式: Wav,MP3,Ogg Vorbis
+				controls: 是否显示控制面板,取值: controls
+				autoplay: 音频在就绪后马上播放,取值: autoplay 
+				preload: 音频在页面加载时进行加载,并预备播放.取值: preload.(如果使用 "autoplay",则忽略该属性)
+	视频标记: 
+		<video>不支持该视频时显示的内容</video>
+			属性: 
+				src: 要播放的视频的 URL,支持格式: 
+				autoplay: 视频在就绪后马上播放,取值: autoplay
+				controls: 向用户显示控件,比如播放按钮,取值: controls 
+				height: 设置视频播放器的高度 
+				width: 设置视频播放器的宽度 
+				loop: 当媒介文件完成播放后再次开始播放,取值: loop  
+				preload: 视频在页面加载时进行加载,并预备播放,取值: preload.(如果使用 "autoplay",则忽略该属性)
+				poster: 改变视频封面(第一帧画面),取值: 图片路径
+	表单中新增属性
+		autocomplete: 自动完成,取值: on,off
+		autofocus: 当页面加载时,使输入字段获得焦点,取值: autofocus.(注: type="hidden" 时,无法使用)
+	表单input元素type属性
+		tel: 电话验证
+		email: 邮箱验证
+		url: 网址验证
+		color: 颜色拾取器
+		date: 日历
+		month: 选择月份
+		time: 时间
+		datetime: 日期时间
+
+	
+	其他标记:
+		<mark>: 重点标注
+		<progress>: 进度条
+				属性: max: 最大值,value: 当前值
+		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	

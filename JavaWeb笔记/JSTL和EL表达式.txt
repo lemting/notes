@@ -1,0 +1,234 @@
+JSTL
+		JSTL是Java中的一个定制标记库集
+JSTL的使用原因
+	1: 实现了JSP页面中的代码复用
+		基于标签库原理,重复率较高的代码块支持复用,提高效率
+	2: 书写JSP页面时可读性更强
+		长得很像xml,方便前端查看和参与开发
+		
+JSTL标签导入JSP页面
+	<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+JSTL函数导入JSP页面
+	<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+	
+EL表达式
+		Expression Language,经常与JSTL配合使用,shijSP页面更直观,写法更简单
+	AAA: JSP页面不识别EL表达式的解决方案
+		1: 修改web.xml文件为 version="2.0"		
+		2: 设置某个jsp页面使用el表达式
+			<%@ page isELIgnored="false"%>
+	A: 语法: ${表达式}
+	B: "."与"[]"运算法
+		a: 通常情况是通用的: ${user.sex} ${user["sex"]}
+		b: "[]"还可以用来进行集合元素中的定位: ${bookList[0].price}
+		c: 在以下情况下不能通用: 
+			1: 包含特殊字符: ${user["first-name"]}	(不能用".")
+			2: 通过变量动态取值: ${user[param]}
+				param可以是name,sex,other
+				"."的写法是: ${user.name} or ${user.sex} or ...
+	c: EL变量
+			 JSP内置对象	-----> 	 	 EL名称     
+				page				   pageScope
+			   request				  requestScope
+			   session				  sessionScope
+			 application			applicationScope
+		
+		EL变量查找顺序: page ->	request -> session -> application -> 未找到(返回null)
+	D: EL自动类型转换
+		要获取一个输入文本框的内容并加20
+			int count = Integer.parseInt(request.getParameter("count")) + 20;
+		EL会进行自动类型转换,只需要这样写
+			${param.count + 20}
+	E: EL隐式对象
+		a: pageContext: 	pageContext实例对应于当前页面的处理 
+		b: pageScope: 		与页面作用域属性的名称和值相关的Map类
+		c: requestScope: 	与页面作用域属性的名称和值相关的Map类
+		d: sessionScope: 	与页面作用域属性的名称和值相关的Map类
+		e: applicationScope 与页面作用域属性的名称和值相关的Map类
+		f: param: 			按名称存储请求参数的主要值的Map类
+		g: paramValues: 	将请求参数的所有值作为String数组存储的Map类
+		h: Header: 			按名称存储请求头主要值的Map类
+		i: headerValues: 	将请求头的所有值作为String数组存储的Map类
+		j: cookie: 			按名称存储请求附带的cookie的Map类
+		k: initParam: 		按名称存储Web应用程序上下文初始化参数的Map类
+	F: EL运算法
+		a: 算术运算符: +,-,*,/(或div),%(mod)
+		b: 关系运算符: ==(eq),!=(ne),<(lt),>(gt),<=(le),>=(ge)
+		c: 逻辑运算符: &&(and),||(or),!(not)
+		d: 验证运算符: empty: 通过结果值判断表达式是否为空,为空返回true,结果: true,false 
+				eg: ${empty 表达式}
+	
+	
+	
+		
+JSTL标签
+	A: 核心标签
+		a: 表达式控制标签
+			1: <c:out> 
+					输出标签,输出常量或输出变量
+				属性: value: 要输出的数据,可以使用EL表达式
+					  default: 变量不存在时默认输出值
+					  escapeXml: 是否不转义字符输出,默认true(不转义)
+			2: <c:set> 
+					存值到Scope中(JSP内置对象): 可将值以变量的形式存放在指定的范围中(2种方式)
+						eg1: <c:set value="今天" var="day" scope="session"></c:set>
+						eg2: <c:set var="age" scope="session">17岁</c:set>
+					存值到JavaBean中: 需要配合target属性指定对象并且通过property属性指定要赋值给对象的哪个属性
+						eg1: <jsp:useBean id="stu" class="Student" scope="session" />
+							 <c:set target="${stu}" property="name" value="Lemting"></c:set>
+						eg2: <c:set target="${stu}" property="age">18</c:set>
+				属性: value: 存入的变量值(存入的变量值也可以放在标签文本内容处)
+					  var: 存入的变量名
+					  scope: 存入的Scope,取值: page,request,session,application
+					  target: 赋值的JavaBean对象名
+					  property: 要赋值的JavaBean对象的属性名			
+			3: <c:remove> 
+					去掉某个变量(只能去掉对象,而不能去掉对象的某个变量)
+				属性: var: 变量名(必选)
+					  scope: 可选,取值: page,request,session,application
+			4: <c:catch>
+					在catch标签中可以包含那些容易出错的JSTL标签(逻辑)
+				属性: var: 存放错误信息的变量
+					eg: <c:catch var="error">
+							<c:set target="不存在" property="不存在">假的</c:set>
+						</c:catch>	//错误信息存放在变量error中,out该变量即可查看			
+		b: 流程控制标签
+			1: <c:if>
+					同程序中的if作用相同,用来实现分支条件控制
+				属性: test: 判断条件表达式(一般为EL表达式)
+					  var: 存放结果的变量
+					  scope: var属性存放的范围,取值: page,request,session,application
+			2: <c:choose>
+			3: <c:when>: 同<c:if>一样
+			4: <c:otherwise>
+			<c:choose>,<c:when>和<c:otherwise>标签的组合使用
+				语法: <c:choose>
+						<c:when test="判断条件">业务逻辑1</c:when>
+						<c:when test="判断条件">业务逻辑2</c:when>
+						...
+						<c:otherwise>业务逻辑3</c:otherwise>
+					  </c:choose>	
+		c: 循环标签
+			1: <c:forEach>
+					根据循环条件遍历集合(Collection)中的元素
+				属性: var: 存储从集合中取出元素的变量(必须无默认值)
+					  items: 要遍历的集合
+					  begin: 遍历的起始位置
+					  end: 遍历的终止位置
+					  step: 循环的步长
+					  varStatus: 存储状态的变量,通过index,count,first,last几个状态值,描述begin和end子集中元素的状态
+							(该变量包含index,count,first,last几个变量)
+							index: 当前元素索引值;count: 遍历子集的第几个元素(从1开始);first(boolean): 是否是第一个元素;last(boolean): 是否是最后一个元素
+				常用用法: 
+					用法1(全部遍历): <c:forEach var="存储当前遍历元素的变量" items="待遍历集合">操作var变量表示的元素</c:forEach>
+					用法2(指定索引闭区间):  <c:forEach var="存储当前遍历元素的变量" items="待遍历集合" begin="开始index值" end="结束index值">操作var变量表示的元素</c:forEach>
+					用法3(部分遍历时指定步长): 
+					用法4(部分遍历时输出元素状态):
+			2: <c:forTokens>
+					用于浏览字符串,并根据指定的字符将字符串截取
+				属性: items: 被迭代的字符串
+					  delims: 指定使用的分隔符(类似正则表达式拆分字符串)
+					  var: 存储遍历到的字符的变量
+					  begin: 遍历的起始位置
+					  end: 遍历的终止位置
+					  step: 循环的步长
+					  varStatus: 存储状态的变量,通过index,count,first,last几个状态值,描述begin和end子集中元素的状态
+							(该变量包含index,count,first,last几个变量)
+							index: 当前元素索引值;count: 遍历子集的第几个元素(从1开始);first: 是否是第一个元素;last: 是否是最后一个元素
+		d: URL操作标签
+			1: <c:import>
+					可以将其他静态或动态文件包含到本JSP页面
+					<jsp:include>: 只能包含同一个web应用中的文件
+					<c:import>: 可以其他web应用中的文件,甚至是网络上的资源
+				属性: url: 被导入资源的URL路径
+					  context: 相同服务器下的其他的web工程,必须以"/"开头
+								引入的内容是webapps下的其他Web project.
+								使用时前提: 修改tomcat的发布路径;修改%TCOMCAT_HOME%/conf/context.xml的Context标签中的属性: crossContext="true"
+					  var: 以String类型存入被包含文件的内容
+					  scope: var变量的JSP范围
+					  charEncodeing: 被导入文件的编码格式
+					  varReader: 以Reader类型存储被包含文件内容
+				常用用法: 导入网络上的绝对路径
+								<c:catch var="error09">		//可能会有异常抛出,故用<c:catch>接收异常
+									<c:import url="http://www.baidu.com" charEncoding="UTF-8"></c:import>
+								</c:catch><c:out value="${error09}"></c:out><br/>	//输出异常信息
+						  导入相对路径文件(同级目录下的tt.txt)
+								<c:catch><c:import url="tt.txt"></c:import><c:catch>
+						  获取同一个服务器的其他web文件(项目: aaa,WebRoot: qwer.jsp)
+								<c:catch><c:import url="/qwer.jsp" context="/aaa"></c:import><c:catch>						
+			2: <c:url>
+					该标签用于动态生成一个String类型的URL,可以同<c:param>标签共同使用,也可以使用html的<a>标签实现超链接
+				属性: value: 表示url路径
+					  var: 将url路径存储在变量中
+					  scope: var变量的范围
+					eg: <c:set value="MyFirstWebApp/index.jsp" var="paetUrl" scope="session"></c:set>
+						<c:url value="http://localhost:8888/${partUrl}" var="newUrl" scope="session"></c:url>
+						<a href="${newUrl}">超链接</a>
+			3: <c:redirect>
+					该标签用来实现请求的重定向,同时可以在url中加入指定的参数
+				属性: url: 指定重定向页面的地址,可以使一个String类型的绝对地址或相对地址
+					  context: 用于导入其他web应用中的页面
+				在<c:redirect>标签里嵌套<c:param>标签实现参数传入
+					eg: <c:redirect url="chongdingxiang.jsp">
+							<c:param name="username">Le<c/c:param>
+							<c:param name="password">123456<c/c:param>
+						</c:redirect>
+						重定向页面获取参数
+						<c:out value="${param.username}"></c:out>
+						<c:out value="${param.password}"></c:out>			  
+	B: 格式化标签
+	C: SQL标签
+	D: XML标签
+
+JSTL常用函数
+	fn:contains(String a,String b): 判断字符串a中是否包含字符串b(区分大小写)
+			eg: <c:out value="${fn:contains('哈HelloWorld','lloW')}"></c:out> 				--> true
+	fn:containsIgnoreCase(String a,String b): 判断字符串a中是否包含字符串b(不区分大小写)
+			eg: <c:out value="${fn:containsIgnoreCase('哈HelloWorld','LLOw')}"></c:out> 	--> true
+	fn:startWith(String a,String b): 判断字符串b是否在字符串a开头
+	fn:endWith(String a,String b): 判断字符串b是否在字符串a结尾
+	fn:escapeXml(String str): str: xml标签代码	
+			eg: <c:out value="${fn:escapeXml('<book>冰与火之歌</book>')}"></c:out>
+	fn:indexOf(String a,String b): 返回字符串b在字符串a第一次出现的索引值		
+			eg: <c:out value="${fn:indexOf('HelloWorld','oWo')}"></c:out>	--> 4
+	fn:length(): 返回字符串长度或集合中的元素个数
+	fn:replace(): 替换一个字符串与另一个字符串的所有匹配
+	fn:split(): 分割字符串后将子串存储在数组中
+	fn:substring(int start,int end): 从指定位置开始到指定位置结束截取字符串
+	fn:toLowerCase(String str): 把字符串转成小写
+	fn:toUpperCase(String str): 把字符串转成大写
+	fn:trim(): 去除字符串两端空格
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			

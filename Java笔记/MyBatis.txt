@@ -1,0 +1,478 @@
+导包(mybatis.jar + mybatis项目lib下的jar)
+
+MyBatis 是持久型框架
+
+一一一: Spring 和 MyBatis 整合
+		A: 整合思路
+			a: Spring 通过单例方式管理 SqlSessionFactory
+			b: Spring 和 MyBatis 整合生成代理对象,使用 SqlSessionFactory 创建 SqlSession.(Spring 和 MyBatis 整合包自动完成)
+			c: 持久层的 Mapper 都需要由 Spring 进行管理
+		B: 整合步骤
+			a: 导入jar包
+				1: MyBatis 的jar包
+				2: Spring 的jar包
+				3: MyBatis 和 Spring 的整合 jar包
+			b: 在 Spring 核心配置文件 applicationContext.xml 配置 SqlSessionFactory 和数据源
+				eg: <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">	
+						<property name="configLocation" value="config/SqlMapConfig.xml" /> //加载MyBatis的配置文件
+						<property name="dataSource" ref="dataSource" />	//配置数据源
+					</bean>
+					//配置数据源
+					<context:property-placeholder location="classpath:dbcp.properties" />
+					<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" >
+						<property name="driverClassName" value="${jdbc.driver}"></property>
+						<property name="url" value="${jdbc.url}"></property>
+						<property name="username" value="${jdbc.username}"></property>
+						<property name="password" value="${jdbc.password}"></property>
+						<property name="maxActive" value="10"></property>
+						<property name="maxIdle" value="5"></property>
+					</bean>
+		C: Spring 管理下开发 dao
+			a: 原始dao开放方法 //让dao接口的实现类继承 org.mybatis.spring.support.SqlSessionDaoSupport,Spring 将自动注入 SqlSessionFactory
+				1: dao接口
+					eg: public interface UserDao {
+							public User findUserById(int id) throws Exception;	//根据id查找
+							public void insertUser(User user) throws Exception;	//插入用户
+						}
+				2: dao实现类
+					eg: public class UserDaoImpl extends SqlSessionDaoSupport implements UserDao {
+							@Override
+							public User findUserById(int id) throws Exception {
+								SqlSession sqlSession = this.getSqlSession(); //SqlSession可以通过 SqlSessionDaoSupport 的 getSqlSession()方法获取
+								User user = sqlSession.selectOne("test.findUserById",id);
+								return user;		//SqlSession 不用 close(),Spring 会自动释放资源
+							}
+						}
+				3: 在Spring 的核心配置文件配置 bean
+					eg: <bean id="userDao" class="dao.UserDaoImpl" >
+							<property name="sqlSessionFactory" ref="sqlSessionFactory">	//注入 SqlSessionFactory 对象
+						</bean>
+			b: mapper代理方法
+				1: mapper接口
+					eg:	public interface UserMapper {
+							public User findUserById(int id);
+						}
+				2: mapper.xml	//需要在 SqlMapConfig.xml 中配置到<mapper>
+					eg: <?xml version="1.0" encoding="UTF-8" ?>
+						<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+						<mapper namespace="mapper.UserMapper">
+							<select id="findUserById" parameterType="int" resultType="bean.User">
+								select * from user where id=#{id}
+							</select>		
+						</mapper>
+				3: Spring 的核心配置文件 
+					通过 MapperFactoryBean 单个mapper的bean注册
+						<bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">	//MapperFactoryBean 会根据mapper接口生成代理对象
+							<property name="mapperInterface" value="" />	//mapperInterface: 指定mapper接口类
+							<property name="sqlSessionFactory" ref="sqlSessionFactory"> //注入 SqlSessionFactory 对象
+						</bean>
+					通过 MapperScannerConfigurer 扫描mapper批量bean注册 //批量注册后,mapper接口的bean的id为mapper类名(首字母小写)
+						<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+							//批量mapper接口的包名,在SqlMapConfig.xml中就不需要在<mappers>中加载mapper.xml映射文件
+							<property name="basePackage" value="包1,包2,..." />	
+							<property name="sqlSessionFactoryBeanName" ref="sqlSessionFactory"> //注入 SqlSessionFactory 对象
+						</bean>
+
+二二二: MyBatis 和 分布式缓存框架 整合
+			MyBatis 无法发实现分布式缓存,需要和其他分布式缓存框架进行整合
+	A: 整合方法
+		a: MyBatis 提供了一个 cache 接口,如果要实现自己的缓存逻辑,实现 (org.apache.ibatis.cache.Cache) 接口开发即可
+				MyBatis 默认支持的 cache 接口的实现类: org.apache.ibatis.cache.impl.PerpetualCache
+		b: 在 Mapper.xml 映射文件的<cache>标签中配置type属性,配置为 cache 接口的实现类
+	B: 和 ehcache 框架整合
+				ehcache: 分布式缓存框架
+		a: Mybatis 和 ehcache 整合包中提供了 cache 接口的实现类
+		b: 在 Mapper.xml 映射文件的<cache>标签中配置type属性,配置为 cache 接口的实现类
+			eg: <cache type="org.mybatis.caches.ehcache.EhcacheCache" />
+		c: 在ClassPath下创建 ehcache.xml 文件
+
+一: 配置文件
+	A: SqlMapConfig.xml		//MyBatis的全局配置文件
+				//<configuration>的字标签使用顺序: properties,settings,typeAliases,typeHandlers,environments,mappers
+		<?xml version="1.0" encoding="UTF-8" ?>
+		<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+		<configuration>
+			//properties: 加载properties文件; 属性: resource: properties文件的路径
+			<properties resource="">
+				<property name="" value=""></property>	//property: 添加属性(建议不用); name: 属性名; value: 属性值 
+			</properties>	
+			//settings: 全局配置参数
+			<settings>
+				<setting name="cacheEnabled" value="TRUE"/>			//cacheEnabled: 在全局范围内启用或禁用缓存配置任何映射器在此配置下.默认: TRUE
+				<setting name="lazyLoadingEnabled" value="FALSE"/>	//lazyLoadingEnabled: 在全局范围内启用或禁用延迟加载.禁用时,所有协会将热加载.默认: FALSE
+				<setting name="aggressiveLazyLoading" value="TRUE"/>//aggressiveLazyLoading: 启用时,有延迟加载属性的对象将被完全加载后调用懒惰的任何属性.否则,每一个属性是按需加载.默认: TRUE
+				<setting name="useGeneratedKeys" value="FALSE"/>	//useGeneratedKeys: 允许JDBC支持生成的密钥.默认: FALSE
+				<setting name="useColumnLabel" value="TRUE"/>		//useColumnLabel: 使用列标签,而不是列名.默认: TRUE
+				<setting name="autoMappingBehavior" value="PARTIAL"/> //autoMappingBehavior: 指定如何自动映射列到字段属性.默认: PARTIAL
+								//取值: PARTIAL: 默认,只会自动映射结果没有嵌套结果映射定义里面; NONE: 自动映射; FULL: 自动映射的结果映射任何的(嵌套和其他).
+				<setting name="defaultExecutorType" value="SIMPLE"/> //defaultExecutorType: 配置默认执行人.默认: SIMPLE
+								//取值: SIMPLE: 默认值,没什么特殊意义; REUSE: 执行器重用准备好的语句; BATCH: 执行器重用语句和批处理更新
+			</settings>	
+			//typeAliases: 类型别名,减少代码长度
+			<typeAliases>
+				<typeAlias alias="" type="" /> 	//typeAlias: 单个别名定义.属性: alias: 别名; type: 类型
+				<package name="" />		//package: 批量别名定义,扫描整个包下的类,别名为类名(首字母不区分大小写).属性: name: 包名
+			</typeAliases>
+			//typeHandlers: 类型处理器,进行Java类型和JDBC类型的转换,MyBatis默认的满足一般使用需求的
+			<typeHandlers></typeHandlers>
+			//environments: 环境集合属性对象
+			<environments default="development">
+				//environment: 环境子属性对象
+				<environment id="development">
+					//transactionManager: 事务管理
+					<transactionManager type="JDBC"><property name="" value=""/></transactionManager>
+					//dataSource: 数据库源参数
+					<dataSource type="POOLED">
+						<property name="driver" value="数据库驱动"/>
+						<property name="url" value="数据库URL"/>
+						<property name="username" value="数据库用户名"/>
+						<property name="password" value="密码"/>
+					</dataSource>
+				</environment>
+			</environments>
+			//mappers: 映射器,导入映射文件
+			<mappers>	
+				//mapper: 使用resource属性: 加载单个映射文件.属性: resource: 映射文件路径
+				<mapper resource="config/sqlmap/User.xml"/>
+				//mapper: 使用class属性: 加载mapper接口的映射文件.要求: 使用mapper代理,映射文件名跟mapper接口类一致,且在同一目录下.属性: class: mapper接口类
+				<mapper class="mapper.UserMapper">
+				//package: 批量加载映射文件,加载包下的所有mapper接口的映射文件.要求: 使用mapper代理,映射文件名跟mapper接口类一致,且在同一目录下.属性: name: 包名
+				<package name="mapper" />
+			</mappers>
+		</configuration>
+
+		a: 简单例子
+			eg: <?xml version="1.0" encoding="UTF-8" ?>
+				<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+				<configuration>	
+					<properties resource="config/db.properties"></properties>	//导入数据库源参数配置文件
+					<typeAliases><typeAlias alias="User" type="bean.User" /></typeAliases>	//使用类型别名
+					<environments default="development">
+						<environment id="development">
+							<transactionManager type="JDBC"></transactionManager> //jdbc事务管理		
+							<dataSource type="POOLED">	//数据库源参数
+								<property name="driver" value="${jdbc.dirver}" />
+								<property name="url" value="${jdbc.url}" />
+								<property name="username" value="${jdbc.username}" />
+								<property name="password" value="${jdbc.password}" />
+							</dataSource>
+						</environment>
+					</environments>
+					<mappers>	//导入映射文件
+						<mapper resource="config/sqlmap/UserMapper.xml" />	
+						<package name="mapper" />	//导入mapper包下的,所有mapper接口的映射文件
+					</mappers>
+				</configuration>
+		
+	B: XxxMapper.xml
+	
+			/** SQL语句结束不需要";"
+				SQL语句中: #{name}: 占位符,parameterType为基本数据类型(包括String)时,name可以随意;为引用数据类型时,name为类的成员变量; 
+						   ${value}: 连接符,跟占位符类似,可以跟其他东西拼接在一起,但是输入类型为基本数据类型时为: ${value}.会引用SQL注入,不建议使用 */
+		<?xml version="1.0" encoding="UTF-8" ?>
+		<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		<mapper namespace="">	/* namespace: 命名空间,若该映射文件是mapper接口的映射文件,则命名空间为mapper接口类的路径,使用其他文件的资源需要加namespace */
+			/* cache: 开启二级缓存,使用该标签即代表开启
+				属性: flushInterval: 刷新间隔(ms),不设置则不自动刷新; size: 引用(缓存的对象)数目,默认: 1024; readOnly: 是否只读,默认: false 
+					  type: 指定二级缓存使用的类类型,用于与其他分布式缓存框架整合	*/
+			<cache flushInterval="" size="" readOnly="" type="" />
+				
+			/* sql: SQL语句片段,可以通过唯一标识引用该SQL片段.属性: id: 唯一标识 */
+			<sql id="">/*SQL语句*/</sql>	//经验: 基于单表来定义SQL片段;在SQL片段中不要包含<where>
+			
+			/* select: SQL查询语句,该SQL语句封装到mappedStatement对象中.
+				属性: id: sql语句唯一标识,statement的id; parameterType: 输入参数的类型; useCache: 是否使用二级缓存,默认: true
+					  resultType: 输出结果的类型(每条记录的类型,非查询结果类型)(为Java对象类型时,SQL语句结果的列名必须与变量名一致)  
+					  resultMap: 指定<resultMap>,作为输出结果的类型,使用其他映射文件的<resultMap>要加namespace */
+			<select id="" parameterType="" resultType="" resultMap="" useCache="">/*SQL查询语句*/</select>
+			
+			/* insert: SQL插入语句
+				属性: id: statement的id; parameterType: 输入参数的类型(bean); flushCache: 执行该SQL语句后是否刷新(清空)二级缓存.默认: true */
+			<insert id="" parameterType="" flushCache="">
+				/* selectKey
+					属性: keyProperty: parameterType指定类的成员变量,查询结果将设置到该变量上; order: 相对insert的SQL语句的执行顺序,取值: BEFORE,AFTER */
+				<selectKey keyProperty="" order="AFTER" resultType="">/*SQL查询语句*/</selectKey>
+				/*SQL插入语句*/
+			</insert>
+		
+			/* delete: SQL删除语句
+				属性: id: statement的id; parameterType: 输入参数的类型 */
+			<delete id="" parameterType="" flushCache="">/*SQL删除语句*/</delete>	
+			
+			/* updata: SQL更新语句
+				属性: id: statement的id; parameterType: 输入参数的类型 */
+			<update id="" parameterType="" flushCache="">/*SQL更新语句*/</update>
+			
+			/* resultMap: 输出结果映射对应关系,可以对SQL语句结果的列名和bean对象的属性名进行映射
+				属性: id: 唯一标识; type: resultMap映射的Java对象; extends: 继承其他的<resultMap>,该处为其他的<resultMap>的id */
+			<resultMap id="" type="" extends="">	//<resultMap>可以对Java对象进行关联映射,<association>则是对该Java对象的Java对象属性进行映射
+													//eg: A类成员变量中有一个B类的对象,<resultMap>对A类成员变量进行映射,<association>对A类的成员变量B的成员变量进行映射
+				/* id: SQL语句结果集的唯一标识列的映射 
+					属性: column: 列名; property: Java对象的成员变量名 */
+				<id column="" property="" />			
+				/* result: SQL语句结果集的普通列的映射 */
+				<result column="" property="" />
+			
+				/* association: 用于映射关联查询单个对象的信息
+					属性: property: 将信息映射到Java对象的哪个Java对象属性; javaType: Java类属性的类型; 
+						  select: 延迟加载的<select>的id ; column: 延迟加载关联查询的关联列,对应<select>的输入参数 */
+				<association property="" javaType="" select="" column="">	//可用于一对一
+					<id column="" property="" />  <result column="" property="" />
+				</association>
+				
+				/* collection: 将关联查询到的多条记录映射到集合对象中	
+					属性: property: 将信息映射到Java对象的哪个集合对象; ofType: 集合的元素的类型; 
+						  select: 延迟加载的<select>的id ; column: 延迟加载关联查询的关联列,对应<select>的输入参数 */
+				<collection property="" ofType="" select="" column=""> 	//可用于一对多,多对多
+					<id column="" property="" />  <result column="" property="" />
+				</collection>
+			</resultMap>
+		</mapper>
+		
+		a: resultType 和 resultMap
+			1: resultType
+					将查询结果按照sql列名Java对象属性名一致性映射到Java对象中
+				常见一些明细记录的展示,比如用户购买商品明细
+			2: resultMap
+					使用 association 和 collection 完成一对一和一对多高级映射
+		b: 简单例子
+			eg: <?xml version="1.0" encoding="UTF-8" ?>
+				<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+				<mapper namespace="test">
+					<select id="findUserById" parameterType="int" resultType="bean.User">	//根据id查询用户
+						select * from user where id=#{id}
+					</select>
+					<select id="findUserByName" parameterType="java.lang.String" resultType="bean.User"> //根据username模糊查询用户
+						select * from user where username like '%${value}%' 
+					</select>
+					<insert id="insertUser">	//插入用户信息
+						<selectKey keyProperty="id" order="AFTER" resultType="java.lang.int">	
+							select LAST_INSERT_ID() 	//得到插入用户的主键值,只适用于自动增长主键	
+						</selectKey>
+						insert into user(username,birthday,sex,address) value(#{username},#{birthday},#{sex},#{address})
+					</insert>
+					<delete id="deleteUserById" parameterType="int">	//删除用户
+						delete from user where id=#{id}
+					</delete>
+					<update id="updataUser" parameterType="bean.User">	//更新用户信息
+						update user set username=#{username},birthday=#{birthday},sex=#{sex},address=#{address} where id=#{id}
+					</update> 
+				</mapper>
+				
+二: MyBatis 工作原理
+
+		A -> B -> C -> D -> E -> 数据库(mysql等) -> 输出结果
+  						    |	
+						 输入参数
+		
+	A: SqlMapConfig.xml
+			MyBatis的全局配置文件,名称不固定,配置了数据源,事务等Mybatis运行环境,
+		a: 配置映射文件(配置SQL语句)
+			mapper.xml, mapper.xml, ... 
+	B: SqlSessionFactory
+			会话工厂,根据配置文件创建 SQLSession				
+		1: 通过配置文件获取数据库连接相关信息
+				eg: java.io.Reader reader = Resources.getResourceAsReader("SqlMapConfig.xml");
+		2: 通过配置信息构建SQLSessionFactory对象
+				eg: SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
+	C: SqlSession
+			会话,操作数据库(发出sql进行增删改查),线程不安全,最好在每个方法里都创建一次 SqlSession
+		a: SqlSession的作用
+			1: 向SQL语句传入参数
+			2: 执行SQL语句
+			3: 获取执行SQL语句的结果
+			4: 事务的控制
+		b: 获取SqlSession: 
+			1: 通过SQLSessionFactory对象打开数据库会话(SqlSession)
+				eg: SqlSession sqlSession = sqlSessionFactory.openSession();
+	D: Executor
+			执行器,SQLSession内部通过执行器操作数据库.
+	E: mapped statement
+			底层封装对象,对操作数据库存储封装.包括sql语句,输入参数和输出结果
+		-----------------------------------------------------------------------------------------------
+	C: SqlSession 的成员方法
+			1: close(): 关闭会话
+		a: 事务
+			1: commint(): 提交事务,事务默认不提交
+			2: rollback(): 回滚事务
+		b: 增删改查
+			1: selectOne(String statementId [,Object arg]): 查询一条记录. statementId = namespace + "." + statement的id(配置文件<select>的id); arg: 输入参数
+			2: selectList(String statementId [,Object arg]): 查询多条记录,并返回结果集合
+			3: insert(String statementId [,Object arg]): 插入一条用户信息.arg: 要插入的用户bean对象
+			4: delete(String statementId [,Object arg]): 删除用户信息
+			5: update(String statementId [,Object arg]): 更新用户信息
+	
+	eg: java.io.Reader reader = Resources.getResourceAsReader("SqlMapConfig.xml");	//通过配置文件获取数据库连接相关信息
+		SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);	//通过配置信息构建SQLSessionFactory对象
+		SqlSession sqlSession = sqlSessionFactory.openSession();	//通过SQLSessionFactory对象打开数据库会话(SqlSession)
+		sqlSession.selectOne(..);sqlSession.selectList(..);sqlSession.delete(..);.....		//增删改查操作
+		sqlSession.commit();	//提交事务	
+		sqlSession.close();		//关闭会话
+
+三: Mybatis 开发 dao
+	A: 原始dao开放方法(写dao接口和dao实现类)
+			单例模式,向dao实现类注入 SqlSessionFactory,在方法体内通过 SqlSessionFactory 创建 SqlSession
+		a: dao接口
+			eg: public interface UserDao {
+					public User findUserById(int id) throws Exception;	//根据id查找
+					public void insertUser(User user) throws Exception;	//插入用户
+				}
+		b: dao实现类
+			eg: public class UserDaoImpl implements UserDao {
+					private SqlSessionFactory sqlSessionFactory;	//通过带参构造注入 SqlSessionFactorys
+					public UserDaoImpl(SqlSessionFactory sqlSessionFactory){this.sqlSessionFactory = sqlSessionFactory;}
+					
+					@Override
+					public User findUserById(int id) throws Exception {
+						SqlSession sqlSession = sqlSessionFactory.openSession();
+						User user = sqlSession.selectOne("test.findUserById",id);
+						sqlSession.close();
+						return user;
+					}
+
+					@Override
+					public void insertUser(User user) throws Exception {
+						SqlSession sqlSession = sqlSessionFactory.openSession();
+						sqlSession.insert("test.insertUser",user);
+						sqlSession.commit();
+						sqlSession.close();
+					}
+				}
+		c: 使用
+			1: 创建 SqlSessionFactory 工厂
+				eg: Reader reader = Resources.getResourceAsReader("SqlMapConfig.xml");	//通过配置文件获取数据库连接相关信息
+					SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);	//通过配置信息构建SQLSessionFactory对象
+			2: 注入 SqlSessionFactory 工厂,获取dao接口的实现类对象
+				eg: UserDao userDao = new UserDaoImpl(sqlSessionFactory);
+			3: 通过该对象调用方法
+				eg: User user = userDao..findUserById(1);
+	B: mapper 代理方法(只需要写mapper接口)
+			写mapper接口,编写 mapper.xml 映射文件
+			该方式的规范
+				1: 在 mapper.xml 中 namespace 等于 mapper接口的地址
+				2: mapper接口中方法名和 mapper.xml 中statement的id一致
+				3: mapper接口中方法的参数类型和 mapper.xml 中的 parameterType 指定的类型一致
+				4: mapper接口中方法的返回值类型和 mapper.xml 中的 resultType 指定的类型一致(返回值为多条信息的话,用集合)
+		a: mapper接口
+			eg:	public interface UserMapper {
+					public User findUserById(int id);
+					public void deleteUserById(int id);
+					public void updateUser(User user);
+				}
+		b: mapper.xml	//需要在 SqlMapConfig.xml 中配置到<mapper>
+			eg: <?xml version="1.0" encoding="UTF-8" ?>
+				<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+				<mapper namespace="mapper.UserMapper">
+					<select id="findUserById" parameterType="int" resultType="bean.User">
+						select * from user where id=#{id}
+					</select>
+					<delete id="deleteUserById" parameterType="int">
+						delete from user where id=#{id}
+					</delete>	
+					<update id="updateUser" parameterType="bean.User">
+						update user set username=#{username},birthday=#{birthday},sex=#{sex},address=#{address} where id=#{id}
+					</update> 		
+				</mapper>
+		c: 使用
+			1: 创建 SqlSessionFactory 工厂,获取 SqlSession 会话
+				eg: Reader reader = Resources.getResourceAsReader("SqlMapConfig.xml");	//通过配置文件获取数据库连接相关信息
+					SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);	//通过配置信息构建SQLSessionFactory对象
+					SqlSession sqlSession = sqlSessionFactory.openSession();	//通过SQLSessionFactory对象打开数据库会话(SqlSession)
+			2: 获取mapper对象
+				eg: UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+			3: 调用mapper方法
+				eg: User user = userMapper.findUserById(1);
+		
+四: 动态SQL
+			MyBatis 核心,对SQL语句进行灵活操作,通过表达式进行判断,对SQL进行灵活配拼接,组装
+	A: OGNL表达式(Mybatis中的)(支持Java中方法)
+			在映射文件标签的属性中(SQL语句处),可以使用OGNL表达式,对SQL语句进行灵活操作
+		a: 转义 
+			&: &amp; 
+			": &quot;
+		b: 操作符: 	
+			1: java常用操作符: +,-,*,/,...
+			2: 自己特有的操作符: and,or,mod,in,not in
+		c: 标签
+			1: <if test=""></if>	//if: 判断结构.属性: test: if的判断条件.若为true,则标签间的文本生效,否则无效.
+			2: <foreach collection="" index="" item="" open="" close="" separator=""></foreach> //foreach: 循环结构.
+						//属性: collection: 要遍历的对象(List,Map或数组); index: 数组或List的索引,Map的key; item: 数组或List的元素,Map的value;
+						//属性: open: 开始遍历时的拼接串 ; close: 结束遍历时的拼接串 ; separator: 每个元素间的间隔符串.	
+						//循环结果: open + item1 + separator + item2 + separator + ... + separator + itemN + close;
+			3: <where></where>	//where: 自动转换为SQL语句的 WHERE 条件.在<where>中嵌套的<if>或<foreach>的内容,将自动去掉"and"连接符后,拼接为SQL语句
+				eg: <where>
+						<if test="sex!=null"> and sex=#{sex} </if>					//sex!=null && username!=null  -->  where sex=#{sex} and username=#{username}
+						<if test="username!=null"> and username=#{username} </if>	//sex==null && username!=null  -->  where username=#{username}
+					</where>														//sex==null && username==null  -->  没有条件
+			4: <include refid=""></include>		//include: 引用SQL片段.属性: refid: SQL片段的id,其他映射文件的SQL片段需要加namespace
+		d: 从集合中取一条数据: 
+			1: 数组: array[index] (String[],..)
+					 array[index].属性名 (Message[],...)
+			2: List: list[index] (list<String>,...)
+					 list[index].属性名 (List<Message>,...)
+			3: Map: [_parameter.]key (Map<String,String>)
+					[_parameter.]key.属性名 (Map<String,Message>,...)
+					
+六: 延迟加载,查询缓存
+	A: 延迟加载
+				先查询简单的SQL,再按需加载关联查询的其他信息(大大提高数据库性能,因为查询单表比关联查询多张表速度要快)
+		a: 延迟加载
+			resultMap可以实现高级映射,association 和 collection 具备延迟加载功能
+		b: 开启延迟加载
+				MyBatis默认不开启延迟加载,需要在MyBatis核心配置文件 SqlMapConfig.xml 中设置全局参数
+			1: <setting name="lazyLoadingEnabled" value="TRUE"/>	//lazyLoadingEnabled: 在全局范围内启用或禁用延迟加载.TRUE: 启用
+			2: <setting name="aggressiveLazyLoading" value="FALSE"/>//aggressiveLazyLoading: FALSE: 将积极加载变为消极加载,每一个属性是按需加载.
+	B: 查询缓存
+		a: 一级缓存(SqlSession 级别)
+					在操作数据库时需要构造 SqlSession 对象,在 SqlSession 对象中有一个数据结构(HashMap)用于存储缓存数据,这就是一级缓存
+			1: 一级缓存工作原理图解						
+					第一次查询 id 为 1 的用户        ---(写入)-->			
+					第二次查询 id 为 1 的用户        <--(读取)---    sqlSession 一级缓存区域 HashMap	
+					执行commit()提交操作             ---(清空)-->		
+			2: 一级缓存工作原理
+				当发起一个查询时,会先去一级缓存查看是否有相应的数据: 
+					如果没有,则查询数据库,将查询出的数据写入一级缓存
+					如果有,则取出一级缓存中的数据
+				当执行commit()后清空一级缓存
+		b: 二级缓存(Mapper(namespace) 级别)
+					多个 SqlSession 去操作同一个 Mapper 的SQL语句.多个 SqlSession 可以共用二级缓存,二级缓存是跨 SqlSession 的.
+					二级缓存是按照 namespace 来分的,不同 namespace 的二级缓存所在区域不同.//相同 namespace 的 Mapper 是一家
+			1: 开启二级缓存
+					MyBatis默认不开启二级缓存,需要在MyBatis核心配置文件 SqlMapConfig.xml 中设置全局参数,还需要在 Mapper.xml 中开启二级缓存
+				SqlMapConfig.xml: <setting name="cacheEnabled" value="TRUE"/>	//cacheEnabled: 在全局范围内启用或禁用缓存配置任何映射器在此配置下.默认: TRUE
+				xxxMapper.xml: <cache />
+			2: 二级缓存工作原理图解	
+					sqlSession1 执行 UserMapper 查询    ---(写入)-->
+					sqlSession2 执行 UserMapper 查询    <--(读取)---   UserMapper 的二级缓存 
+					sqlSession3 执行 UserMapper 提交    ---(清空)-->
+			3: 二级缓存工作原理
+				当某个sqlSession执行Mapper的查询操作时,会先去同 namespace 下的 Mapper 的二级缓存查看是否有相应的数据: 
+					如果没有,则查询数据库,将查询出的数据写入二级缓存
+					如果有,则取出二级缓存中的数据
+				当某个sqlSession执行commit()后,清空同 namespace 下的 Mapper 的二级缓存
+			4: 应用场景
+					对于访问多的查询请求且用户对查询结果实时性要求不高,此时可采用 MyBatis 二级缓存技术降低数据库访问量
+				业务场景: 耗时较高的统计分析sql,电话账单查询sql等
+				
+七: 逆向工程	(需要下载逆向工程)
+		针对单表自动生成MyBatis执行所需的代码(mapper.java,mapper.xml,Javabean)
+		企业实际开发中,常用的逆向工程方式: 由数据库的表生成Java代码
+	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		

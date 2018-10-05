@@ -1,0 +1,74 @@
+A: 自定义注解
+	@Target({ElementType.METHOD,ElementType.TYPE})	
+		/*使用域: 
+		 * CONSTRUCTOR: 构造方法声明;
+		 * FIELD: 字段声明;
+		 * LOCAL_VARIABLE: 局部变量声明;
+		 * METHOD: 方法声明;
+		 * PACKAGE: 包声明;
+		 * PARAMETER: 参数声明;
+		 * TYPE: 类,接口
+		 */
+	@Retention(RetentionPolicy.RUNTIME)		
+		/*生命周期: 
+		 * SOURCE: 只在源码显示,编译时丢失;
+		 * CLASS: 编译时会记录到class中,运行时忽略;
+		 * RUNTIME: 运行时存在,可以通过反射读取
+		 */
+	@Inherited	//该标识注解代表: 允许子类继承父类的该自定义注解(只会继承类注解,方法注解不会被继承)
+	@Documented	//该标识注解代表: 生成javadoc时会包含注解
+	public @interface 自定义注解
+	{
+		/*
+		 * 1: 成员类型受限,合法类型包括[基本数据类型]和String,Class,Annotation,Enumeration
+		 * 2: 如果注解只有一个成员,则成员名必须取名为 value(),在使用时可以忽略成员名和赋值号
+		 * 3: 成员以无参无异常的方式声明
+		 * 4: 可以用default为成员赋默认值
+		 * 5: 注解类可以没有成员,没有成员的注解称为标识注解
+		 */
+		String desc();		//成员以无参无异常的方式声明
+		String author();
+		int age() default 18;	//可以用default为成员赋默认值
+	}
+	
+B: 解析自定义注解
+	//该方法只能解析RUNTIME类型的注解
+	1: 使用来加载器加载类
+		Class c = Class.forName("使用了注解的类");
+	2: 找到类上面的注解
+		boolean isExist = c.isAnnotationPresent(注解类.class); //返回true则代表该类上有指定注解
+	2: 找到方法上的注解
+		Method[] ms = c.getMethods();
+		for(Method m: ms)
+			boolean isMeExist = m.isAnnotationPresent(注解类.class); //返回true则代表该方法上有指定注解
+	2: 找到方法上的注解(第二种方式)
+		Method[] ms = c.getMethods();
+		for(Method m: ms){
+			Annotation[] as = m.getAnnotations();
+			for(Annotation a: as)
+				if(a instanceof 注解类)
+					注解类 z = (注解类)a;  //获取注解实例
+		}
+	2: 找到字段上的注解
+		....
+	3: 获取注解实例
+		注解类 z = c.getAnnotation(注解类.class);
+		注解类 z = m.getAnnotation(注解类.class);
+	
+	
+instanceof 运算符
+		是用来在运行时指出对象是否是特定类的一个实例.instanceof通过返回一个布尔值来指出,这个对象是否是这个特定类或者是它的子类的一个实例.
+	用法: 
+		result = object instanceof class
+	参数: 
+		Result：布尔类型
+		Object：必选项.任意对象表达式。
+		Class：必选项.任意已定义的对象类。
+	说明: 
+		如果 object 是 class 的一个实例,则 instanceof 运算符返回 true.如果 object 不是指定类的一个实例,或者 object 是 null,则返回 false
+	
+	
+	
+	
+	
+	

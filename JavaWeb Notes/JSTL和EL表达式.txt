@@ -10,6 +10,8 @@ JSTL标签导入JSP页面
 	<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 JSTL函数导入JSP页面
 	<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+JSTL格式化标签导入JSP页面
+	<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 	
 EL表达式
 		Expression Language,经常与JSTL配合使用,shijSP页面更直观,写法更简单
@@ -177,27 +179,35 @@ JSTL标签
 						<c:out value="${param.username}"></c:out>
 						<c:out value="${param.password}"></c:out>			  
 	B: 格式化标签
+		a: 数字日期格式化
+			1: <fmt:formatDate>		//格式化日期和时间
+				属性: value: 要格式化的日期
+					  pattern: 格式化的格式. eg: "yyyy-MM-dd HH:mm:ss"
+			2: <fmt:parseDate>		//主要将字符串类型的时间或日期转化为时间或日期对象
+				属性: value: 字符串类型的时间或日期
+					  pattern: 字符串使用的时间样式
+					  type: 转化为的类型,默认: date
 	C: SQL标签
 	D: XML标签
 
 JSTL常用函数
-	fn:contains(String a,String b): 判断字符串a中是否包含字符串b(区分大小写)
+	1: fn:contains(String a,String b): 判断字符串a中是否包含字符串b(区分大小写)
 			eg: <c:out value="${fn:contains('哈HelloWorld','lloW')}"></c:out> 				--> true
-	fn:containsIgnoreCase(String a,String b): 判断字符串a中是否包含字符串b(不区分大小写)
+	2: fn:containsIgnoreCase(String a,String b): 判断字符串a中是否包含字符串b(不区分大小写)
 			eg: <c:out value="${fn:containsIgnoreCase('哈HelloWorld','LLOw')}"></c:out> 	--> true
-	fn:startWith(String a,String b): 判断字符串b是否在字符串a开头
-	fn:endWith(String a,String b): 判断字符串b是否在字符串a结尾
-	fn:escapeXml(String str): str: xml标签代码	
+	3: fn:startWith(String a,String b): 判断字符串b是否在字符串a开头
+	4: fn:endWith(String a,String b): 判断字符串b是否在字符串a结尾
+	5: fn:escapeXml(String str): str: xml标签代码	
 			eg: <c:out value="${fn:escapeXml('<book>冰与火之歌</book>')}"></c:out>
-	fn:indexOf(String a,String b): 返回字符串b在字符串a第一次出现的索引值		
+	6: fn:indexOf(String a,String b): 返回字符串b在字符串a第一次出现的索引值		
 			eg: <c:out value="${fn:indexOf('HelloWorld','oWo')}"></c:out>	--> 4
-	fn:length(): 返回字符串长度或集合中的元素个数
-	fn:replace(): 替换一个字符串与另一个字符串的所有匹配
-	fn:split(): 分割字符串后将子串存储在数组中
-	fn:substring(int start,int end): 从指定位置开始到指定位置结束截取字符串
-	fn:toLowerCase(String str): 把字符串转成小写
-	fn:toUpperCase(String str): 把字符串转成大写
-	fn:trim(): 去除字符串两端空格
+	7: fn:length(): 返回字符串长度或集合中的元素个数
+	8: fn:replace(): 替换一个字符串与另一个字符串的所有匹配
+	9: fn:split(): 分割字符串后将子串存储在数组中
+	10: fn:substring(int start,int end): 从指定位置开始到指定位置结束截取字符串
+	11: fn:toLowerCase(String str): 把字符串转成小写
+	12: fn:toUpperCase(String str): 把字符串转成大写
+	13: fn:trim(): 去除字符串两端空格
 			
 			
 			

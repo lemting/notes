@@ -378,7 +378,7 @@ Spring中为了避免 ApplicationContext 对象多次创建,封装了监听器: 
 			//3: 使用AspectJ的XML配置切面
 			<aop:config>
 				<aop:pointcut expression="execution(* service.tranfer(..)") id="pointcut1">
-				<aop:advisor advice-ref="tx" />
+				<aop:advisor advice-ref="txAdvice" />
 			</aop:config>	
 		b: 注解
 			1: 配置事务管理器

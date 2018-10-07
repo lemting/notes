@@ -15,7 +15,7 @@ MyBatis 是持久型框架
 			b: 在 Spring 核心配置文件 applicationContext.xml 配置 SqlSessionFactory 和数据源
 				eg: <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">	
 						<property name="configLocation" value="config/SqlMapConfig.xml" /> //加载MyBatis的配置文件
-						<property name="dataSource" ref="dataSource" />	//配置数据源
+						<property name="dataSource" ref="dataSource" />	//注入数据源
 					</bean>
 					//配置数据源
 					<context:property-placeholder location="classpath:dbcp.properties" />
@@ -27,6 +27,45 @@ MyBatis 是持久型框架
 						<property name="maxActive" value="10"></property>
 						<property name="maxIdle" value="5"></property>
 					</bean>
+					//配置事务管理
+					<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+						<property name="dataSource" ref="dataSource" />
+					</bean>
+					
+					/*通过 MapperScannerConfigurer 扫描mapper批量bean注册.批量注册后,mapper接口的bean的id为mapper类名(首字母小写)
+						得遵守规范: 
+							1: 在 mapper.xml 中 namespace 等于 mapper接口的地址
+							2: mapper接口中方法名和 mapper.xml 中statement的id一致
+							3: mapper接口中方法的参数类型和 mapper.xml 中的 parameterType 指定的类型一致
+							4: mapper接口中方法的返回值类型和 mapper.xml 中的 resultType 指定的类型一致(返回值为多条信息的话,用集合) */
+					<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+						//批量mapper接口的包名,在SqlMapConfig.xml中就不需要在<mappers>中加载mapper.xml映射文件
+						<property name="basePackage" value="包1,包2,..." />	
+						//整合时,注入 SqlSessionFactory 报错.
+						//<property name="sqlSessionFactoryBeanName" ref="sqlSessionFactory" /> 注入 SqlSessionFactory 对象
+					</bean>
+					
+					
+			c: MyBatis 配置文件简化
+				eg: <?xml version="1.0" encoding="UTF-8" ?>
+					<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+					<configuration>
+						//配置别名,配置po包下的所有类的别名
+						<typeAliases>
+							<package name="po"/>
+						</typeAliases>
+						//全局setting配置,根据需要加
+						
+						//在Spring的配置文件中配置数据库,<environments>可以不用写
+						
+						/* mapper: 在Spring配置文件使用扫描包的方式注入mapper时,<mapper>可以不用写,
+							但是得遵守规范:
+								1: 在 mapper.xml 中 namespace 等于 mapper接口的地址
+								2: mapper接口中方法名和 mapper.xml 中statement的id一致
+								3: mapper接口中方法的参数类型和 mapper.xml 中的 parameterType 指定的类型一致
+								4: mapper接口中方法的返回值类型和 mapper.xml 中的 resultType 指定的类型一致(返回值为多条信息的话,用集合) */
+						<mappers></mappers>
+					</configuration>
 		C: Spring 管理下开发 dao
 			a: 原始dao开放方法 //让dao接口的实现类继承 org.mybatis.spring.support.SqlSessionDaoSupport,Spring 将自动注入 SqlSessionFactory
 				1: dao接口
@@ -64,13 +103,15 @@ MyBatis 是持久型框架
 					通过 MapperFactoryBean 单个mapper的bean注册
 						<bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">	//MapperFactoryBean 会根据mapper接口生成代理对象
 							<property name="mapperInterface" value="" />	//mapperInterface: 指定mapper接口类
-							<property name="sqlSessionFactory" ref="sqlSessionFactory"> //注入 SqlSessionFactory 对象
+							//整合时,注入 SqlSessionFactory 报错.
+							//<property name="sqlSessionFactory" ref="sqlSessionFactory"> //注入 SqlSessionFactory 对象
 						</bean>
 					通过 MapperScannerConfigurer 扫描mapper批量bean注册 //批量注册后,mapper接口的bean的id为mapper类名(首字母小写)
 						<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
 							//批量mapper接口的包名,在SqlMapConfig.xml中就不需要在<mappers>中加载mapper.xml映射文件
 							<property name="basePackage" value="包1,包2,..." />	
-							<property name="sqlSessionFactoryBeanName" ref="sqlSessionFactory"> //注入 SqlSessionFactory 对象
+							//整合时,注入 SqlSessionFactory 报错.
+							//<property name="sqlSessionFactoryBeanName" ref="sqlSessionFactory" /> //注入 SqlSessionFactory 对象
 						</bean>
 
 二二二: MyBatis 和 分布式缓存框架 整合

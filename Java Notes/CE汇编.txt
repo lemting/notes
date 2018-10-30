@@ -1,0 +1,188 @@
+一: CE 
+	A: CE 脚本函数
+		a: aobscan(agr0,agr1) 	/* 可用于 [特征码] 等 */
+					将 字节数组(arg1) 对应的地址传给 指定变量(arg0)
+			1: aobscan(存储地址的变量,特征码字节数组)	//(字节数组一般5,6个就可以了)
+					eg: aobscan(Dizhi,8b e5 5d c3 8b 88) 
+			2: aobscan 在CE自动汇编脚本中的使用
+				位于 [ENABLE] 之前.在脚本激活之后,代码生效之前,查询出 特征码(字节数组) 的地址,并赋值给 指定变量
+					eg: aobscan(Dizhi,8b e5 5d c3 8b 88) 	
+						[ENABLE]
+							...  //需要操作的地址,可以通过特征码的地址加上偏移找到  eg: Dizhi+00000c1: 
+						[DISABLE]
+							...
+		b: fullaccess(arg0,arg1)	/* 可用于 [人造指针] 等 */
+					将 指定地址(arg0) 之后的 指定字节长度(arg1) 的内存改为可读可写权限
+			1: fullaccess(内存地址,字节长度)
+					eg: fullaccess(00742fa0,4)
+			2: fullaccess 在CE自动汇编脚本中的使用
+				位于 [ENABLE] 之前.在脚本激活之后,代码生效之前,将指定地址之后的指定字节长度的内存改为可读可写权限
+					eg: fullaccess(00742fa0,4)
+						[ENABLE]
+						[DISABLE]
+		c: alloc(arg0,arg1)		/* [申请内存空间] */
+					申请 指定字节长度(arg1) 的内存,并赋值给 指定变量(arg0)
+			1: alloc(代表申请内存的变量,字节长度)
+					eg: alloc(point,4)
+			2: alloc 在CE自动汇编脚本中的使用
+				位于 [ENABLE] 之后,申请 指定字节长度 的内存,并赋值给 指定变量
+					eg: [ENABLE]
+							alloc(point,4)
+							registersymbol(point)	//将 point 加入到全局的字符表(即将 point 变成全局变量,其他的脚本也可以访问)
+							point: 
+							...
+						[DISABLE]
+							dealloc(point,4)		//释放资源
+							unregistersymbol(point)	//将 point 从全局的字符表中去除
+		d: createthread(arg0)	/* [创建线程] */
+					根据 指定内存的首地址 创建线程
+			1: createthread(申请内存的变量)
+					eg: alloc(newmem,256)
+						createthread(newmem)
+			2: createthread 在CE自动汇编脚本中的使用
+					eg: [ENABLE]	//植物大战僵尸 阳光+500 脚本
+							alloc(newmem,256)		//申请内存
+							label(exit)  			//创建标签,类似锚点
+							createthread(newmem)	//创建线程
+
+							newmem:
+							mov eax,[007794f8]   	//阳光基址  //不能直接操作内存,需要通过寄存器间接操作	
+							mov eax,[eax+00000868]
+							add [eax+00005578],1F4  //阳光增加500
+							cmp [eax+00005578],2706	//阳光上限 9990
+							jle exit				//若不超过上限,则跳转到 exit
+							mov [eax+00005578],2706 //阳光设为上限值 9990
+
+							exit:
+							ret				//线程返回
+						[DISABLE]
+							dealloc(newmem,256)		//释放资源
+	
+	B: Windows 函数	
+		a: call 函数名		/* call: 调用函数,可以调用 程序的函数,也可以调用 Windows 函数 */
+			1: 注入数值参数
+				在 call 之前,通过 push 注入,但是先进后出 //第一个参数要在最后 push,最后一个参数要最先 push
+			2: 注入寄存器存储的参数
+				在 call 之前出现就可以
+		b: keybd_event 		//按键事件
+					四个参数: arg0,arg1,arg2,arg3
+			1: arg0: 按下的键的编号.
+			2: arg2: 键的状态.取值: 0: 按下,2: 弹起
+				eg: push 0		//模拟按下 主键区'2'键
+					push 0
+					push 0
+					push 32
+					call keybd_event
+					push 0
+					push 2
+					push 0
+					push 32
+					call keybd_event
+					
+				
+二: 汇编常用指令
+	A: 指令中的符号标识
+		a: Rn			工作寄存器 R0-R7 
+		b: Ri			工作寄存器 R0 和 R1 
+		c: @Ri			间接寻址的8位 RAM 单元地址(00H-FFH)
+		d: #data8		8位常数
+		e: #data16		16位常数
+		f: addr16		16位目标地址,能转移或调用到 64KROM 的任何地方
+		g: addr11		11位目标地址,在下条指令的 2K 范围内转移或调用
+		h: Rel: 		8位偏移量,用于 SJMP 和所有条件转移指令,范围 -128～+127
+		i: Bit			片内RAM 中的可寻址位和 SFR 的可寻址位
+		j: Direct		直接地址,范围片内 RAM 单元(00H-7FH)和80H-FFH
+		k: $			指本条指令的起始位置
+	B: 算术运算类指令
+		a: add			加(+)
+		b: addc			加(+)
+		c: subb			减(-)
+		e: imul			乘(*)
+		f: div			除(/)
+		g: inc			自增(++)
+		e: dec			自减(--)
+		h: cmp			比较(将两个参数相减,进行比较)	
+			/* ------------------------------------------------------------------ */
+			/* C: 条件转移指令 */
+					对 cmp exp1,exp2 结果的判断跳转
+				a: 通用		//j: (jump)跳转; e: (equal)等于; n: (not)相反
+					1: je  (jz)		exp1 = exp2,跳转至标号处
+					2: jne			!=
+				a: 无符号位	//a: (above)大于; b: (below)小于; 
+					3: ja			>
+					4: jae (jnb)	>=
+					5: jb			<
+					6: jbe (jna)	<=	
+				b: 有符号位	//g: (great)大于; l: (less than)小于;
+					7: jg			>
+					8: jge	(jnl)	>=
+					9: jl			<
+					10: jle	(jng)	<=
+				c: 其他
+					11: jo 			溢出跳转
+					12: jno			不溢出跳转
+					13: js			负号跳转
+					14: jns			非负跳转
+					15: jp			奇偶跳转
+				eg: cmp exp1,exp2	//比较 exp1 和 exp2 的值
+					je [入口]	//当 exp1 = exp2 时,跳转到指定入口
+					jle [入口]	//当 exp1 <= exp2 时,跳转到指定入口
+			/* ------------------------------------------------------------------ */
+		i: anl			与(∩)
+		j: orl			或(∪)
+		k: xrl			异或(⊕)
+		l: clr			清零
+		m: cpl			求反
+		n: rl			左移(<<)
+		o: rlc			左移(<<)
+		p: rr			右移(>>)
+		q: rrc			右移(>>)
+		r: swap			交换
+		s: jmp			跳转
+		t: cjne
+		u: djnz
+		v: nop			空操作
+		w: acall
+		x: lcall
+		y: ret
+		z: reti
+		a: ajmp
+		b: ljmp
+		c: sjmp
+	D: 数据传递类指令
+		a: mov			赋值
+		b: movc
+		c: movx
+		d: push			压栈
+		e: pop			弹栈
+		f: xch
+		g: xchd
+	E: 布尔指令
+		a: clr
+		b: setb
+		c: cpl
+		d: anl
+		e: orl
+		f: mov
+		g: jc
+		h: jnb
+		i: jbc
+	F: 伪指令
+		a: org
+		b: db
+		c: dw
+		d: equ
+		e: data
+		f: xdata
+		g: bit
+		h: end
+		
+		
+		
+			
+			
+			
+			
+			
+			
+			

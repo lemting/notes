@@ -13,6 +13,9 @@ MySQL配置文件(/data/my.ini)
 修改默认结束符
 	delimiter 结束符
 	
+/* Navicat 连接 MySQL8.0 数据库报 2059 错的解决方案,文件最后 */
+	
+	
 A: MySQL简单命令行: 
 	a: MySQL登录
 		mysql + 参数
@@ -98,7 +101,7 @@ C: 数据表
 		方法2: insert [into] TABLE_NAME set COLUMN_NAME={EXPR|default},COLUMN_NAME={EXPR|default},...; (与第一种的区别在于,此方法可以使用子查询(SubQuery))
 		方法3: insert [into] TABLE_NAME [(COLUMN_NAME,...)] select ...; (此方法可以将查询结果插入到指定数据表)
 	g: 查找记录
-		select SELECT_EXPR [,SELECT_EXPR,...] 
+		select [distinct] SELECT_EXPR [,SELECT_EXPR,...] 		//distinct: 去重复
 		[
 			from TABLE_NAME											//要查询的表
 			[where WHERE_CONDITION]									//查询条件
@@ -373,10 +376,10 @@ I: 存储引擎
 	d: 事务		
 			事务用于保证数据库完整性
 		1: 事务的特性
-			原子性(Atomicity): 事务是一个完整的操作
-			一致性(Consistency): 当事务完成时,数据必须处于一致状态
-			隔离性(Isolation): 对数据进行修改的所有并发事务是彼此隔离的
-			持久性(Durability): 事务完成后,它对数据库的修改被永久保持
+			原子性(Atomicity)
+			一致性(Consistency)
+			隔离性(Isolation)
+			持久性(Durability)
 	e: 外键
 		保证数据一致性的策略
 	f: 索引
@@ -385,8 +388,16 @@ I: 存储引擎
 		
 		
 		
-		
-		
+/* Navicat 连接 MySQL8 数据库报 2059 错的解决方案 */
+	navicat 链接 mysql8 以后的版本会出现 2059 的错误,原因是在 mysql8 之前的版本中加密规则为 mysql_native_password,在 mysql8 以后为caching_sha2_password.
+	a: 解决此问题有两种方法: 
+		1: 一种是更新 navicat 驱动来解决此问题
+		2: 一种是将 mysql 用户登录的加密规则修改为 mysql_native_password
+	b: 代码: 	//更改 root
+		ALTER USER 'root'@'localhost' IDENTIFIED BY 'password' PASSWORD EXPIRE NEVER; 	//修改加密规则  
+		ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'yourPassword';  //更新一下用户的密码
+		FLUSH PRIVILEGES; //刷新权限
+
 		
 		
 		

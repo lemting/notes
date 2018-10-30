@@ -1,0 +1,400 @@
+一:	VB数据类型
+		声明变量: {Public|Private|Dim|Static} 变量名 As Type [= Expression]
+	A: 数值型
+		1: Integer			%,整型
+		2: Long				&,长整型
+		3: Single			!,单精度浮点型
+		4: Double			#,双精度浮点型
+		5: Currency			货币型
+		6: byte				字节型
+		7: Decimal			@,79228162514264337593543950335到-79228162514264337593543950335
+	B: 字符串型
+		1: String			$,变长字符串		
+		2: String * num		定长字符串
+	C: 布尔型		Boolean		
+	D: 日期型		Date		
+	E: 变体数据型	Variant	
+	
+二: VB顺序,选择,循环结构
+	A: 选择结构	
+		a: If 语句
+			1: If..Then
+					If <exp> Then
+						<code>
+					End If
+			2: If..Then
+					If <exp> Then <code>
+			3: If..Then..Else
+					If <exp> Then
+						<code>
+					Else
+						<code>
+					End If
+			4: If..Then..ElseIf
+					If <exp> Then
+						<code>
+					ElseIf <exp> Then
+						<code>
+					...
+					End If
+		b: Select 语句
+				Select Case <exp>
+					Case <exp1>
+						<code1>
+					Case <exp2>
+						<code2>
+					...
+					Case Else
+						<codeN>
+				End Select
+	B: 循环结构
+		a: For 循环
+				For 循环变量 = 初值 to 终值 [Step 步长]
+					<code>
+				Next 循环变量 
+		b: Do 循环
+			1: 无循环条件(直到遇到"Exit Do",或用户按Ctrl+Break组合键)
+					Do
+						<code>
+					Loop
+			2: Do While..
+					Do While <exp>
+						<code>	
+					Loop
+			3: Do .. While
+					Do
+						<code>	
+					Loop While <exp>
+			4: Do Until ..	(False才执行)
+					Do Until <exp>
+						<code>	
+					Loop
+			5: Do .. Until 	(False才执行)
+					Do
+						<code>	
+					Loop Until <exp>
+		c: While 循环
+			While <exp>
+				<code>
+			Wend
+三: 数组
+	A: 数组定义
+		a: 定长数组
+				{Public|Private|Dim} name(index1[,index2 ,...]) As Type
+			1: name: 数组名字
+			2: index: 下标,数组长度(只能是常数)	  	eg: arr1(3)  长度为3的一维数组; arr2(4,3)  二维数组
+			3: Type: 数组元素的数据类型
+		b: 动态数组
+				{Private|Dim} name() As Type
+				ReDim name(index1[,index2 ,...]) [Preserve]
+			1: 使用 ReDim 语句定义数组的大小,该处的index可以是变量
+			2: 每次使用 ReDim 都会清空数组数据
+			3: 可以在 ReDim 语句后面加 Preserve 参数,用来保留数组中的数据,此时只能改变最后一维的大小
+	B: 使用数组
+		1: 操作数组中的元素: arr(index)
+			eg: arr(1) = 12 : Dim i As Integer = arr(2) :  arr(3) = arr(4)
+		2: 操作二维数组中的元素: arr(index1,index2)
+			eg: arr(1,2) = 14 : arr(2,3) = arr(1,2)
+
+四: 过程	
+	A: 子过程
+		a: 子过程的定义
+				{Static|Private|Public} Sub name[(参数列表)]
+					<code>
+				End Sub
+			1: name: 子过程名称
+		b: 参数列表格式
+				[[ByVal] name[()] As Type [,...]]
+			1: ByVal: 代表值传递,加上该参数则为值传递
+			2: name: 形参变量名
+			3: (): 参数是数组时使用
+		b: 子过程的调用
+			[Call] name[(参数列表)]
+	B: 函数过程
+		a: 函数过程的定义
+				{Static|Private|Public} Function name[(参数列表)] [As Type]
+					<code>
+				End Sub
+			1: name: 函数过程名
+			2: Type: 函数返回值类型.若不写,则返回变体类型
+		b: 函数过程的调用
+			name[(参数列表)]
+五: 数据库
+
+
+	
+六: VB所有控件
+	-------------- VB6.0 --------------
+	A: 所有控件
+		a: PictureBox		图像框
+		b: Label			标签
+		c: TextBox			输入框
+		d: Frame			组(该组件内的东西不受对外界干扰)
+		e: CommandButton	按钮
+		f: CheckBox			复选框
+		g: OptionButton		单选按钮
+		h: ComboBox			下拉列表
+		i: ListBox			选择项列表
+		j: HScrollBar		左右滚动条
+		k: VScrollBar		上下滚动条
+		l: Timer			
+		m: DriverListBox	驱动器列表
+		n: DirListBox		目录列表框
+		o: FileListBox		文件列表框
+		p: Shape			图形
+		q: Line				直线
+		r: Image			图片框
+		s: Data				数据
+		t: OLE				
+	B: 常用事件
+		a: Timer			在计时器控件中,用Interval属性所预定的时间间隔过去后发生
+		//窗体事件
+		b: Activate 		激活,窗体变为活动窗体时发生此事件
+		c: Deactivate		当对象不在是活动窗口时发生
+		d: Load				当窗体被装载时发生
+		e: QueryUnload		在某个窗体被关闭或应用程序结束前发生
+		f: Unload			当窗体从屏幕上删除时发生
+		//鼠标事件
+		g: Click			单击事件
+		h: Dblclick			双击事件
+		i: MouseDown		按下鼠标键
+		j: MouseMove		鼠标移动
+		k: MouseUp			释放鼠标键
+		l: Scroll			当用户用鼠标在滚动框内推动滚动条时发生
+		//键盘事件
+		m: KeyDown			当对象具有焦点时按下键盘上某个键时发生
+		n: KeyPress			当对象具有焦点时按下并释放一个键时发生
+		o: KeyUp			当对象具有焦点时释放键盘上某个键时发生
+		//发生改变事件
+		p: Change			当控件内容发生改变时发生
+		q: PathChange		当用户指定新的FileName属性或Path属性,从而改变了路径时发生
+		r: PatternChange	当用户指定新的FileName属性或Path属性,从而改变了当前文件列表类型时发生
+		//布局事件
+		s: Resize			当对象第一次显示或窗口的尺寸发生变化时发生
+		//焦点事件
+		t: GotFocus			当对象获得焦点时发生
+		u: LostFocus		当对象失去焦点时发生
+		//拖放事件
+		v: DragDrop			当用户在窗体上用鼠标拖动一个控件然后放开时发生
+		w: DragOver			当对象被拖动并越过另一个控件时发生
+		x: DragDown			ComboBox控件的列表部分正要被放下时发生(Style属性为1时,不发生)
+		//外观事件
+		y: Paint			当窗口内容被重绘时发生
+	-------------- VB6.0 --------------
+	--------------  VS    -------------
+	A: 公共控件
+		a: Button			按钮
+		b: CheckBox			复选框
+		c: CheckedListBox	复选框列表
+		d: ComboBox			下拉列表
+		e: DateTimePicker	日期时间
+		f: Label			标签
+		g: LinkLabel		超链接标签
+		h: ListBox			选择项列表
+		i: ListView			项的集合
+		j: MaskedTextBox	使用掩码的输入框
+		k: MonthCalendar	日历
+		l: NotifyIcon		在windows通知区域显示图标
+		m: NumbericUpDown	可↑↓控制加减的数字输入框
+		n: PictureBox		图像域
+		o: ProgressBar		进度条
+		p: RadioButton		单选按钮
+		q: RichTextBox		文本域
+		r: TextBox			输入框
+		s: ToolTip			显示信息,鼠标移至关联组件时显示信息
+		t: TreeView			显示可选择包含图像的标签项的分层集合
+		u: WebBrowser		允许在窗体内可以浏览网页
+	B: 容器
+		a: FlowLayoutPanel	 
+		b: GroupBox
+		c: Panel
+		d: SplitContainer
+		e: TabControl
+		f: TableLayoutPanel
+	C: 菜单和工具栏
+		a: ContextMenuStrip		右键菜单
+		b: MenuStrip			工具栏.
+		c: StatusStrip			工具栏.支持图像下拉项,标签等
+		d: ToolStrip			工具栏.支持图像按钮,图像下拉项,输入框,标签等
+		e: ToolStripContainer	边框四面都支持工具栏的窗体容器
+	D: 数据
+		a: Chart				图表
+		b: BindingNavigator		提供用于导航和处理绑定到窗体控件的数据的用户界面
+		c: BindingSource		封装窗体的数据源,并提供导航,筛选,排序和更新功能
+		d: DataGridView			显示网格中可以自定义的数据的行和列
+		e: DataSet				表示数据在内存中的缓存
+	G: VB PowerPacks
+		a: PrintForm			将Windows表单打印为简单报表
+		b: LineShape			水平线,垂直线或对角线
+		c: OvalShape			椭圆
+		d: RectangleShape		矩形
+		e: DataRepeater			按可自定义的列表格式显示数据
+	
+七: VB常用内部函数
+	A: 类型转换函数
+		1: Cbool(string)		转换为布尔值(Boolean)
+		2: Cbyte(string)		转换为字节类型的值(Byte)
+		3: Ccur(string)			转换为货币类值 (Currency)
+		4: Cdate(string)		转换为日前类型的值 (Date)
+		5: Cdbl(string)			转换为双精度值 (Double)
+		6: Cint(string)			转换为整数值 (Integer)
+		7: Clng(string)			转换为长整型的值 (Long)
+		8: Csng(string)			转换为单精度的值 (Single)
+		9: Cstr(var)			转换为字符串值 (String)
+		10: Str(var)			数值转换为字符串(Variant)
+		11: Val(string)			字符串转换为数值 
+		12: CVErr(string)		转换为Error值
+	B: 类型判断函数
+		1: IsArray(var)			判断一个变量是否是数组 
+		2: IsDate(var)				判断一个变量是否是日期 
+		3: IsNull(var)				判断一个变量是否为空 
+		4: IsNumeric(exp)			判断表达式是否包含数值 
+		5: IsObject(var)			判断一个变量是否是对象 
+		6: TypeName(var)			返回变量的数据类型 
+	C: 常用数学函数
+			在三角函数中,以弧度表示
+		1: Abs(num) 			取绝对值
+		2: Cos(num) 			余弦函数
+		3: Exp(num) 			e为底的指数函数
+		4: Log(num) 			以e为底的自然对数
+		5: Rnd					产生(0,1)的随机数
+		   Randomize			随机数种子.不执行该语句,则多次调用Rnd,不会产生不同的随机数	
+		6: Sin(num) 			正弦函数
+		7: Sgn(num) 			符号函数，取正负号：X>0 则结果为1；X=0 则结果为0；X<0 则结果为-1
+		8: Sqr(num) 			平方根
+		9: Tan(num) 			正切函数
+		10: Atn(num)	 		反切函数
+		11: Int(num)			向下取整
+		12: Fix(num)			向下取整
+		13: Formatpercent(num)	返回百分比 
+		14: Hex(num)			返回num的16进制数 
+		15: Oct(num)			返回num的8进制数
+		16: Round(num[,n])		按小数位四舍五入.n: 小数位(默认值: 0)
+	D: 字符串类函数
+		1: Format(exp [,str])				使数值,日期,字符串按指定格式输出,一般用于Print方法中
+		1: StrComp(string1,string2)			比较两个字符串 
+		2: Asc(string)						返回字符串第一个字符的ASCII码
+		3: Chr(charcode)					返回ASCII码为charcode的字符
+		4: Len(string)						计算字符串X的长度
+		5: InStr([n,]string,searchstr)		从第n个字符开始寻找字符串searchstr在string中的索引
+		6: InstrRev([n,]string,searchstr)	同上,从右边开始搜索  
+		7: Ucase(string),Lcase(string)		转换大小写
+		8: Left(string,num)					从左侧开始截取num个字符返回
+		9: Right(string,num)				从右侧开始截取num个字符返回
+		10: Trim(string)					去除两端空格(Ltrim()+Rtrim())
+		11: Mid(string,start[,len])			截取从start开始的len个字符
+		12: Replace(string,find,withstr)	用字符串withstr替换find并返回
+		13: StrReverse(string)				反转字符串
+		14: Split(str)						以str为分割符,将字符串分割为字符串数组
+		15: Space(num)						返回num个空格		 
+	E: 日期时间类函数
+			若date里只有时间,没有日期,则日期视为#1899/12/30#
+		1: Year(date)					返回年
+		2: Month(date)					返回月
+		3: Day(date)					返回日
+		4: Hour(date)					返回时
+		5: Minute(date)					返回分
+		6: Second(date)					返回秒
+		7: Date()						返回系统日期
+		8: Time()						返回系统时间
+		9: Now()						返回系统日期时间
+		10: Weekday(date)				返回星期几
+		11: WeekdayName(date)			返回星期几的名称
+		12: DateAdd(type,num,date)		返回增加指定时间间隔的日期.type: 间隔类型,取值: yyyy-年,m-月,d-日,h-小时,n-分
+		13: DateDiff(type,date1,date2)	返回两个时间的间隔.type: 间隔类型
+		14: Datevalue(date)				返回date中的日期部份 
+		15: DateSerial(Y,M,D)			合并年,月,日成为日期
+		16: TimeSerial(H,M,S)			合并时,分,秒成为时间
+		17: FormatDatetime(date)		返回格式化为日期的表达式 
+		18: MonthName(X)				返回X(1-12)月的月份名称
+	F: 杂项
+		1: Shell(string[,type])			将string在DOS命令执行.type: 窗口类型
+		2: Array(list)					返回数组,只能为一个变体变量或变体动态数组赋值
+				eg: Dim a As Variant = Array(1,2,3,5,2,3,5,67)
+		3: CreateObject(class)			创建一个对象 
+		4: GetObject(pathfilename)		得到文件对象 
+		5: Inputbox(prompt)				提供一个可供输入数据的对话框 
+		6: LBound(arrayP)				返回数组的最小索引 
+		7: Msgbox(string)				输出一个消息框 
+		8: Ubound(array)				返回数组的最大索引
+	G: 窗体方法
+		a: Print		在对象上输出文本内容
+				[object.]Print [Spc(n)|Tab(n)] [exp [,|;]  [exp [,|;] ...]]
+ 			1: object: 对象,可以是窗体,图形框或打印机.若省略了对象,则为当前窗体
+			2: Spc(n): 用于输出时插入n个空格
+			3: Tab(n): 在输出表达式列表时移动n个制表符
+			4: exp: 表达式列表,要输出的内容,该方法会自动换行
+			5: ";" : 按紧凑格式输出,Print方法将不会换行
+			6: "," : 光标定位在下一个打印区的开始位置(每个14列为一个打印区)
+		b: Cls			清除运行时在窗体或图形对象中显示的文本(不能清除设计时的)
+				[object.]Cls
+			object: 对象,可以是窗体或图形框.若省略了对象,则为当前窗体
+		c: Move			用于移动窗体或控件,并可改变其大小
+				[object.]Move left [,top [,width [,height]]]
+			1: object: 对象,除时钟,菜单外的所有控件.省略时为当前窗体
+			2: left: 距屏幕或窗体左边距离,数值表达式,单位: Twip(下同)
+			3: top: 距屏幕或窗体上边距离
+			4: width: 宽度
+			5: height: 高度
+	H: 交互函数
+		a: InputBox		对话框,等待用户输入或单击按钮,函数返回文本框中的输入数据
+				InputBox [$] (prompt [, title] [,default] [, x] [, y])
+			1: prompt: 给予用户的提示
+			2: title: 对话框的标题
+			3: default: 输入框中默认文本
+			4: x,y: 对话框的x,y坐标
+		b: MsgBox		信息框,等待用户单击一个按钮,返回用户所选按钮的数值
+				MsgBox( prompt [,button] [, title] )
+			1: prompt: 给予用户的提示
+			2: button: 整形表达式或表达式的和,指定显示"按钮"的数目及形式,使用的图标样式。默认值为0
+			3: title: 对话框的标题
+		c: MsgBox 过程	
+			跟MsgBox()函数功能相同,用法类似
+				MsgBox prompt [,button] [, title]
+			
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

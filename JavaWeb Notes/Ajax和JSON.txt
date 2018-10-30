@@ -53,11 +53,11 @@ Ajax
 		4: getAllResponseHeader(): 获取所有的响应报头
 		5: getResponseHeader(String name): 查询响应中的某个字段的值
 		6: readyState: 值: 
-							0: 请求未初始化,open还没有调用
-							1: 服务器连接已建立,open已经调用了
-							2: 请求已接收,也就是接收到头信息了
-							3: 请求处理中,也就是接收到响应主体了
-							4: 请求已完成,且响应已就绪,也就是响应完成了						
+							0 : 请求未初始化,open还没有调用
+							1 : 服务器连接已建立,open已经调用了
+							2 : 请求已接收,也就是接收到头信息了
+							3 : 请求处理中,也就是接收到响应主体了
+							4 : 请求已完成,且响应已就绪,也就是响应完成了						
 		利用onreadystatechange事件来监听readyState属性的值的变化
 			eg: var xmlhttprequest = new XMLHttpRequest();
 				xmlhttprequest.open("POST","get.php",true); 	

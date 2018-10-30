@@ -1,0 +1,393 @@
+SpringMVC: 基于 MVC 的 Web 框架
+	
+SpringMVC 是 Spring 的一个模块,SpringMVC 和 Spring 无需通过中间整合层进行整合
+
+springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是类似 
+
+一一一: Spring, SpringMVC 与 MyBatis 的整合
+	A: 整合思路
+											表现层: SpringMVC
+
+											业务层: service 接口
+				Spring: 将各层进行整合
+											持久层: MyBatis
+											
+											数据库: MySQL
+				
+		1: 持久层: 通过 Spring 管理持久层的 mapper(相当于 dao 接口)
+		2: 业务层: 通过 Spring 管理业务层的 service,service 中可以调用 mapper 接口
+				   Spring 进行事务控制
+		3: 表现层: 通过 Spring 管理表现层的 Handler,Handler可以调用 service 接口
+			mapper,service,Handler 都是JavaBean
+	B: 步骤
+		a: Spring 整合 MyBatis
+					通过 Spring 管理 mapper 接口,使用 mapper 的扫描器自动扫描 mapper 接口在 Spring 中进行注册
+		b: Spring 整合 service 层
+					通过 Spring 管理 service 接口,实现事务控制.
+		c: Spring 整合 SpringMVC
+					SpringMVC 和 Spring 无需通过中间整合层进行整合
+			
+一: SpringMVC 
+	A: SpringMVC 原理
+		a: SpringMVC 工作原理
+			1: 用户发起 请求(request) 到 前端控制器(DispatcherServlet)
+			2: 前端控制器(DispatcherServlet) 请求 处理器映射器(HandlerMapping) 查找 处理器(Handler)
+					可以根据xml配置,注解进行查找
+			3: 处理器映射器(HandlerMapping) 向 前端控制器(DispatcherServlet) 返回 处理器(Handler)
+			4: 前端控制器(DispatcherServlet) 调用 处理器适配器(HandlerAdapter) 执行 处理器(Handler)
+			5: 处理器适配器(HandlerAdapter) 执行 处理器(Handler)
+			6: 处理器(Handler) 执行完后向 处理器适配器(HandlerAdapter) 返回 ModelAndView 
+					ModelAndView 是 SpringMVC 框架的一个底层对象,包括 Model 和 View
+			7: 处理器适配器(HandlerAdapter) 向 前端控制器(DispatcherServlet) 返回 模型数据(ModelAndView)
+			8: 前端控制器(DispatcherServlet) 请求 视图解析器(View Resolver) 对 模型数据(ModelAndView) 进行视图解析
+					根据逻辑视图名解析成真正的视图(jsp等)
+			9: 视图解析器(View Resolver) 向 前端控制器(DispatcherServlet) 返回解析后的 View
+			10: 前端控制器(DispatcherServlet) 进行视图渲染,将 模型数据(ModelAndView) 填充到 request 域
+			11: 前端控制器(DispatcherServlet) 向用户 响应(response)
+		b: 所用组件
+			1: DispatcherServlet	前端控制器.接收请求,响应结果.相当于转发器
+			2: HandlerMapping		处理器映射器.根据请求的url查找 处理器(Handler)
+			3: HandlerAdapter		处理器适配器.按照 HandlerAdapter 要求的规则执行 处理器(Handler)
+			4: Handler 				处理器.编写时需要按照 HandlerAdapter 的要求
+			5: View Resolver		视图解析器.进行视图解析,根据逻辑视图名解析成真正的视图(view)
+			6: View 				视图.是一个接口,它的实现类支持不同的View类型(jsp,pdf,...)
+				需要程序员开发的组件: Handler,View
+
+二: SpringMVC 的使用
+	A: SpringMVC 非注解使用
+		a: 在 web.xml 中配置 前端控制器(DispatcherServlet)
+				<web-app>
+					<servlet>
+						<servlet-name>springmvc</servlet-name>
+						<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+						/*contextConfigLocation: 配置 SpringMVC加载的配置文件(配置处理器映射器,适配器等).
+							不配置 contextConfigLocation,则默认加载 /WEB-INF/servlet名称-servlet.xml (springmvc-servlet.xml)
+							与 Spring 整合时,设为 classpath:applicationContext.xml */
+						<init-param> 	
+							<param-name>contextConfigLocation</param-name> 
+							<param-value>classpath:springmvc.xml</param-value>	
+						</init-param>	
+					</servlet>
+					<servlet-mapping>
+						<servlet-name>springmvc</servlet-name>
+						<url-pattern>*.action</url-pattern>		//解析request请求访问的类型. "*.action": 类似Struts2; "/" : 所有的访问都  
+					</servlet-mapping>
+				</web-app>
+		b: 在 springmvc.xml 配置 处理器映射器,处理器适配器,视图解析器,Handler
+			<beans>		//多个映射器,适配器,解析器可以并存
+				//配置处理器映射器	  //所有的处理器映射器都实现了 HandlerMapping 接口
+				/* BeanNameUrlHandlerMapping: 根据Handler的name进行url映射 */
+				<bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping" />  
+				/* SimpleUrlHandlerMapping: 简单url处理器映射器,可以通过<prop>自定义url映射到Handler */				
+				<bean class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">   
+					<property>
+						/* prop: 对Handler进行url映射  .属性: key: resuest访问路径url; value: Handler的id 
+							eg: <prop key="queryUsers_Test">queryUsers</prop> */
+						<prop key="">value</prop> 
+					</property>
+				</bean>
+				
+				//配置处理器适配器 	 //所有的处理器适配器都实现了 HandlerAdapter 接口
+				/* SimpleControllerHandlerAdapter: 处理器适配器 */				
+				<bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />
+				/* HttpRequestHandlerAdapter: 开发Handler类似servlet */
+				<bean class="org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter" />
+				
+				//配置视图解析器
+				/* InternalResourceViewResolver: jsp视图解析器 */
+				<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+					//prefix,suffix: 查找视图的前缀和后缀,最终视图url为: prefix + 逻辑视图名 + suffix	(视图逻辑名由 Handler 返回的 ModelAndView 指定)
+					//prefix,suffix 参数对HttpRequestHandlerAdapter适配器无效,因为实现HttpRequestHandler接口的handleRequest()不是通过返回ModelAndView,而是直接通过request转发
+					//配置视图解析器的前缀
+					<property name="prefix" value="/WEB-INF/jsp/" />	
+					//配置视图解析器的后缀
+					<property name="suffix" value=".jsp" />	//逻辑视图名为 hello, 则实际url为 /WEB-INF/jsp/hello.jsp
+				</bean>
+				
+				//配置Handler	属性: id: 唯一标识; name: 访问路径; class: Handler类的类型
+				<bean id="queryUsers" name="/queryUsers.action" class="controller.UserController" />
+			</beans>
+		c: 开发 Handler
+			1: SimpleControllerHandlerAdapter 处理器适配器
+					实现 Controller 接口,重写 handleRequest()方法 (org.springframework.web.servlet.mvc.Controller)
+				eg: @Override
+					public ModelAndView handleRequest(HttpServletRequest arg0, HttpServletResponse arg1) throws Exception {
+						//调用service查找数据库,查询数据,使用静态数据模拟
+						List<User> users = new ArrayList<>();
+						User user1 = new User();user1.setUsername("张三");user1.setId(1);user1.setBirthday(new Date()); users.add(user1); //填充数据
+						ModelAndView modelAndView = new ModelAndView();	//创建 ModelAndView
+						modelAndView.addObject("userList",users);	//设置数据,相当于request的setAttribute()
+						modelAndView.setViewName("WEB-INF/jsp/user/userList.jsp");	//指定视图
+						return modelAndView;
+					}
+			2: HttpRequestHandlerAdapter 处理器适配器
+					实现 HttpRequestHandler 接口,重写 handleRequest()方法 (org.springframework.web.HttpRequestHandler)
+				eg: @Override
+					public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+						//调用service查找数据库,查询数据,使用静态数据模拟
+						List<User> users = new ArrayList<>();
+						User user1 = new User();user1.setUsername("张三");user1.setId(1);user1.setBirthday(new Date()); users.add(user1); //填充数据
+						request.setAttribute("userList", users); //设置数据
+						request.getRequestDispatcher("WEB-INF/jsp/user/userList.jsp").forward(request, response); //转发视图
+					}
+	
+	B: SpringMVC 参数绑定(仅限注解使用)
+				SpringMVC 中,接收页面提交的数据是通过方法形参来接收,而不是在 controller 类定义成员变量接收
+		a: 参数绑定过程
+			1: 从客户端请求 key/value 数据,经过参数绑定,将 key/value 数据绑定到 controller 方法的形参上
+			2: 处理器适配器调用 SpringMVC 提供参数绑定组件将 key/value 数据转成 controller 方法的形参
+				参数绑定组件: converter(将任意类型转换为Java对象,特殊情况下需要自定义 converter)
+			3: 参数绑定到 controller 方法的形参上 
+		a: 参数绑定默认支持的类型: 
+			1: HttpServletRequest: 通过 request 对象获取请求信息	//适用于get,post
+			2: HttpServletResponse: 通过 response 处理响应信息		//适用于get,post
+			3: HttpSession: 通过 session 对象得到 session 中存放的对象	//适用于get,post
+			4: Model/ModelMap: ModelMap 是 Model 接口的实现类,通过 Model/ModelMap 向页面传递数据	//适用于get,post
+			5: JavaBean: 表单 name 和 JavaBean 的变量名必须一致		//适用于get,post
+					//JavaBean中的变量是对象: JSP中表单的 name 可以为  成员变量名.成员变量名 (eg: name="a.b.c")
+					//JavaBean中的变量是数组: JSP中表单的 name 可以是数组名 (eg: 将复选框的数据传入数组中)
+					//JavaBean中的变量是List集合: JSP中表单的 name 可以是  List集合名[索引].集合元素的变量名	(eg: name="userList[${status.index}].username")
+					//JavaBean中的变量是Map集合: JSP中表单的 name 可以是  Map集合名['Map集合的key']	(eg: name="userMap['username']")
+			6: 简单类型: 但是变量名必须和请求的 key 同名	//只适用于get
+		c: 自定参数绑定
+					对于 controller 形参中的 JavaBean 对象,如果属性中有日期时间类型,需要自定义参数绑定(将日期时间数据串转成日期或时间类型)
+			1: 需要向处理器适配器中注入自定义的参数绑定组件
+				eg: <mvc:annotation-driven conversion-service="conversionService"></mvc:annotation-driven>	//注入自定义的参数绑定组件
+					<bean id="conversionService" class="org.springframework.format.support.FormattingConversionService">	//配置自定义的参数绑定组件
+						<property name="converters">	//转换器
+							<list>
+								<bean class="converter.UserDateConverter" />	//自定义日期转换器的类路径
+							</list>
+						</property>
+					</bean>
+			2: 编写自定义日期转换器类
+					实现 Converter<原始数据的类型,要转换成的日期或时间类型> 接口的 convert()方法
+				eg: public class UserDateConverter implements Converter<String,Date> {
+						@Override
+						public Date convert(String soure) {
+							SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+							try{ return simpleDateFormat.parse(soure);	//转换成功直接返回
+							}catch(ParseException e){e.printSrackTrace();}
+							return null;	//转换失败返回null
+						}
+					}
+		d: 使用
+			1: 直接在 controller 方法形参上定义支持的类型,可以直接使用这些对象
+				eg: @Controller
+					public class DemoController {
+						@RequestMapping("/queryUsers")
+						public void queryUsers(HttpServletRequest request,HttpServletResponse response) {...}
+					}
+			
+	C: SpringMVC 注解使用	//结合 (B: SpringMVC 参数绑定) 使用
+		a: 在 web.xml 中配置 前端控制器(DispatcherServlet)
+			参考 A: a: 在 web.xml 中配置 前端控制器(DispatcherServlet)
+		b: 在 springmvc.xml 配置 处理器映射器,处理器适配器,视图解析器,Handler
+			<beans>		//多个映射器,适配器,解析器可以并存
+				/* mvc:annotation-driven: mvc的注解驱动,默认加载了很多的参数绑定方法,比如json转换解析器 
+						可以代替 处理器映射器 和 处理器适配器 的配置: 
+							//配置注解式处理器映射器	  //RequestMappingHandlerMapping: 注解方式的处理器映射器
+							<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" />  	
+							//配置注解式处理器适配器 	 //RequestMappingHandlerAdapter: 注解方式的处理器适配器			
+							<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter" />  */
+				<mvc:annotation-driven></mvc:annotation-driven>
+	
+				//配置视图解析器
+				/* InternalResourceViewResolver: jsp视图解析器 */
+				<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" />  
+					//prefix,suffix: 查找视图的前缀和后缀,最终视图url为: prefix + 逻辑视图名 + suffix (视图逻辑名由 Handler 返回的 ModelAndView 指定)
+					//配置视图解析器的前缀
+					<property name="prefix" value="/WEB-INF/jsp/" />	
+					//配置视图解析器的后缀
+					<property name="suffix" value=".jsp" />	//逻辑视图名为 hello, 则实际url为 /WEB-INF/jsp/hello.jsp
+				</bean>
+				
+				//配置单个Handler	属性: class: 注解的Handler类的类型
+				<bean class="controller.UserController" />
+				//扫描批量配置Handler	属性: base-package: 要扫描的包
+				<context:component-scan base-package="controller"></context:component-scan>	
+			</beans>
+		c: 开发注解式 Handler
+					一个 Handler 类可以写多个方法,方法返回值可以是: 
+							ModelAndView (方法里可以: 指定视图并返回 ModelAndView,重定向,转发),String (返回 逻辑视图名,重定向,转发),void (重定向,转发)
+			1: @Controller				(org.springframework.stereotype.Controller)
+						注解在类上,标识该类为 Handler 控制器 
+			2: @RequestMapping(value="url",method={RequestMethod.GET,RequestMethod.POST,...},)	(org.springframework.web.bind.annotation.RequestMapping)
+						注解在方法上,对方法和url进行映射,类似在 springmvc.xml 中配置 Handler .url: 映射访问url
+						注解在类上,设置该类所有url映射的根路径(实际url = 根路径 + 配置的url)
+					属性: value: 映射访问url; method: 限制http的请求方法,限制为所写的方法
+			3: @RequestParam(value="",required=true,defauktValue="")		(org.springframework.web.bind.annotation.RequestParam)
+						注解在形参上,处理简单类型的绑定
+					属性: value: 用户请求的 key; required: 是否必须,默认true,表示请求中一定要有相应的参数,否则报错; defauktValue: 默认值
+						eg: @RequestMapping("/queryUsers")
+							public String queryUsers(@RequestParam(value="username",required="false") String username){..}
+			4: @ModelAttribute(value="")
+						注解在参数上,指定 JavaBean 数据回显到页面在 request 域中的 key
+						注解在方法上,可以将方法的返回值传到页面
+					属性: value: 页面 request 域中的 key
+						eg: @RequestMapping("/queryUsers") @ModelAttribute("url")
+							public String queryUsers(@ModelAttribute("user") UserVo userVo){..}
+			
+				eg: @Controller
+					public class Zhujie_Controller {
+						@RequestMapping("/queryUsers.action")
+						public ModelAndView queryUsers() {
+							//调用service查找数据库,查询数据,使用静态数据模拟
+							List<User> users = new ArrayList<>();
+							User user1 = new User();user1.setUsername("张三");user1.setId(1);user1.setBirthday(new Date()); users.add(user1); //填充数据
+							ModelAndView modelAndView = new ModelAndView();	//创建 ModelAndView
+							modelAndView.addObject("userList",users);	//设置数据,相当于request的setAttribute()
+							modelAndView.setViewName("WEB-INF/jsp/user/userList.jsp");	//指定视图
+							return modelAndView;
+						}
+						@RequestMapping("/queryUsers2.action")
+						public String queryUsers2(Model medel) {
+							//调用service查找数据库,查询数据,使用静态数据模拟
+							List<User> users = new ArrayList<>();
+							User user1 = new User();user1.setUsername("张三");user1.setId(1);user1.setBirthday(new Date()); users.add(user1); //填充数据
+							medel.setAttribute("userList",users);	//设置数据,相当于request的setAttribute()
+							return "redirect: WEB-INF/jsp/user/userList.jsp"; //返回视图.redirect: 重定向方式; forward: 转发方式 
+						}
+						@RequestMapping("/queryUsers3.action")
+						public void queryUsers3(HttpServletRequest request,HttpServletResponse response) {
+							//调用service查找数据库,查询数据,使用静态数据模拟
+							List<User> users = new ArrayList<>();
+							User user1 = new User();user1.setUsername("张三");user1.setId(1);user1.setBirthday(new Date()); users.add(user1); //填充数据
+							request.setAttribute("userList",users);
+							request.getRequestDispatcher("WEB-INF/jsp/user/userList.jsp").forward(request,response); //转发到视图
+						}
+					}
+			
+三: 异常处理,JSON 数据交互,图片上传,拦截器				
+	A: 异常处理
+			系统的 dao,service,controller 出现都通过 throws Exception 向上抛出,最后由 SpringMVC 前端控制器 交由 异常处理器(ExceptionResolver) 进行异常处理
+		a: 全局异常处理器(只能配置一个,配置多个多余的无效)
+			1: 自定义全局异常处理器
+					实现 HandlerExceptionResolver 接口,重写 resolveException()方法	(org.springframework.web.servlet.HandlerExceptionResolver)
+				eg: public class UserExceptionResolver implements HandlerExceptionResolver {
+						@Override
+						public ModelAndView resolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception exception) {
+							String message = null;
+							//解析出异常类型
+							if(exception instanceof UserException)	//若是自定义异常(UserException: 自定义异常类)
+								message = ((UserException)exception).getMessage();	//设置异常信息
+							else	//若不是自定义异常
+								message = "未知错误!!";	//设置未知异常信息
+							ModelAndView modelAndView = new ModelAndView();
+							modelAndView.addObject("message",message);	//将错误信息传到页面
+							modelAndView.setViewName("error");	//指向错误页面
+							return modelAndView;
+						}
+					}
+			2: 在 springmvc.xml 配置全局异常处理器
+				eg: <beans>
+						<bean class="exception.UserExceptionResolver" />
+					</beans>
+	B: 图片的上传	
+		a: form 中提交 enctype="multipart/form-data" 的数据时,需要 SpringMVC 对 multipart 类型进行解析
+			//在 springmvc.xml 配置 multipart 类型解析器
+			<beans>
+				<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+					<property name="maxUploadSize"><value>5242880</value></property> //设置上传文件的最大尺寸为 5MB
+				</bean>
+			</beans>
+		b: jar包
+			(commons-fileupload.jar)(commons-io.jar)
+	C: JSON 数据交互
+				SpringMVC 使用 jackson 的包进行 JSON 转换(@RequestBody,@ResponseBody)
+		a: 在 springmvc.xml 配置 JSON 转换器
+			//如果使用了 <mvc:annotation-driven /> 则该处配置不用写
+			<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+				<property name="messageConverters">
+					<list> <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" /> </list>
+				</property>
+			</bean>
+		a: 请求 key/value,输出 Json.
+					此方法比较常用
+			1: @ResponseBody 将 Java对象转成 Json 串输出
+				eg: @RequestMapping("/requestJson")
+					public @ResponseBody User requestJson(User user) {
+						return user;
+					}
+		b: 请求 Json,输出 Json.
+					要求请求的是 Json 串,所以在前端页面中需要将请求的内容转成 Json,不太方便
+			1: @RequestBody 将 Json 串转成 Java对象
+			2: @ResponseBody 将 Java对象转成 Json 串输出
+				eg: @RequestMapping("/requestJson")
+					public @ResponseBody User requestJson(@RequestBody User user) {
+						return user;
+					} 
+	D: 拦截器
+				SpringMVC 拦截器针对 HandlerMapping 进行拦截设置
+		a: 拦截器类	
+				实现 HandlerInterceptor 接口,重写 preHandle(),postHandle(),afterCompletion()方法 (org.springframework.web.servlet.HandlerInterceptor)
+			public class LanJieQi implements HandlerInterceptor {
+				@Override	//进入 Handler 之前执行		//可用于身份认证,身份授权
+				public boolean preHandle(HttpServletRequest request,HttpServletResponse response,Object arg2) throws Exception {
+					return false;
+				}
+				
+				@Override	//进入 Handler 方法之后,返回 ModelAndView 之前执行	  //可用于将公用的模型数据在这里传到视图(eg: 菜单导航)
+				public void postHandle(HttpServletRequest request,HttpServletResponse response,Object arg2,ModelAndView modelAndView) throws Exception {
+				}
+				
+				@Override 	//Handler 执行完成后执行 	//可用于统一异常处理,统一日志处理
+				public void afterCompletion(HttpServletRequest request,HttpServletResponse response,Object arg2,Exception exception) throws Exception {
+				}
+			}
+		b: 配置拦截器
+			1: SpringMVC 类似全局的拦截器
+						SpringMVC 框架将配置的类似全局的拦截器注入到每个 HandlerMapping 中.
+				eg:	<mvc:interceptors>
+						<mvc:interceptor>	//interceptor: 拦截器,可以配置多个,顺序执行
+							<mvc:mapping path="" />		//访问url. "/**": 表示所有的url,包括子目录; "/*": 表示所有的url,但不包括子目录
+							<bean class="interceptor.HandlerInterceptor1" />	//配置拦截器bean
+						</mvc:interceptor>
+					</mvc:interceptors>
+				
+			2: 在某个 HandlerMapping 中配置拦截器
+						经过该 HandlerMapping 映射成功的 Handler 最终使用该拦截器 
+				eg: <bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"> 	//BeanNameUrlHandlerMapping 处理器映射器
+						<property name="interceptors">
+							<list>
+								<ref bean="handlerInterceptor1">	//引入拦截器
+							</list>
+						</property>
+					</bean>
+					<bean id="handlerInterceptor1" class="interceptor.HandlerInterceptor1" />	//拦截器bean
+
+
+
+
+
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

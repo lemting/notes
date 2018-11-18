@@ -122,8 +122,25 @@
 五: 数据库
 
 
-	
-六: VB 控件
+六: 文件
+	A: 打开文件
+		a: Open <fileName> For <model> As [#]<fileNumber>
+			1: fileName: 文件名,包含完整路径
+			2: model: 模式,取值: Output: > (先清); Input: < ; Append: >>
+			3: fileNumber: 指定的文件号,1~511 
+				eg: Open "C:\xxx\txt" For Output As #1
+				eg: FileNo = FreeFile() : Open "C:\xxx\txt" For Output As FileNo
+	B: 写顺序文件(Input/Append)
+		a: Write #<fileNumber> , [输出列表]
+			1: 输出列表: [{Spc(n)|Tab(n)}][数值或字符串表达式][;|,]
+			2: Write 输出的数据会以紧凑格式存放,数据线之间以符号','分隔,并给字符串加上双引号
+				eg: Write #1, "学号","高数","英语","VB"
+		b: Print #<fileNumber> , [输出列表]
+			1: 输出列表: [{Spc(n)|Tab(n)}][数值或字符串表达式][;|,]
+	C: 读顺序文件
+	D: 关闭顺序迸溅
+		
+七: VB 控件
 	-------------- VB6.0 --------------
 	A: 主要属性
 		//通用
@@ -147,7 +164,7 @@
 		l: ScaleMode		坐标度量单位  (取值: 0 : VbUser,用户定义; 1 : VbTwips,默认; 2 : VbPoints,磅; 3 : VbPixels,像素; 
 												 4 : VbCharacters,字符; 5 : VbInches,英寸; 6 : VbMillimeters,毫米; 7 : VbCentimeters,厘米)
 		  
-		//窗体,图像框,打印机: 绘图常用	
+		/* 绘图常用 -> 窗体,图像框,打印机 */
 		m: CurrentX			对象在绘图时的X坐标  
 		   CurrentY			对象在绘图时的Y坐标
 		n: DrawWidth		线宽(单位: 像素,最小1)	
@@ -156,6 +173,16 @@
 		p: FillStyle		填充的图案 (取值: 0 ~ 7 )
 		q: FillColor		填充图案的颜色
 		r: AutoRedarw		自动重画 (boolean)
+		
+		/* 窗体方法 */
+		s: Print [内容]				打印内容并换行			
+		t: Cls						清除 Print 的痕迹
+		u: Move	 left[,top[,width[,height]]]	移动窗体,或控件;或改变对象的大小
+		v: Load  窗体名称			加载指定窗体
+		w: UnLoad  窗体名称			卸载指定窗体
+		x: [窗体名称].Show [模式]	指定窗体状态
+						模式: 0 : (默认)Modeless,非模型式,可对其他窗体进行操作; 1 : Model,模型式,只有关闭该窗体后才能操作其他窗体
+		y: [窗体名称].Hide			隐藏窗体	
 		
 	B: 控件
 		a: PictureBox		//图像框  //命名: picName
@@ -189,9 +216,15 @@
 			5: Text				被选定的项目的文本内容
 			6: Selected			某项的是否被选中 (boolean)
 			7: MultiSelect		是否允许多选 (取值: 0 : 不能多选(默认); 1 : 可用鼠标空格键简单多选; 2 : 可用 Shift + Ctrl 选定多个连续项)
+			//方法
+			1: AddItem  项目字符串[,index]	 	在[末尾添加][索引index处插入]指定内容的项目
+			2: RemoveItem  index				删除索引为index的项目
+			3: Clear							清空所有项目
 		i: ComboBox			//下拉列表  //命名: cboName
 			1: List,ListIndex,ListCount,Sorted,Text //参考列表框(Selected,MultiSelect不可用)
 			2: Style			组合框样式 (取值: 0 : 下拉式组合框; 1 : 简单组合框; 2 : 下拉式列表框)
+			//方法
+			1: AddItem,RemoveItem,Clear
 		j: HScrollBar,VScrollBar //左右滚动条,上下滚动条
 			1: Value			滑块当前位置的值
 			2: Min,Max			滑块最小值,最大值
@@ -276,7 +309,7 @@
 	G: VB PowerPacks
 		a: PrintForm 将Windows表单打印为简单报表 b: LineShape 水平线,垂直线或对角线 c: OvalShape 椭圆 d: RectangleShape 矩形 e: DataRepeater 按可自定义的列表格式显示数据
 	
-七: VB常用内部函数
+八: VB常用内部函数
 	A: 类型转换函数
 		1: Cbool(string)		转换为布尔值(Boolean)
 		2: Cbyte(string)		转换为字节类型的值(Byte)
@@ -292,11 +325,11 @@
 		12: CVErr(string)		转换为Error值
 	B: 类型判断函数
 		1: IsArray(var)			判断一个变量是否是数组 
-		2: IsDate(var)				判断一个变量是否是日期 
-		3: IsNull(var)				判断一个变量是否为空 
-		4: IsNumeric(exp)			判断表达式是否包含数值 
-		5: IsObject(var)			判断一个变量是否是对象 
-		6: TypeName(var)			返回变量的数据类型 
+		2: IsDate(var)			判断一个变量是否是日期 
+		3: IsNull(var)			判断一个变量是否为空 
+		4: IsNumeric(exp)		判断表达式是否包含数值 
+		5: IsObject(var)		判断一个变量是否是对象 
+		6: TypeName(var)		返回变量的数据类型 
 	C: 常用数学函数
 			在三角函数中,以弧度表示
 		1: Abs(num) 			取绝对值
@@ -318,6 +351,8 @@
 		16: Round(num[,n])		按小数位四舍五入.n: 小数位(默认值: 0)
 	D: 字符串类函数
 		1: Format(exp [,str])				使数值,日期,字符串按指定格式输出,一般用于Print方法中
+				格式化数值: '#'(任意位上的数,没有位则没有数)  '0'(任意位上的数,没有位则为0)  '.'(小数点)  '%'(百分制)  'E+'(科学计数法)
+					eg: "###,##0.00"  "0.00E+#0"  "###,###,##0.00%"  "000,000.00"
 		1: StrComp(string1,string2)			比较两个字符串 
 		2: Asc(string)						返回字符串第一个字符的ASCII码
 		3: Chr(charcode)					返回ASCII码为charcode的字符
@@ -397,8 +432,11 @@
 		c: MsgBox 过程	
 			跟MsgBox()函数功能相同,用法类似
 				MsgBox prompt [,button] [, title]
-			
-
+	I: 关于窗体的方法
+		a: Load  窗体名称
+		b: UnLoad  窗体名称
+		c: [窗体名称].Show [模式]
+		d: [窗体名称].Hide
 
 
 

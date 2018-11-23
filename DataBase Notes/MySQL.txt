@@ -256,7 +256,8 @@ F: 内置函数
 		3: curtime(): 当前时间 
 		4: date_add(): 日期变化
 			eg: select date_add('2018-7-23',interval -365 day);  =>  '2017-7-23';
-		5: datediff(日期1,日期2): 日期差值 
+		5: datediff(方式,日期1,日期2): 以指定方式返回日期差值 
+			eg: datediff('s',date1,date2)
 		6: date_format(日期,String): 日期格式化
 			eg: select date_format('2018-7-23','%m/%d/%Y');  =>  07/23/2018;
 	e: 信息函数
@@ -394,8 +395,8 @@ I: 存储引擎
 		1: 一种是更新 navicat 驱动来解决此问题
 		2: 一种是将 mysql 用户登录的加密规则修改为 mysql_native_password
 	b: 代码: 	//更改 root
-		ALTER USER 'root'@'localhost' IDENTIFIED BY 'password' PASSWORD EXPIRE NEVER; 	//修改加密规则  
-		ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'yourPassword';  //更新一下用户的密码
+		ALTER USER 'root'@'localhost' IDENTIFIED BY 'YourPassword' PASSWORD EXPIRE NEVER; 	//修改加密规则  
+		ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'YourPassword';  //更新一下用户的密码
 		FLUSH PRIVILEGES; //刷新权限
 
 		

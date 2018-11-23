@@ -2,7 +2,7 @@ JavaEE 三层之 service 层框架
 
 加载Spring核心配置文件创建 ApplicationContext 对象: ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
 
-Spring中为了避免 ApplicationContext 对象多次创建,封装了监听器: org.springframework.web.context.ContextLoaderListener
+Spring 中为了避免 ApplicationContext 对象多次创建,封装了监听器: org.springframework.web.context.ContextLoaderListener
 		<web-app>
 			<listener>		//在web.xml中配置该监听器
 				<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -15,6 +15,25 @@ Spring中为了避免 ApplicationContext 对象多次创建,封装了监听器: 
 	利用该监听器的 getCurrentWebApplicationContext()方法就可以获取 ApplicationContext 对象
 		eg: ApplicationContext context  = ContextLoaderListener.getCurrentWebApplicationContext();
 
+Spring 解决post乱码
+	<filter>
+		<filter-name>CharacterEncodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>utf-8</param-value>
+		</init-param>
+		<init-param>
+			<param-name>forceEncoding</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<<filter-name>CharacterEncodingFilter</filter-name>
+		<url-pattern>/ *</url-pattern>  //这里url为 '/*'
+	</filter-mapping>
+		
+		
 一一一: 框架整合
 	A: Struts2 和 Spring 整合
 		a: 把Struts2的 Action 对象创建交给 Spring 进行管理

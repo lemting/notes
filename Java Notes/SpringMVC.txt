@@ -19,6 +19,11 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 				   Spring 进行事务控制
 		3: 表现层: 通过 Spring 管理表现层的 Handler,Handler可以调用 service 接口
 			mapper,service,Handler 都是JavaBean
+			
+		Controller 和页面进行数据交互, 调用 Service 获取数据
+		Service 进行业务逻辑操作, Service 调用 mapper 进行对数据库的操作
+		mapper 和数据库进行数据交互
+			
 	B: 步骤
 		a: Spring 整合 MyBatis
 					通过 Spring 管理 mapper 接口,使用 mapper 的扫描器自动扫描 mapper 接口在 Spring 中进行注册
@@ -210,6 +215,12 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 		c: 开发注解式 Handler
 					一个 Handler 类可以写多个方法,方法返回值可以是: 
 							ModelAndView (方法里可以: 指定视图并返回 ModelAndView,重定向,转发),String (返回 逻辑视图名,重定向,转发),void (重定向,转发)
+			Handler 方法参数绑定常用的注解,我们根据他们处理的Request的不同内容部分分为四类: (常用类型)
+				1: 处理 Requet uri 部分(这里指uri template中variable,不含queryString部分)的注解: @PathVariable;
+				2: 处理 Request header 部分的注解: @RequestHeader, @CookieValue;
+				3: 处理 Request body 部分的注解: @RequestParam, @RequestBody;
+				4: 处理 Attribute 类型的注解: @SessionAttributes, @ModelAttribute;
+				
 			1: @Controller				(org.springframework.stereotype.Controller)
 						注解在类上,标识该类为 Handler 控制器 
 			2: @RequestMapping(value="url",method={RequestMethod.GET,RequestMethod.POST,...},)	(org.springframework.web.bind.annotation.RequestMapping)
@@ -221,12 +232,17 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 					属性: value: 用户请求的 key; required: 是否必须,默认true,表示请求中一定要有相应的参数,否则报错; defauktValue: 默认值
 						eg: @RequestMapping("/queryUsers")
 							public String queryUsers(@RequestParam(value="username",required="false") String username){..}
-			4: @ModelAttribute(value="")
+			4: @RequestBody
+						该注解常用来处理 Content-Type: 不是 application/x-www-form-urlencoded 编码的内容,eg: application/json,application/xml等
+			5: @SessionAttributes(value="",types="")
+						该注解用来绑定 HttpSession 中的 attribute 对象的值,便于在方法中的参数里使用
+			6: @ModelAttribute(value="")
 						注解在参数上,指定 JavaBean 数据回显到页面在 request 域中的 key
 						注解在方法上,可以将方法的返回值传到页面
 					属性: value: 页面 request 域中的 key
 						eg: @RequestMapping("/queryUsers") @ModelAttribute("url")
 							public String queryUsers(@ModelAttribute("user") UserVo userVo){..}
+			
 			
 				eg: @Controller
 					public class Zhujie_Controller {

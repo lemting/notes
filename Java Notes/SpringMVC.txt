@@ -199,7 +199,7 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 	
 				//配置视图解析器
 				/* InternalResourceViewResolver: jsp视图解析器 */
-				<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" />  
+				<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">  
 					//prefix,suffix: 查找视图的前缀和后缀,最终视图url为: prefix + 逻辑视图名 + suffix (视图逻辑名由 Handler 返回的 ModelAndView 指定)
 					//配置视图解析器的前缀
 					<property name="prefix" value="/WEB-INF/jsp/" />	

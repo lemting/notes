@@ -31,6 +31,8 @@ MyBatis 是持久型框架
 					<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
 						<property name="dataSource" ref="dataSource" />
 					</bean>
+					//开启事务控制的注解支持
+					<tx:annotation-driven transaction-manager="transactionManager" />
 					
 					/*通过 MapperScannerConfigurer 扫描mapper批量bean注册.批量注册后,mapper接口的bean的id为mapper类名(首字母小写)
 						得遵守规范: 

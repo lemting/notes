@@ -29,7 +29,7 @@ Spring 解决post乱码
 		</init-param>
 	</filter>
 	<filter-mapping>
-		<<filter-name>CharacterEncodingFilter</filter-name>
+		<filter-name>CharacterEncodingFilter</filter-name>
 		<url-pattern>/ *</url-pattern>  //这里url为 '/*'
 	</filter-mapping>
 		

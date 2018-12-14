@@ -14,6 +14,11 @@
 	C: 布尔型		Boolean		
 	D: 日期型		Date		
 	E: 变体数据型	Variant	
+	F: 自定义数据类型 (类似结构体)	//字符串必须为定长字符串类型: <StringName> As String * <length>
+		[Private|Public] Type <varname> 
+			成员变量名 As Type
+			...
+		End Type
 	
 二: VB顺序,选择,循环结构
 	A: 选择结构	
@@ -86,7 +91,7 @@
 			3: Type: 数组元素的数据类型
 		b: 动态数组
 				{Private|Dim} name() As Type
-				ReDim name(index1[,index2 ,...]) [Preserve]
+				ReDim [Preserve] name(index1[,index2 ,...]) 
 			1: 使用 ReDim 语句定义数组的大小,该处的index可以是变量
 			2: 每次使用 ReDim 都会清空数组数据
 			3: 可以在 ReDim 语句后面加 Preserve 参数,用来保留数组中的数据,此时只能改变最后一维的大小
@@ -123,22 +128,70 @@
 
 
 六: 文件
-	A: 打开文件
+	A: 顺序文件
+		//打开顺序文件
 		a: Open <fileName> For <model> As [#]<fileNumber>
 			1: fileName: 文件名,包含完整路径
-			2: model: 模式,取值: Output: > (先清); Input: < ; Append: >>
-			3: fileNumber: 指定的文件号,1~511 
-				eg: Open "C:\xxx\txt" For Output As #1
-				eg: FileNo = FreeFile() : Open "C:\xxx\txt" For Output As FileNo
-	B: 写顺序文件(Input/Append)
-		a: Write #<fileNumber> , [输出列表]
+			2: model: 模式,取值: Output: > (先清除文件内容); Input: < ; Append: >>
+			3: fileNumber: 指定的文件号,1~511	//避免文件号重复, 可以使用 FreeFile() 函数获取文件号
+				FreeFile([{0|1}]): 取0: 获取 1~255 间未使用的文件号; 取1: 256~511 //不加参数默认取0
+					eg: Open "C:\xxx\txt" For Output As #1
+					eg: FileNo = FreeFile() : Open "C:\xxx\txt" For Output As FileNo	
+		//写顺序文件(Input/Append)
+		b: Write #<fileNumber> , [输出列表]
 			1: 输出列表: [{Spc(n)|Tab(n)}][数值或字符串表达式][;|,]
 			2: Write 输出的数据会以紧凑格式存放,数据线之间以符号','分隔,并给字符串加上双引号
 				eg: Write #1, "学号","高数","英语","VB"
-		b: Print #<fileNumber> , [输出列表]
+		c: Print #<fileNumber> , [输出列表]
 			1: 输出列表: [{Spc(n)|Tab(n)}][数值或字符串表达式][;|,]
-	C: 读顺序文件
-	D: 关闭顺序迸溅
+		//读顺序文件
+		d: Input #<fileNumber>, 变量列表
+			1: 读出数据并将数据赋值为变量列表中的变量
+		e: Line Input #<fileNumber>, 字符串变量
+			1: 读取一行数据(不包含回车换行符)
+		f: Input(每次读的字符个数n, [#]<fileNumber>)
+			1: 读取指定字符个数
+		g: EOF(<fileNumber>)
+			1: 返回文件指针是否到达文件末尾(Boolean)
+		h: LOF(<fileNumber>)
+			1: 返回文件的字节数
+		//关闭顺序文件
+		i: Close([[#]<fileNumber>, ...])   /   Close #<fileNumber>
+			1: Close(): 不加参数,关闭所有打开的文件
+			2: Close(1): 关闭1号文件
+			3: Close #1: 关闭1号文件
+	B: 随机文件
+		//打开随机文件
+		a: Open <fileName> For Random As #<fileNumber> [Len=记录长度]
+			1: 记录长度: 用于指定随机文件中每条记录的长度,默认值为 128字节
+			2: 随机文件打开后可以同时进行读写操作
+		//随机文件的读写
+		b: Put [#]<fileNumber>, [记录号,] 变量名
+			1: 将一个记录变量的内容,写入所打开的文件的记录位置.如果省略记录号,则在当前记录后写入一条记录
+		c: Get [#]<fileNumber>, [记录号,] 变量名
+			1: 将指定记录位置的记录内容读入到记录变量中.如果省略记录号,则读出当前记录后的一条记录
+	C: 二进制文件
+		//打开二进制文件
+		a: Open <fileName> For Binary As #<fileNumber>
+		//二进制文件的读写
+		b: Put / Get
+	D: 文件操作语句和函数
+		//操作未打开的文件
+		a: FileCopy <fileName>,<newFile>
+			1: 复制文件(不能 复制 已经打开的文件)
+		b: Kill <fileName>
+			1: 删除文件(支持'*'和'?'通配符)(不能 删除 已经打开的文件)
+		c: Name <fileName> As <newName>
+			1: 重命名/移动 文件或目录(不支持通配符)(不能 重命名/移动 已经打开的文件)
+		//操作已打开的文件
+		d: Seek [#]<fileNumber>, 位置
+			1: 设置下一个读/写操作的位置(对于随机文件,就是记录号)
+		e: Seek(<fileNumber>)
+			1: 返回当前的读/写位置(Long)
+		f: Loc(# [<fileNumber>])
+			1: 返回当前字节位置(顺序文件); 返回上一次读/写的记录号(随机文件); 返回上次读/写的字节位置(二进制文件)
+		g: FileLen([<fileName])
+			1: 返回文件的大小(如果文件已打开,则返回打开前的大小)(Long)
 		
 七: VB 控件
 	-------------- VB6.0 --------------
@@ -197,11 +250,12 @@
 			1: Text				文本框内容(String)
 					//特殊
 					vbCrLf: 换行  eg: txt1.Text = txt1.Text & vbCrLf
-			2: MaxLength		文本最大长度(默认: 0)
-			3: Multiline		是否多行方式显示(默认: False)
-			4: ScrollBars		滚动条样式 (取值: 0 : None,无滚动条; 1 : Horizontal,水平; 2 : Vertical,垂直; 3 : Both,水平+垂直)
+			2: Locked			是否可编辑文本(默认: False)
+			3: MaxLength		文本最大长度(默认: 0)
+			4: Multiline		是否多行方式显示(默认: False)
+			5: ScrollBars		滚动条样式 (取值: 0 : None,无滚动条; 1 : Horizontal,水平; 2 : Vertical,垂直; 3 : Both,水平+垂直)
 									//多行显示时,才能看到垂直滚动条
-			5: SelText			选择的正文内容 //设置 SelStart,SelLength 后,会自动填充正文
+			6: SelText			选择的正文内容 //设置 SelStart,SelLength 后,会自动填充正文
 			   SelStart			选择的正文开始位置(从0开始)
 			   SelLength		选择的正文的长度
 		d: Frame			//框架,组(该组件内的东西不受对外界干扰)
@@ -247,8 +301,14 @@
 			7: DefaultExt		默认扩展名
 			8: Color 			选定的颜色
 		l: DriverListBox	//驱动器列表
+			1: Drive 			哪个磁盘(eg: "c:\\", "D:\\")
 		n: DirListBox		//目录列表框
+			1: Path				路径 
 		o: FileListBox		//文件列表框
+			1: Path				路径
+			2: Pattern			文件过滤器(eg: "*.txt")
+			3: FileName			选中的文件的名称
+				选中的文件的路径: Path & "\" & FileName
 		p: Image			//图片框  //命名: imgName
 			1: Picture
 			2: Stretch			伸展图片(True: 图片伸缩适应图片框大小 ; False: 图片框不变,图片被裁剪或位于左上角)
@@ -352,6 +412,13 @@
 		14: Hex(num)			返回num的16进制数 
 		15: Oct(num)			返回num的8进制数
 		16: Round(num[,n])		按小数位四舍五入.n: 小数位(默认值: 0)
+			//进制转换
+			Oct(num)			//十进制转八进制
+			oct("&H"&num)		//十六进制转八进制
+			Hex(num)			//十进制转十六进制
+			Hex("&O"&num)		//八进制转十六进制
+			CLng("&H"&Str(num))	//十六进制转换为十进制
+		
 	D: 字符串类函数
 		1: Format(exp [,str])				使数值,日期,字符串按指定格式输出,一般用于Print方法中
 				格式化数值: '#'(任意位上的数,没有位则没有数)  '0'(任意位上的数,没有位则为0)  '.'(小数点)  '%'(百分制)  'E+'(科学计数法)

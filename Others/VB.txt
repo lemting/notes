@@ -125,7 +125,69 @@
 		b: 函数过程的调用
 			name[(参数列表)]
 五: 数据库
-
+	A: 连接数据库
+		
+		
+	B: ADO 控件基本属性
+		a: ConnectionString		通过该属性与数据库建立连接
+			1: Provide				指定数据源的名称
+			2: FileName				指定数据源所对应的文件名
+			3: RemoteProvide		在远程数据服务器打开一个客户端时所用的数据源名称
+			4: RemoteServer			在远程数据服务器打开一个主机端时所用的数据源名称	
+			eg: ado1.ConnectionString = "Provider=MSDASQL.1;Persist Security Info=False;Data Source=ItemBank"
+		b: RecordSource			确定访问数据,这些数据构成记录集对象 Recordset
+				该属性值可以是单个表名, 一个存储查询, 也可以是使用SQL查询语句的一个查询字符串
+			eg: ado1.RecordSource = "select * from user"
+		c: ConnectionTimeout	数据连接超时时间
+		d: MaxRecords			指定一个查询中最多返回的记录数
+	C: ADO 控件事件
+		a: Reposition			当一条记录成为当前记录后触发
+		b: Validate				当要移动指针,修改与删除记录前或卸载含有数据控件的窗体时触发
+			Save 参数: 是否有数据发生变化
+			Action 参数: 哪一种操作触发了 Validate 事件
+				取值: 0 : 取消对数据控件的操作; 1 : MoveFirst; 2 : MovePrevious; 3 : MoveNext; 4 : MoveLast; 
+					  5 : AddNew; 6 : Update; 7 : Delete; 8 : Find; 12 : 设置 Bookmark; 10 : Close; 11 : 卸载窗体 	   
+	D: ADO 控件方法
+		a: Refresh					
+		b: UpdateControls
+		c: UpdateRecord
+	E: Recordset 记录集
+		a: 属性
+			1: AbsolutePostition 	指针位置(从0开始)
+			2: BOF,EOF				指针是否在记录集 首记录之前/末记录之后
+			3: BookMark				当前指针
+			4: RecordCount			记录集的记录数(只读,为了获得准确值,可先使用 MoveLast 方法)
+			5: Index				索引(需 ADO 数据源的 RecordSource 为数据表)
+		b: 方法
+			1: Move 方法
+				MoveFirst       	指针移至第1条记录
+				MoveLast       		指针移至最后1条记录
+				MoveNext       		指针移至下1条记录
+				MovePrevious      	指针移至上1条记录
+				Move [n]			向前或向后移 n 条记录
+			2: Find 方法
+				FindXxx	<条件>	(找到匹配的记录时: 记录定位到该记录, Recordset 的 NoMatch=False; 未找到时: 记录位置不变,NoMatch=True )
+					eg: ado1.Recordset.FindFiest 专业 Like "*建*"
+			3: Seek 方法
+				数据表对象.Seek <比较运算符(字符串引起)>,<Key1>,...		(需要通过Index属性设置索引)
+					eg: ado1.Recordset.Seek ">=","110001"
+		c: 其他
+			Recordset("字段名称")			对应字段名称的数据 
+			Recordset(i).Name           	第 i 个字段的名称
+			Recordset(i)              		第 i 个字段数据 
+			Recordset.Fields.Count      	记录的字段数 
+			Recordset.Fields(i).DefinedSize 	第 i 个字段数据域位长度	
+			Recordset.Fields(i).Type        第 i 个字段数据类型			
+			Recordset.PageSize             	设定每页显示的资料笔数 
+			Recordset.PageCount             分页后的总页数 
+			Recordset.AbsolutePage          目前所在的页数
+			//方法
+			Recordset.AddNew             	新增数据至数据表中 
+			Recordset.Edit					编辑当前记录
+			Recordset.Update             	更新目前这笔资料 
+			Recordset.Delete             	删除目前这笔资料  
+			Recordset.GetRows             	将数据集中的数据储存至数组中 
+			Recordset.Sort             		将数据集中的数据排序
 
 六: 文件
 	A: 顺序文件

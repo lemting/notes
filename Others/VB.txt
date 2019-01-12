@@ -199,7 +199,7 @@
 				FreeFile([{0|1}]): 取0: 获取 1~255 间未使用的文件号; 取1: 256~511 //不加参数默认取0
 					eg: Open "C:\xxx\txt" For Output As #1
 					eg: FileNo = FreeFile() : Open "C:\xxx\txt" For Output As FileNo	
-		//写顺序文件(Input/Append)
+		//写顺序文件(Output/Append)
 		b: Write #<fileNumber> , [输出列表]
 			1: 输出列表: [{Spc(n)|Tab(n)}][数值或字符串表达式][;|,]
 			2: Write 输出的数据会以紧凑格式存放,数据线之间以符号','分隔,并给字符串加上双引号
@@ -252,7 +252,7 @@
 			1: 返回当前的读/写位置(Long)
 		f: Loc(# [<fileNumber>])
 			1: 返回当前字节位置(顺序文件); 返回上一次读/写的记录号(随机文件); 返回上次读/写的字节位置(二进制文件)
-		g: FileLen([<fileName])
+		g: FileLen([<fileName>])
 			1: 返回文件的大小(如果文件已打开,则返回打开前的大小)(Long)
 		
 七: VB 控件
@@ -324,7 +324,7 @@
 		e: CommandButton	//按钮  //命名: cmdName
 			1: Style			按钮样式 (取值: 0 : Standard,标准(不能显示图片); 1 : Graphical,图形(可显示图片))	
 		f: CheckBox			//复选框  //命名: chkName
-			1: Value			复选框的状态 (取值: 0 : vbUnchecked,被选定; 1 : vbChecked,被选定; 2 : vbGrayed,部分选定)
+			1: Value			复选框的状态 (取值: 0 : vbUnchecked,未被选定; 1 : vbChecked,被选定; 2 : vbGrayed,部分选定)
 		g: OptionButton		//单选按钮
 			1: Value			单选按钮的状态 (取值: True: 被选定; Flase: 未被选定)
 		h: ListBox			//选择项列表,列表框

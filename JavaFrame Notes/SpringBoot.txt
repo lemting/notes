@@ -1,0 +1,102 @@
+Spring Boot
+
+一: 获取 SpringBoot 项目
+	A: 网址: (start.spring.io)
+		基本依赖包(dependencies): Web, DevTools(开发环境工具包: spring-boot-devtools)
+	B: 使用 IDEA 导入项目
+	C: 开启 热部署(配置 pom.xml)
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId> //DevTools
+			<!--<scope>runtime</scope>-->	//删除该项
+			<optional>true</optional>	//添加该项
+		</dependency>
+		<build>		
+			<plugins>
+				<plugin>
+					<configuration>
+						<fork>true</fork>	//添加该项	(自动reload)
+					</configuration>
+				</plugin> </plugins> </build>
+		/* 若使用 IEDA , 使用快捷键 Ctrl + Shift + A 
+			搜索 Registry , 修改 compiler.automake.allow.when.app.running 值为 True(打上勾) 
+			搜索 Make Project automatically, 勾选 Make Project automatically */
+	D: 项目结构
+		a: src/main/java		主程序,项目代码
+		b: src/main/resources	配置文件
+		c: src/test/java		测试程序
+		d: pom.xml				maven 配置文件
+		
+		project
+			-src
+				-main
+					-java
+						-com.xx.projectName
+							-comm
+							-domain
+							-repository
+							-service
+							-web
+							-Application.java
+					-resources
+						-static
+						-templates
+						-application.properties
+				-test
+			-pom.xml
+		
+二: 测试类
+	@RunWith(SpringRunner.class)
+	@SpringBootTest
+	public class HelloControllerTest {	//测试 HelloController 类
+
+		private MockMvc mvc;
+
+		@Before
+		public void  setUp() throws Exception {
+			mvc = MockMvcBuilders.standaloneSetup((new HelloController())).build(); 
+		}
+
+		@Test
+		public void testHello() throws Exception {
+			mvc.perform(MockMvcRequestBuilders.get("/hello?name=it you know"));
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

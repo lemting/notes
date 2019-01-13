@@ -150,6 +150,7 @@ MyBatis 是持久型框架
 								//取值: PARTIAL: 默认,只会自动映射结果没有嵌套结果映射定义里面; NONE: 自动映射; FULL: 自动映射的结果映射任何的(嵌套和其他).
 				<setting name="defaultExecutorType" value="SIMPLE"/> //defaultExecutorType: 配置默认执行人.默认: SIMPLE
 								//取值: SIMPLE: 默认值,没什么特殊意义; REUSE: 执行器重用准备好的语句; BATCH: 执行器重用语句和批处理更新
+				<setting name="mapUnderscoreToCamelCase" value="true"/>	 //开启驼峰命名转换,默认false 
 			</settings>	
 			//typeAliases: 类型别名,减少代码长度
 			<typeAliases>

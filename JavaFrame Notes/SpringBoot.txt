@@ -1,10 +1,55 @@
 Spring Boot
 
+
+一一一: SpringBoot + MyBatis		//参考文档 (https://blog.csdn.net/winter_chen001/article/details/77249029)
+	1: 创建 SpringBoot 项目, 添加 Web, MySQL, JDBC, MyBatis 依赖(开启热部署)
+	2: 配置 application.properties 或 application.yml	//配置数据源,扫描 XxxMapper.xml,别名
+			注: XxxMapper.xml 需放在 resources 下 ( eg: resources/mapper/UserMapper.xml )
+		eg: server: 
+				port: 8888	//设置端口号
+				servlet: 
+					context-path: /SpringbootMybatisDemo	//设置访问url需添加前缀: 项目名(SpringbootMybatisDemo)
+			spring:
+				datasource:  //配置数据源
+					url: jdbc:mysql://localhost:3306/springboot-demo?serverTimezone=GMT%2B8
+					username: root
+					password: lemting
+					driver-class-name: com.mysql.cj.jdbc.Driver
+					//数据源其他设置(可选)
+					maxActive: 20
+					initialSize: 1
+					maxWait: 60000
+					minIdle: 1
+					timeBetweenEvictionRunsMillis: 60000
+					minEvictableIdleTimeMillis: 300000
+					validationQuery: select 'x'
+					testWhileIdle: true
+					testOnBorrow: false
+					testOnReturn: false
+					poolPreparedStatements: true
+					maxOpenPreparedStatements: 20	
+			mybatis:
+				mapper-locations: classpath:mapper/*.xml  //(##*/##)//扫描 XxxMapper.xml //一定要对应mapper映射xml文件的所在路径
+				type-aliases-package: com.lemting.springbootmybatisdemo.domain  	//对应实体类的路径
+				
+	3: 生成对应的 pojo 和 mapper  //MyBatis 逆向工程 
+	4: 编写 Serivce, Controller		//通过 @Service,@RestController,@RequestMapping 等注解 进行注册
+	5: SpringBoot 启动类,添加 @MapperScan //扫描 mapper 类
+		@SpringBootApplication
+		@MapperScan("com.lemting.mapper")  //将项目中对应的 mapper 类的路径加进来就可以了
+		public class SpringbootMybatisDemoApplication {
+			SpringApplication.run(SpringbootMybatisDemoApplication.class, args);
+		}
+
 一: 获取 SpringBoot 项目
 	A: 网址: (start.spring.io)
-		基本依赖包(dependencies): Web, DevTools(开发环境工具包: spring-boot-devtools)
-	B: 使用 IDEA 导入项目
-	C: 开启 热部署(配置 pom.xml)
+		a: 添加基本依赖包(dependencies): Web, DevTools(开发环境工具包: spring-boot-devtools)
+		b: 使用 IDEA 导入项目
+	B: IEDA 
+		a: 通过 File -> New -> Project -> Spring Initializr (使用默认url: start.spring.io)
+		b: 添加基本依赖包
+二: SpringBoot 
+	A: 开启 热部署(配置 pom.xml)
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId> //DevTools
@@ -14,6 +59,8 @@ Spring Boot
 		<build>		
 			<plugins>
 				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
 					<configuration>
 						<fork>true</fork>	//添加该项	(自动reload)
 					</configuration>
@@ -21,7 +68,7 @@ Spring Boot
 		/* 若使用 IEDA , 使用快捷键 Ctrl + Shift + A 
 			搜索 Registry , 修改 compiler.automake.allow.when.app.running 值为 True(打上勾) 
 			搜索 Make Project automatically, 勾选 Make Project automatically */
-	D: 项目结构
+	B: 项目结构
 		a: src/main/java		主程序,项目代码
 		b: src/main/resources	配置文件
 		c: src/test/java		测试程序
@@ -33,36 +80,70 @@ Spring Boot
 					-java
 						-com.xx.projectName
 							-comm
-							-domain
+							-domain		//bean
+							-mapper		//存放 XxxMapper.java
 							-repository
-							-service
-							-web
-							-Application.java
+							-service	
+							-web		//controller
+							-XxxApplication.java	//SpringBoot启动类
 					-resources
+						-mapper	 //存放 XxxMapper.xml
 						-static
 						-templates
-						-application.properties
+						-application.properties	 //配置文件(代替Spring,SpringMVC,..的xml配置等等s)
 				-test
 			-pom.xml
 		
-二: 测试类
-	@RunWith(SpringRunner.class)
-	@SpringBootTest
-	public class HelloControllerTest {	//测试 HelloController 类
+	C: 测试类
+		@RunWith(SpringRunner.class)
+		@SpringBootTest
+		public class HelloControllerTest {	//测试 HelloController 类
 
-		private MockMvc mvc;
+			private MockMvc mvc;
 
-		@Before
-		public void  setUp() throws Exception {
-			mvc = MockMvcBuilders.standaloneSetup((new HelloController())).build(); 
+			@Before
+			public void  setUp() throws Exception {
+				mvc = MockMvcBuilders.standaloneSetup((new HelloController())).build(); 
+			}
+
+			@Test
+			public void testHello() throws Exception {
+				mvc.perform(MockMvcRequestBuilders.get("/hello?name=it you know"));
+			}
 		}
 
-		@Test
-		public void testHello() throws Exception {
-			mvc.perform(MockMvcRequestBuilders.get("/hello?name=it you know"));
-		}
-	}
-	
+	D: application.properties	
+		a: server.port					//服务器端口号
+		b: server.servlet.context-path	//访问路径前缀
+		//Mybatis 的配置
+		c: mybatis.config-location		//mybatis 核心配置文件所在路径
+		d: mybatis.type-aliases-package //mybatis 别名扫描包
+ 		e: mybatis.mapper-locations		//所有的mapper映射文件
+		//数据库配置
+		f: spring.datasource.data
+		g: spring.datasource.driver-class-name = com.mysql.jdbc.Driver
+		h: spring.datasource.url
+		i: spring.datasource.username
+		j: spring.datasource.password
+		k: spring.datasource.maxActive: 20
+		l: spring.datasource.initialSize: 1
+		m: spring.datasource.maxWait: 60000
+		n: spring.datasource.minIdle: 1
+		o: spring.datasource.timeBetweenEvictionRunsMillis: 60000
+		p: spring.datasource.minEvictableIdleTimeMillis: 300000
+		q: spring.datasource.validationQuery: select 'x'
+		r: spring.datasource.testWhileIdle: true
+		s: spring.datasource.testOnBorrow: false
+		t: spring.datasource.testOnReturn: false
+		u: spring.datasource.poolPreparedStatements: true
+		v: spring.datasource.maxOpenPreparedStatements: 20
+		
+	B: 获取 pplication.properties 里的变量
+		a: 在变量定义时加上 @Value 
+			@Value("${变量名}")
+			private String 变量;
+			
+		
 	
 	
 	

@@ -1,0 +1,124 @@
+A: 常用
+	a: shutdown 		//关机重启命令
+		1: -l				注销
+		2: -s				关机
+		3: -r				重启
+		4: -h				睡眠
+		5: -a				终止系统关闭
+		6: -t <time>		<time>秒后执行关机或重启
+		7: -c <msg>			提示信息
+		8: -f 				强制关闭正在运行的应用程序而不事先警告用户(若 -t参数指定大于 0 的值, 则默认为 -f 参数)
+	b: color <f><b>		//更改 DOS窗口 颜色(f: 前景色; b: 背景色; 取值: 一位十六进制数)
+	c: cls				//清屏
+		
+B: 系统工具
+	a: services.msc		//打开 服务
+	b: gpedit.msc		//打开 本地组策略编辑器
+	c: regedit			//打开 注册表
+		/* 注册表结构 */
+		1: HKEY_CLASSES_ROOT	//管理文件系统. 
+					根据在 Windows 中安装的应用程序的扩展名, 该根键指明其文件类型的名称, =相应打开该文件所要调用的程序等等信息
+		2: HKEY_CURRENT_USER	//管理系统当前用户的信息.
+					在这个根键中保存了本地计算机中存放的当前登录的用户信息, 包括用户登录的用户名和暂存的密码. 
+					在用户登录 Windows98 时, 其信息从 HKEY_USERS 中相应的项拷贝到 HKEY_CURRENT_USER 中.
+		3: HKEY_LOCAL_MACHINE	//管理用户当前硬件配置.
+					在这个根键中保存了本地计算机硬件配置数据, 
+					此根键下的子关键字包括在 SYSTEM.DAT 中, 用来提供 HKEY_LOCAL_MACHINE 所需的信息, 或者在远程计算机中可访问的一组键中.
+					这个根键里面的许多子键与 System.ini 文件中设置项类似
+		4: HKEY_USERS			//管理系统的用户信息.
+					在这个根键中保存了存放在本地计算机口令列表中的用户标识和密码列表. 同时每个用户的预配置信息都存储在 HKEY_USERS 根键中.
+					HKEY_USERS 是远程计算机中访问的根键之一.
+		5: HKEY_CURRENT_CONFIG	//管理当前用户的系统配置.
+					在这个根键中保存着定义当前用户桌面配置(eg: 显示器)的数据,
+					该用户使用的文档列表(MRU), 应用程序配置和其他有关当前用户的 Windows98 中文版的安装的信息
+		/* 常用注册表项 */
+		1: HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run		//开机自启动程序
+		2: HKEY_CURRENT_USER\Software\Microsoft\Internet Explorer\Main -> Start Page	//IE 启动页
+
+C: 网络IP
+	a: netstat			//查看 端口 状态
+		1: -a				显示所有连接和侦听端口
+		2: -n				以数字形式显示地址和端口号
+		3: -r				显示路由表
+		4: -t				一直 ping, 直到停止: 若要查看统计信息并继续操作, 请键入 Ctrl+Break; 若要停止, 请键入 Ctrl+C
+							//ping -t -l 65550 <ip> : 死亡之 ping, 发送大于64K的文件并一直 ping
+		5: -l <size>        发送缓冲区大小	
+	b: ipconfig			//查看 IP
+		1: -all				显示全部
+	c: ping <ip>		//给指定ip发送数据(eg: ping 192.168.1.34   ping www.baidu.com)
+		1: -a					将ip地址解析为主机名
+		2: -release/release6    释放指定适配器的 IPv4/IPv6 地址
+		3: -renew/renew6        重获指定适配器的 IPv4/IPv6 地址
+		4: 
+	d: mstsc 			//登录远程桌面
+		1: -v:<ip[:port]> 	指定要连接的远程计算机
+	e: systeminfo		//查看系统信息
+	f: net view			//查看 局域网 其他计算机名称
+	g: arp -a			//列出 局域网内主机
+	h: telnet
+	
+D: 黑客常用命令
+	a: net use <新盘符>\\<ip>\<盘符>$[ /del]	//使用指定ip主机的指定盘符, 并作为新盘符添加到本机[从本机中删除]
+					eg: net use k:\\192.168.1.1\C$ 		net use k:\\192.168.1.1\C$ /del
+	b: net start	//查看已开启的服务
+		1: <server>			//开启服务 eg: net start mysql
+	c: net stop <server>	//停止服务
+	d: net user				//查看所有用户
+		1: <username>		//查看用户属性
+		2: <username> <password>			//更换用户密码
+		3: <username> <password> /add		//创建新用户    eg: net user demo 123 /add
+		4: <username> /active:{yes|no}		//启用或禁用用户  eg: net user guest /active:yes
+	e: net password	<password>		//更改系统登录密码
+	f: net localgroup administrators <username> /add	//将用户添加到管理员, 使其具有管理员权限
+	g: net share			//查看本地开启的共享
+		1: <ip> <盘符>$			//开启共享		eg: net share
+		2: <ip> <盘符>$ /del	//删除
+		3: <盘符>$ 				//开启共享指定盘符	eg: net share c$
+		4: <盘符>$ /del			//删除共享指定盘符
+		
+E: 文件系统	
+	a: tree <dir>			//查看目录和子目录(以树的形式递归展开)
+	b: dir <dir>			//查看目录
+	c: cd <dir>				//切换到目录
+	d: md <dir>				//创建目录	
+	e: rd <dir>				//删除目录
+	f: start				//打开网页或文件	(eg: start www.baidu.com   start 123.txt)
+	g: type <file>			//在 DOS窗口 下查看文件
+	h: copy con <file>		//创建文件
+	i: ren <file> <newname> //文件重命名(不能移动)
+	j: del <file>			//删除文件
+	k: copy	<file> <new>	//复制文件
+	l: move <file> <new>	//移动文件
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

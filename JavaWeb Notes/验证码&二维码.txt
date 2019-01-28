@@ -1,4 +1,4 @@
-验证码: 
+一: 验证码
 		Captcha,是一种区分用户是计算机还是人的公共全自动程序.
 	作用: 可以防止恶意破解密码,刷票,论坛灌水,有效防止某个黑客对某一个特定注册用户用特定程序暴力破解方式进行不断的登录尝试
 	
@@ -75,7 +75,7 @@
 				eg: String kaptchaExpected = (String)request.getSession().getAttribute(com.google.code.kaptcha.Constants.KAPTCHA_SESSION_KEY);
 	
 	
-二维码
+二: 二维码
 		2-dimensional bar code,是某种特定的几何图形按一定规律在平面(二维方向上)分布的黑白相间的图形记录数据符号信息的图形
 	A: 二维码的分类
 			根据码制的编码原理分类

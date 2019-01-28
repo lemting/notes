@@ -7,7 +7,7 @@ JSTL的使用原因
 		长得很像xml,方便前端查看和参与开发
 		
 JSTL标签导入JSP页面
-	<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+	<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 JSTL函数导入JSP页面
 	<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 JSTL格式化标签导入JSP页面
@@ -126,6 +126,7 @@ JSTL标签
 					用法2(指定索引闭区间):  <c:forEach var="存储当前遍历元素的变量" items="待遍历集合" begin="开始index值" end="结束index值">操作var变量表示的元素</c:forEach>
 					用法3(部分遍历时指定步长): 
 					用法4(部分遍历时输出元素状态):
+					循环指定次数: <c:forEach var="i" begin="0" end="5"></c:forEach>
 			2: <c:forTokens>
 					用于浏览字符串,并根据指定的字符将字符串截取
 				属性: items: 被迭代的字符串

@@ -1,4 +1,8 @@
 SpringMVC: 基于 MVC 的 Web 框架
+	Model: 		模型层(serivce(业务逻辑层),mapper(数据访问层),pojo(模型))
+	Control: 	控制层(controller)
+	View: 		视图层(JSP)
+	
 	
 SpringMVC 是 Spring 的一个模块,SpringMVC 和 Spring 无需通过中间整合层进行整合
 
@@ -223,20 +227,22 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 				
 			1: @Controller				(org.springframework.stereotype.Controller)
 						注解在类上,标识该类为 Handler 控制器 
-			2: @RequestMapping(value="url",method={RequestMethod.GET,RequestMethod.POST,...},)	(org.springframework.web.bind.annotation.RequestMapping)
+			2: @RestController
+						注解在类上,标识该类为 Handler 控制器 //但是只返回 json 数据
+			3: @RequestMapping(value="url",method={RequestMethod.GET,RequestMethod.POST,...},)	(org.springframework.web.bind.annotation.RequestMapping)
 						注解在方法上,对方法和url进行映射,类似在 springmvc.xml 中配置 Handler .url: 映射访问url
 						注解在类上,设置该类所有url映射的根路径(实际url = 根路径 + 配置的url)
 					属性: value: 映射访问url; method: 限制http的请求方法,限制为所写的方法
-			3: @RequestParam(value="",required=true,defauktValue="")		(org.springframework.web.bind.annotation.RequestParam)
+			4: @RequestParam(value="",required=true,defauktValue="")		(org.springframework.web.bind.annotation.RequestParam)
 						注解在形参上,处理简单类型的绑定
 					属性: value: 用户请求的 key; required: 是否必须,默认true,表示请求中一定要有相应的参数,否则报错; defauktValue: 默认值
 						eg: @RequestMapping("/queryUsers")
 							public String queryUsers(@RequestParam(value="username",required="false") String username){..}
-			4: @RequestBody
+			5: @RequestBody
 						该注解常用来处理 Content-Type: 不是 application/x-www-form-urlencoded 编码的内容,eg: application/json,application/xml等
-			5: @SessionAttributes(value="",types="")
+			6: @SessionAttributes(value="",types="")
 						该注解用来绑定 HttpSession 中的 attribute 对象的值,便于在方法中的参数里使用
-			6: @ModelAttribute(value="")
+			7: @ModelAttribute(value="")
 						注解在参数上,指定 JavaBean 数据回显到页面在 request 域中的 key
 						注解在方法上,可以将方法的返回值传到页面
 					属性: value: 页面 request 域中的 key

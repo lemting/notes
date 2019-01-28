@@ -1,9 +1,25 @@
 Spring Boot
 
+//Idea 修改(错误: 找不到 Bean) Severity 等级为 Warning
+File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Autowiring for Bean Class -> 修改 Severity 为 Warning
+
 
 一一一: SpringBoot + MyBatis		//参考文档 (https://blog.csdn.net/winter_chen001/article/details/77249029)
 	1: 创建 SpringBoot 项目, 添加 Web, MySQL, JDBC, MyBatis 依赖(开启热部署)
-	2: 配置 application.properties 或 application.yml	//配置数据源,扫描 XxxMapper.xml,别名
+	2: pom.xml 添加 连接池 依赖
+		//c3p0 连接池
+		<dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>mchange-commons-java</artifactId>
+            <version>0.2.11</version>
+        </dependency>
+		<dependency>
+			<groupId>com.mchange</groupId>
+			<artifactId>c3p0</artifactId>
+			<version>0.9.5.2</version>
+		</dependency>
+		
+	3: 配置 application.properties 或 application.yml	//配置数据源,扫描 XxxMapper.xml,别名
 			注: XxxMapper.xml 需放在 resources 下 ( eg: resources/mapper/UserMapper.xml )
 		eg: server: 
 				port: 8888	//设置端口号
@@ -11,36 +27,54 @@ Spring Boot
 					context-path: /SpringbootMybatisDemo	//设置访问url需添加前缀: 项目名(SpringbootMybatisDemo)
 			spring:
 				datasource:  //配置数据源
+					type: 	//使用连接池的数据源
 					url: jdbc:mysql://localhost:3306/springboot-demo?serverTimezone=GMT%2B8
 					username: root
 					password: lemting
 					driver-class-name: com.mysql.cj.jdbc.Driver
-					//数据源其他设置(可选)
-					maxActive: 20
-					initialSize: 1
-					maxWait: 60000
-					minIdle: 1
-					timeBetweenEvictionRunsMillis: 60000
-					minEvictableIdleTimeMillis: 300000
-					validationQuery: select 'x'
-					testWhileIdle: true
-					testOnBorrow: false
-					testOnReturn: false
-					poolPreparedStatements: true
-					maxOpenPreparedStatements: 20	
 			mybatis:
 				mapper-locations: classpath:mapper/*.xml  //(##*/##)//扫描 XxxMapper.xml //一定要对应mapper映射xml文件的所在路径
 				type-aliases-package: com.lemting.springbootmybatisdemo.domain  	//对应实体类的路径
 				
-	3: 生成对应的 pojo 和 mapper  //MyBatis 逆向工程 
-	4: 编写 Serivce, Controller		//通过 @Service,@RestController,@RequestMapping 等注解 进行注册
-	5: SpringBoot 启动类,添加 @MapperScan //扫描 mapper 类
+	4: 生成对应的 pojo 和 mapper  //MyBatis 逆向工程 
+	5: 编写 Serivce, Controller		//通过 @Service,@Controller,@RestController,@RequestMapping 等注解 进行注册
+	6: SpringBoot 启动类,添加 @MapperScan //扫描 mapper 类
 		@SpringBootApplication
 		@MapperScan("com.lemting.mapper")  //将项目中对应的 mapper 类的路径加进来就可以了
 		public class SpringbootMybatisDemoApplication {
 			SpringApplication.run(SpringbootMybatisDemoApplication.class, args);
 		}
 
+二二二: SpringBoot + JSP		//参考文档 (https://blog.csdn.net/hp_yangpeng/article/details/80521866)
+		 //webapp 下的目录为可直接访问目录(静态资源)   eg: localhost:8080/index.html (实际访问: webapp/index.html)
+	1: 创建 SpringBoot 项目, 添加 Web 依赖(开启热部署)
+	2: pom.xml 添加 JSP 依赖
+		//Tomcat
+		<dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-jasper</artifactId>
+            <!-- <scope>provided</scope> --> //注意，这个scope需要被注释掉
+        </dependency>
+        //JSP 标签库
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>jstl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet.jsp</groupId>
+            <artifactId>javax.servlet.jsp-api</artifactId>
+        </dependency>
+		
+	3: 创建 webapp\WEB-INF\jsp  //webapp 与 java,resources 为同级目录
+	4: 设置 web.xml
+		File -> Project Structure -> Modules -> Web (没有就新建一个)
+			-> 添加 web.xml	(webapp\WEB-INF\web.xml)
+			-> 设置 webapp 为 Web Resource Directories 
+	5: 在 application.properties(或 yml) 中添加 JSP 的前缀和后缀
+		spring.mvc.view.prefix=/WEB-INF/jsp/	//页面默认前缀目录
+		spring.mvc.view.suffix=.jsp				//页面默认后缀目录
+	
+	
 一: 获取 SpringBoot 项目
 	A: 网址: (start.spring.io)
 		a: 添加基本依赖包(dependencies): Web, DevTools(开发环境工具包: spring-boot-devtools)
@@ -48,6 +82,7 @@ Spring Boot
 	B: IEDA 
 		a: 通过 File -> New -> Project -> Spring Initializr (使用默认url: start.spring.io)
 		b: 添加基本依赖包
+		
 二: SpringBoot 
 	A: 开启 热部署(配置 pom.xml)
 		<dependency>
@@ -79,10 +114,8 @@ Spring Boot
 				-main
 					-java
 						-com.xx.projectName
-							-comm
 							-domain		//bean
 							-mapper		//存放 XxxMapper.java
-							-repository
 							-service	
 							-web		//controller
 							-XxxApplication.java	//SpringBoot启动类
@@ -91,6 +124,10 @@ Spring Boot
 						-static
 						-templates
 						-application.properties	 //配置文件(代替Spring,SpringMVC,..的xml配置等等s)
+					-webapp	 //web根目录
+						-xxx	//其他静态资源,可直接访问  eg: localhost:8080/index.html (实际访问: webapp/index.html)
+						-WEB-INF
+							-web.xml
 				-test
 			-pom.xml
 		
@@ -98,7 +135,6 @@ Spring Boot
 		@RunWith(SpringRunner.class)
 		@SpringBootTest
 		public class HelloControllerTest {	//测试 HelloController 类
-
 			private MockMvc mvc;
 
 			@Before
@@ -112,33 +148,46 @@ Spring Boot
 			}
 		}
 
-	D: application.properties	
-		a: server.port					//服务器端口号
-		b: server.servlet.context-path	//访问路径前缀
-		//Mybatis 的配置
-		c: mybatis.config-location		//mybatis 核心配置文件所在路径
-		d: mybatis.type-aliases-package //mybatis 别名扫描包
- 		e: mybatis.mapper-locations		//所有的mapper映射文件
-		//数据库配置
-		f: spring.datasource.data
-		g: spring.datasource.driver-class-name = com.mysql.jdbc.Driver
-		h: spring.datasource.url
-		i: spring.datasource.username
-		j: spring.datasource.password
-		k: spring.datasource.maxActive: 20
-		l: spring.datasource.initialSize: 1
-		m: spring.datasource.maxWait: 60000
-		n: spring.datasource.minIdle: 1
-		o: spring.datasource.timeBetweenEvictionRunsMillis: 60000
-		p: spring.datasource.minEvictableIdleTimeMillis: 300000
-		q: spring.datasource.validationQuery: select 'x'
-		r: spring.datasource.testWhileIdle: true
-		s: spring.datasource.testOnBorrow: false
-		t: spring.datasource.testOnReturn: false
-		u: spring.datasource.poolPreparedStatements: true
-		v: spring.datasource.maxOpenPreparedStatements: 20
-		
-	B: 获取 pplication.properties 里的变量
+	D: application.properties		//参考文档(https://blog.csdn.net/je_ge/article/details/54783184)
+		a: Spring Config
+			1: spring.config.name   	//配置文件名称,默认为 application 
+			2: spring.config.location 	//配置文件存放位置,默认为 classpath 目录下
+		b: Spring MVC (WebMvcProperties)
+			1: spring.mvc.view.prefix 	//指定mvc视图的前缀. 
+			2: spring.mvc.view.suffix	//指定mvc视图的后缀. (实际视图名 = prefix + 视图名 + suffix)
+			3: spring.mvc.async.request-timeout    	//设定async请求的超时时间(ms),如果没有设置的话,以具体实现的超时时间为准
+			4: spring.mvc.date-format 				//设定日期的格式，比如dd/MM/yyyy. 
+			5: spring.mvc.favicon.enabled 				//是否支持favicon.ico，默认为: true 
+			6: spring.mvc.ignore-default-model-on-redirect //在重定向时是否忽略默认model的内容,默认为true
+			7: spring.mvc.locale 							//指定使用的Locale. 
+			8: spring.mvc.message-codes-resolver-format 	//指定message codes的格式化策略(PREFIX_ERROR_CODE,POSTFIX_ERROR_CODE). 
+		c: Server	
+			1: server.port					//服务器端口号
+			2: server.servlet.context-path	//访问路径前缀
+		d: MyBatis		
+			1: mybatis.config-location		//mybatis 核心配置文件所在路径
+			2: mybatis.type-aliases-package //mybatis 别名扫描包
+			3: mybatis.mapper-locations		//所有的mapper映射文件
+		c: DataSource (数据源)
+			1: spring.datasource.type		//连接池数据源	eg: com.mchange.v2.c3p0.DriverManagerDataSource
+			2: spring.datasource.driver-class-name = com.mysql.jdbc.Driver	//数据库驱动类
+			3: spring.datasource.url		
+			4: spring.datasource.username
+			5: spring.datasource.password
+			6: spring.datasource.data	
+		c: Http
+			1: spring.hateoas.apply-to-primary-object-mapper   	//设定是否对object mapper也支持HATEOAS,默认为: true 
+			2: spring.http.converters.preferred-json-mapper 	//是否优先使用JSON mapper来转换. 
+			3: spring.http.encoding.charset 	//指定http请求和相应的Charset,默认: UTF-8 
+			4: spring.http.encoding.enabled 	//是否开启http的编码支持,默认为true 
+			5: spring.http.encoding.force  		//是否强制对http请求和响应进行编码,默认为true
+		d: logging
+			1: logging.path=/var/logs 		//日志文件路径
+			2: logging.file=myapp.log 		//日志文件名
+			3: logging.config= # location of config file (default classpath:logback.xml for logback) 
+			4: logging.level.*= # levels for loggers, e.g. “logging.level.org.springframework=DEBUG” (TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF)
+					
+	B: 获取 application.properties 里的变量
 		a: 在变量定义时加上 @Value 
 			@Value("${变量名}")
 			private String 变量;

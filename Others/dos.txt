@@ -56,7 +56,9 @@ C: 网络IP
 	f: net view			//查看 局域网 其他计算机名称
 	g: arp -a			//列出 局域网内主机
 	h: telnet
-	
+	i: netsh wlan show profiles 	//查看链接过的wifi
+	j: netsh wlan show profiles <name> key=clear	//查看链接过的wifi的密码
+		
 D: 黑客常用命令
 	a: net use <新盘符>\\<ip>\<盘符>$[ /del]	//使用指定ip主机的指定盘符, 并作为新盘符添加到本机[从本机中删除]
 					eg: net use k:\\192.168.1.1\C$ 		net use k:\\192.168.1.1\C$ /del
@@ -89,7 +91,12 @@ E: 文件系统
 	j: del <file>			//删除文件
 	k: copy	<file> <new>	//复制文件
 	l: move <file> <new>	//移动文件
-	
+
+F: 进程
+	a: tasklist 			//查看进程
+	b: tskill <pid>|<name>	//杀进程
+
+
 
 
 

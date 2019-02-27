@@ -8,6 +8,15 @@ SpringMVC 是 Spring 的一个模块,SpringMVC 和 Spring 无需通过中间整�
 
 springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是类似 
 
+/* 编写 Controller
+	a: 返回 页面
+		1: 使用 @Controller 注解类 (返回视图)
+	b: 返回 Json
+		1: 使用 @RestController 注解类
+		2: 使用 @Controller 注解类 (返回视图), 使用 @ResponseBody 注解方法 (代表该方法不返回视图而返回 Json 数据)
+*/
+
+
 一一一: Spring, SpringMVC 与 MyBatis 的整合
 	A: 整合思路
 											表现层: SpringMVC
@@ -239,7 +248,8 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 						eg: @RequestMapping("/queryUsers")
 							public String queryUsers(@RequestParam(value="username",required="false") String username){..}
 			5: @RequestBody
-						该注解常用来处理 Content-Type: 不是 application/x-www-form-urlencoded 编码的内容,eg: application/json,application/xml等
+						该注解常用来处理 Content-Type: 不是 application/x-www-form-urlencoded 编码的内容,
+					eg: application/json,application/xml 等
 			6: @SessionAttributes(value="",types="")
 						该注解用来绑定 HttpSession 中的 attribute 对象的值,便于在方法中的参数里使用
 			7: @ModelAttribute(value="")
@@ -305,7 +315,64 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 				eg: <beans>
 						<bean class="exception.UserExceptionResolver" />
 					</beans>
-	B: 图片的上传	
+	B: 异常处理(注解)
+		a: 自定义异常类
+			1: 创建 error 层
+			2: 创建异常处理类接口 CommonError
+				public interface CommonError {
+					int getErrorCode();
+					String getErrorMsg();
+					CommonError setErrorMsg(String errorMsg);
+				}
+			3: 创建异常枚举类 EmBusinessError, 实现 CommonError 接口
+				public enum EmBusinessError implements CommonError {
+					UNKNOWN_ERROR(10001,"未知错误"),	//未知错误
+					PARAMETER_VALIDATION_ERROR(10002,"参数不合法"), //通用错误信息 10002
+					USER_NOT_EXIST(20001,"用户不存在")	//20000 开头为用户信息相关错误定义
+					;	//.......  
+					private int errorCode;
+					private String errorMsg;
+					EmBusinessError(int errorCode, String errorMsg) { this.errorCode = errorCode; this.errorMsg = errorMsg; }
+					@Override
+					public int getErrorCode() { return this.errorCode; }
+					@Override
+					public String getErrorMsg() { return errorMsg; }
+					@Override
+					public CommonError setErrorMsg(String errorMsg) { this.errorMsg = errorMsg; return this; }
+				}
+			4: 创建异常类 BusinessException, 继承 Exception, 实现 CommonError 接口
+				public class BusinessException extends Exception implements CommonError {
+					private CommonError commonError;
+					//直接接收 EmBusinessError 的传参 用于构造业务异常
+					public BusinessException(CommonError commonError){ super(); this.commonError = commonError; }
+					//接受自定义 errorMsg 的方式构造业务异常
+					public BusinessException(CommonError commonError,String errorMsg){ super(); this.commonError = commonError; this.commonError.setErrorMsg(errorMsg); }
+					@Override
+					public int getErrorCode() { return this.commonError.getErrorCode(); }
+					@Override
+					public String getErrorMsg() { return this.commonError.getErrorMsg(); }
+					@Override
+					public CommonError setErrorMsg(String errorMsg) { this.commonError.setErrorMsg(errorMsg); return this; }
+				}
+		b: 注解处理 Controller 异常
+			1: 创建 BaseController 
+				@ExceptionHandler(Exception.class)	//将所有异常吸收
+				@ResponseStatus(HttpStatus.OK)	//设置前端状态为 200, 不会进入报错页面
+				public Object handlerException(HttpServletRequest request, Exception e){
+					Map<String, Object> responseData = new HashMap<>();	//response 数据
+					if(e instanceof BusinessException) {	//判断是否为自定义异常类
+						BusinessException businessException = (BusinessException) e;
+						responseData.put("errorCode", businessException.getErrorCode()); //错误代码
+						responseData.put("errorMsg", businessException.getErrorMsg());	//错误信息
+					} else {	//不为自定义的异常, 则为 未知异常
+						responseData.put("errorCode", EmBusinessError.UNKNOWN_ERROR.getErrorCode());
+						responseData.put("errorMsg", EmBusinessError.UNKNOWN_ERROR.getErrorMsg());
+					}
+					return .....
+				}
+		2: 所有的 Controller 继承自 BaseController, 实现处理全局异常
+	
+	C: 图片的上传	
 		a: form 中提交 enctype="multipart/form-data" 的数据时,需要 SpringMVC 对 multipart 类型进行解析
 			//在 springmvc.xml 配置 multipart 类型解析器
 			<beans>
@@ -315,7 +382,7 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 			</beans>
 		b: jar包
 			(commons-fileupload.jar)(commons-io.jar)
-	C: JSON 数据交互
+	D: JSON 数据交互
 				SpringMVC 使用 jackson 的包进行 JSON 转换(@RequestBody,@ResponseBody)
 		a: 在 springmvc.xml 配置 JSON 转换器
 			//如果使用了 <mvc:annotation-driven /> 则该处配置不用写
@@ -339,7 +406,7 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 					public @ResponseBody User requestJson(@RequestBody User user) {
 						return user;
 					} 
-	D: 拦截器
+	E: 拦截器
 				SpringMVC 拦截器针对 HandlerMapping 进行拦截设置
 		a: 拦截器类	
 				实现 HandlerInterceptor 接口,重写 preHandle(),postHandle(),afterCompletion()方法 (org.springframework.web.servlet.HandlerInterceptor)

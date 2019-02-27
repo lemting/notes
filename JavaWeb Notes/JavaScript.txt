@@ -70,7 +70,7 @@ JavaScript最初叫"LiveScript",是网景公司(Netscape)开发的,为自己的�
 						for (var prop in myObject){    // 显示 "The property 'name' is James"，等等。
 							window.alert("The property '" + prop + "' is " + myObject[prop]);}
 		
-函数
+三: 函数
 	格式: function 函数名(参数列表){[return 语句]}
 		注意: arguments对象
 			在函数代码中,使用特殊对象arguments,开发者无需明确指出参数名,就能访问它们
@@ -81,7 +81,7 @@ JavaScript最初叫"LiveScript",是网景公司(Netscape)开发的,为自己的�
 		没有函数名,不能单独定义,也不能单独调用,一般是做为数据给其他变量赋值.
 			
 		
-三: 方法
+四: 方法
 	常用客户端输出方法	
 		1: document.write(Object obj): 在网页的body标记中输出obj;
 				document 是一个文档对象,代表整个网页
@@ -97,7 +97,7 @@ JavaScript最初叫"LiveScript",是网景公司(Netscape)开发的,为自己的�
 		7: parseFloat(String str): 在str中从左往右提取浮点型数据,若遇到非浮点型的内容,则停止提取,并返回结果
 		8: window.prompt(String text [,defaultText]): 弹出一个输入框,让用户输入;text为提示信息,defaultText是输入框中的默认内容   
 
-对象: 
+五: 对象 (详见 一一一, 二二二, 三三三)
 	JavaScript对象的分类:
 		A: JS内置对象: Array,Date,String,Math,...
 			a: String: 字符串对象
@@ -125,9 +125,7 @@ JavaScript最初叫"LiveScript",是网景公司(Netscape)开发的,为自己的�
 								show: function(){document.write("姓名: " + obj.name + "<br />性别: " + obj.sex + "<br />年龄: " + obj.age);};
 							};
 							
-	
 一一一: JavaScript内置对象
-
 	A:	String: 字符串对象
 			构造方法: 
 				String(String str): 一字符串创建字符串
@@ -194,7 +192,7 @@ JavaScript最初叫"LiveScript",是网景公司(Netscape)开发的,为自己的�
 
 	D:	Math: 数学对象
 			静态成员变量:
-				E: 算术常量e,自然对数的底数(约2.718).
+				E : 算术常量e,自然对数的底数(约2.718).
 				LN2: 2 的自然对数(约0.693)
 				LN10: 10 的自然对数(约2.302)
 				LOG2E: 以 2 为底的e的对数(约1.414)
@@ -203,37 +201,37 @@ JavaScript最初叫"LiveScript",是网景公司(Netscape)开发的,为自己的�
 				SQRT1_2: 2 的平方根的倒数(等于0.707)
 				SQRT2: 2 的平方根(约1.414)
 			静态成员方法: 	
-				三角函数:
-					sin(x): 正弦
-					cos(x): 余弦
-					tan(x): 正切
-					acos(x): 反余弦
-					asin(x): 反正弦
-					atan(x): 反正切
-					atan2(y,x): 从x轴到点(x,y)之间的角度
-				取整: 
-					abs(x): 绝对值
-					ceil(x): 向上取整
-					floor(x): 向下取整
-					round(x): 四舍五入取整
-				比较值: 
-					max(x,y): 两数的最大值
-					min(x,y): 两数的最小值
-				指数对数: 
-					exp(x): e的x次幂
-					log(x): e为底x的自然对数
-					pow(x,y): x的y次幂 
-					sqrt(x): 根号x
-				随机数: 
-					random(): (0~1)间的随机数
+				a: 三角函数
+					1: sin(x): 正弦
+					2: cos(x): 余弦
+					3: tan(x): 正切
+					4: acos(x): 反余弦
+					5: asin(x): 反正弦
+					6: atan(x): 反正切
+					7: atan2(y,x): 从x轴到点(x,y)之间的角度
+				b: 取整
+					1: abs(x): 绝对值
+					2: ceil(x): 向上取整
+					3: floor(x): 向下取整
+					4: round(x): 四舍五入取整
+				c: 比较值 
+					1: max(x,y): 两数的最大值
+					2: min(x,y): 两数的最小值
+				d: 指数对数 
+					1: exp(x): e的x次幂
+					2: log(x): e为底x的自然对数
+					3: pow(x,y): x的y次幂 
+					4: sqrt(x): 根号x
+				e: 随机数 
+					1: random(): (0~1)间的随机数
 					
 	E: 	Number: 数值对象
 			构造方法: 
 				Number(value): value是要创建的 Number 对象的数值,或是要转换成数字的值
 			成员方法: 
-				toFixed([num]): 把数字转换为字符串,结果的小数点后有指定位数的数字(未带参数,则默认是小数点后0位)
-				valueOf(): 返回基本数字值的字符串形式(相当于toString(10))
-				toString([radix]): 以radix进制转换为一个字符串(未带参则默认是10进制)
+				1: toFixed([num]): 把数字转换为字符串,结果的小数点后有指定位数的数字(未带参数,则默认是小数点后0位)
+				2: valueOf(): 返回基本数字值的字符串形式(相当于toString(10))
+				3: toString([radix]): 以radix进制转换为一个字符串(未带参则默认是10进制)
 			
 二二二: BOM对象(浏览器各组件对象)	
 
@@ -432,8 +430,11 @@ JavaScript最初叫"LiveScript",是网景公司(Netscape)开发的,为自己的�
 			使用JS操作CSS中的个属性.JS只能操作或修改行内样式,对于类样式,可以通过className来赋值
 		每个HTML标记都有一个style属性.这个style属性又是一个style对象.这个style对象的属性与CSS中的属性一一对应.
 		style对象属性名与CSS属性名的转换
-			若属性名是一个单词,style对象属性与CSS属性一样;若属性名是多个单词,则第一个单词小写,后面每个单词的首字母大写,并去掉"-".
-				eg: imgObj.style.border = "1px solid red";	divObj.style.backgroundColor = "red";	divObj.style.fontSize = "18px";	
+				若属性名是一个单词,style对象属性与CSS属性一样;若属性名是多个单词,则第一个单词小写,后面每个单词的首字母大写,并去掉"-".
+			1: . 访问
+				eg: imgObj.style.border = "1px solid red";	divObj.style.backgroundColor = "red";	divObj.style.fontSize = "18px";
+			2: [] 访问
+				eg: imgObj.style["border"] = "1px solid red";	divObj.style["backgroundColor"] = "red";
 			
 	E: Event DOM: 事件对象模型. eg: onclick,onload 等
 		

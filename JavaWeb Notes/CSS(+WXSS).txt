@@ -142,7 +142,7 @@ CSS属性
 		b: text-decoration: 文本修饰线,取值: none(无),underline(下划线),overline(上划线),line-throught(删除线)
 		c: text-align: 文本水平对齐方式,取值: left,center,right
 		d: line-height: 行高	eg: line-height:24px;	line-height:150%;
-		e: text-indent: 首行缩进.	eg: text-indent: 28px;
+		e: text-indent: 首行缩进.	eg: text-indent: 28px; text-indent: 2em; //2em: 两个字 
 		f: letter-spacing: 字间距.
 	I: 列表
 			list-style: 复合属性(list-style-image,list-style-position,list-style-type)

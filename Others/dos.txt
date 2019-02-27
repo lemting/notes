@@ -10,6 +10,7 @@ A: 常用
 		8: -f 				强制关闭正在运行的应用程序而不事先警告用户(若 -t参数指定大于 0 的值, 则默认为 -f 参数)
 	b: color <f><b>		//更改 DOS窗口 颜色(f: 前景色; b: 背景色; 取值: 一位十六进制数)
 	c: cls				//清屏
+	d: ipconfig -flushdns	//刷新DNS
 		
 B: 系统工具
 	a: services.msc		//打开 服务

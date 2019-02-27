@@ -507,7 +507,6 @@ MyBatis 是持久型框架
 	
 	<?xml version="1.0" encoding="UTF-8"?>
 	<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
-
 	<generatorConfiguration>
 		<context id="testTables" targetRuntime="MyBatis3">
 			<commentGenerator>
@@ -566,14 +565,6 @@ MyBatis 是持久型框架
 			//指定数据库表
 			<table schema="" tableName="C_I"></table>
 			<table schema="" tableName="Chapter"></table>
-			<table schema="" tableName="Item"></table>
-			<table schema="" tableName="KC_C"></table>
-			<table schema="" tableName="KC_QT"></table>
-			<table schema="" tableName="KeCheng"></table>
-			<table schema="" tableName="Level"></table>
-			<table schema="" tableName="QS_I"></table>
-			<table schema="" tableName="QuestionsSet"></table>
-			<table schema="" tableName="QuestionType"></table>
 			<!-- 有些表的字段需要指定java类型
 			<table schema="" tableName="">
 				<columnOverride column="" javaType="" />
@@ -581,7 +572,45 @@ MyBatis 是持久型框架
 		</context>
 	</generatorConfiguration>
 
-		
+	A: Idea 下 maven 使用 mybatis-generator 插件实现逆向工程
+		a: pom.xml 添加插件
+			<!-- MyBatis 逆向工程 -->
+            <plugin>
+                <groupId>org.mybatis.generator</groupId>
+                <artifactId>mybatis-generator-maven-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.mybatis.generator</groupId>	//逆向工程核心文件
+                        <artifactId>mybatis-generator-core</artifactId>	
+                        <version>1.3.6</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>mysql</groupId>	//mysql 驱动(可以是其他 数据库驱动)
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>8.0.13</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>mybatis generator</id>	//id 任意
+                        <phase>package</phase>
+                        <goals> <goal>generate</goal> </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- 允许移动生成的文件 -->
+                    <verbose>true</verbose>
+                    <configurationFile>
+                        src/main/resources/generatorConfig.xml	//核心配置文件: generatorConfig.xml 位置
+                    </configurationFile>
+                </configuration>
+            </plugin>
+		b: 编写 generatorConfig.xml, 放置在 pom.xml 配置的路径
+		c: 启动插件
+			1: Run --> Edit Configurations..  --> 添加 Maven 
+				   --> 在 Command Line 填入 mybatis-generator:generate
+			2: 启动添加的 Maven 
+	
 		
 		
 		

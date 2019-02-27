@@ -3,6 +3,21 @@ Spring Boot
 //Idea 修改(错误: 找不到 Bean) Severity 等级为 Warning
 File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Autowiring for Bean Class -> 修改 Severity 为 Warning
 
+//找不到 com.mysql.cj.jdbc.Driver 时,注意检查 pom.xml 配置的 <scope>runtime</scope>, 该处删掉即可
+
+/* 解决 Ajax 不能跨域请求(CORS 头缺少 'Access-Control-Allow-Origin'): 
+	1: 在 Controller 类上加上 @CrossOrigin(origins = {"*"},allowCredentials = "true") 注解
+	2: 在 Ajax 请求体中添加  xhrFields: {withCredentials: true}
+		eg: $.ajax({
+				type: "POST",
+				contentType: "application/x-www-form-urlencoded",
+				url: "http://localhost:8888/miaosha/user/register",
+				data: { "telphone": "11"},
+				xhrFields: { withCredentials: true },
+				success: function(data) { alert("success")},
+				error: function(data) { alert("error"); }
+			});
+*/
 
 一一一: SpringBoot + MyBatis		//参考文档 (https://blog.csdn.net/winter_chen001/article/details/77249029)
 	1: 创建 SpringBoot 项目, 添加 Web, MySQL, JDBC, MyBatis 依赖(开启热部署)
@@ -35,15 +50,15 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 			mybatis:
 				mapper-locations: classpath:mapper/*.xml  //(##*/##)//扫描 XxxMapper.xml //一定要对应mapper映射xml文件的所在路径
 				type-aliases-package: com.lemting.springbootmybatisdemo.domain  	//对应实体类的路径
-				
-	4: 生成对应的 pojo 和 mapper  //MyBatis 逆向工程 
-	5: 编写 Serivce, Controller		//通过 @Service,@Controller,@RestController,@RequestMapping 等注解 进行注册
-	6: SpringBoot 启动类,添加 @MapperScan //扫描 mapper 类
+	4: SpringBoot 启动类,添加 @MapperScan //扫描 mapper 类
 		@SpringBootApplication
 		@MapperScan("com.lemting.mapper")  //将项目中对应的 mapper 类的路径加进来就可以了
 		public class SpringbootMybatisDemoApplication {
 			SpringApplication.run(SpringbootMybatisDemoApplication.class, args);
 		}
+	5: 生成对应的 pojo 和 mapper  //MyBatis 逆向工程 
+	6: 编写 Serivce, Controller		//通过 @Service,@Controller,@RestController,@RequestMapping 等注解 进行注册
+	
 
 二二二: SpringBoot + JSP		//参考文档 (https://blog.csdn.net/hp_yangpeng/article/details/80521866)
 		 //webapp 下的目录为可直接访问目录(静态资源)   eg: localhost:8080/index.html (实际访问: webapp/index.html)
@@ -63,12 +78,13 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>javax.servlet.jsp-api</artifactId>
+			<version>2.3.3</version>
         </dependency>
 		
 	3: 创建 webapp\WEB-INF\jsp  //webapp 与 java,resources 为同级目录
 	4: 设置 web.xml
 		File -> Project Structure -> Modules -> Web (没有就新建一个)
-			-> 添加 web.xml	(webapp\WEB-INF\web.xml)
+			-> 添加 web.xml	(webapp\WEB-INF\web.xml)(Deployment Descriptors)
 			-> 设置 webapp 为 Web Resource Directories 
 	5: 在 application.properties(或 yml) 中添加 JSP 的前缀和后缀
 		spring.mvc.view.prefix=/WEB-INF/jsp/	//页面默认前缀目录
@@ -130,8 +146,14 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 							-web.xml
 				-test
 			-pom.xml
-		
-	C: 测试类
+	C: 常用注解
+		a: @CrossOrigin
+			注解在类上(注解在Controller上), 允许 Ajax 跨域请求
+			eg: @Controller 
+				@CrossOrigin(origins = {"*"},allowCredentials = "true")
+				public AA {...}
+
+	D: 测试类
 		@RunWith(SpringRunner.class)
 		@SpringBootTest
 		public class HelloControllerTest {	//测试 HelloController 类
@@ -148,7 +170,7 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 			}
 		}
 
-	D: application.properties		//参考文档(https://blog.csdn.net/je_ge/article/details/54783184)
+	E: application.properties		//参考文档(https://blog.csdn.net/je_ge/article/details/54783184)
 		a: Spring Config
 			1: spring.config.name   	//配置文件名称,默认为 application 
 			2: spring.config.location 	//配置文件存放位置,默认为 classpath 目录下

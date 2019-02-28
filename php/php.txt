@@ -1,5 +1,4 @@
-
-A: 
+A: PHP
 	a: 代码格式
 		1: <?php   ?>		
 		2: <?      ?>		//简短风格, 需要 php.ini 文件中的 short_open_tag = On (默认开启)
@@ -36,51 +35,246 @@ B: 变量(需要 '$' 进行标识)
 		5: Null(空类型) 
 		6: Resource(资源)	//资源是由专门的函数来建立和使用的, 例如打开文件,数据连接, 图形画布
 C: 运算符
-
+	a: 赋值运算符
+		1: = 	
+		2: & (引用赋值, 相当于取别名)		eg: $b = &$a;
+	b: 算术运算符    	+  -  *  /  %
+	c: 比较运算符 		== 	!=  <>  >  <  <=  >=   ===  (全等, 值一致且数据类型一致) !== 
+	d: 逻辑运算符 		and  or  !  &&  ||  xor(异或)
+	e: 三目运算符		?:
+	f: 字符串连接符		
+		1: .
+		2: .= (连接赋值运算符)
+	g: 错误控制运算符	@ (忽略表达式可能产生的任何错误信息)	eg:  $conn = @mysql_connect("l","u","p");
 D: 语言结构
+	a: 选择结构
+		1: if(){}else{}
+		   if(){}else if(){} ...
+		2: switch(){
+			   case <exp1>:   break;
+				...
+			   default: 	
+		   }
+	b: 循环结构
+		1: for(;;){}
+		2: foreach(数组 as 值){}
+		   foreach(数组 as 下标 => 值){}
+		3: while(){}
+		   do{}while()
 	
 	
+-------------------------------------------------------------------------------------------------------------------------
 	
+A: 系统常量
+	1: __FILE__ 		PHP程序文件名. 它可以帮助我们获取当前文件在服务器的物理位置
+	2: __LINE__			PHP程序文件行数. 它可以告诉我们, 当前代码在第几行
+	3: PHP_VERSION		当前PHP解析器的版本号. 
+	4: PHP_OS			执行当前PHP版本的操作系统名称
 	
-	
-	
-
-	
-	
-	
-	
-	
-	
-	
-A: 常用函数
+B: 常用函数
 		memory_get_usage(): 获取内存占用大小
 		var_dump(<var>): 获取变量数据类型
 		fopen("f.txt","r"):	打开文件
 		mysql_connect("localhost","root","root"): 连接 mysql 数据库
 		imagecreate(100,100): 创建图形画布
-	a: 
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+		error_reporting(0): 禁止显示PHP警告提示
+		unset($var): 释放变量
+		define(常量名,常量值[,$case_sensitive = true]): 定义常量,$case_sensitive: 是否大小写不敏感 (bool)
+		constant(常量名): 获取常量值
+	a: 数学函数
+		1: abs(n) 				求n绝对值
+		2: ceil(n) 				向上取整
+		3: floor(n) 			向下取整
+		4: fmod(x,y) 			浮点数n取余 (x % y)
+		5: pow(x,n)				x^n
+		6: round(n) 			浮点数n四舍五入
+		7: sqrt(n) 				求n平方根
+		8: mt_rand(min,max) 	更好的随机数 [min,max]
+		9: rand(min,max)		随机数 [min,max]
+		10: pi() 				获取圆周率值
+		11: max(a,b,..)		 	求最大值(多个数 或 数组)
+		    max(array)
+		12: min(a,b,..) 		求最小值
+		    min(array)
+	b: 字符串函数
+		1: strlen(str)				获取 str 长度
+		2: md5(str)					字符串 md5 编码
+		3: str_shuffle(str)			随机打乱 str
+		4: strrev(str)				反转 str
+		5: parse_str(str,var)		将 str 解析成变量var
+		6: dirname(path) 			返回路径path中的目录部分	eg: echo dirname("c:/test/home.php");  // c:/test
+		7: number_format(n1,n2,s1,s2)		格式化数字: 千位分组. 
+										n1: 格式化的数字; n2: 小数位数; s1: 用作小数点的字符串; s2: 用作千位分隔符的字符串
+		//去空格
+		1: trim(str) 				删除 str 两端 的 空格 或 其他预定义字符
+		2: rtrim(str)/chop(str) 	删除 str 右边 的 空格 或 其他预定义字符
+		3: ltrim(str) 				删除 str 左边 的 空格 或 其他预定义字符
+		//大小写转换
+		1: strtolower(str)			str 转为小写
+		2: strtoupper(str)			str 转为大写
+		3: ucfirst(str)				str 首字母大写
+		4: ucwords(str)				str 每个单词首字符转为大写
+		//字符转义
+		1: htmlentities(str,)		把 str 转为 HTML 实体
+		2: htmlspecialchars(str)	预定义字符转html编码
+		3: nl2br(str)				str 中的 '\n' 转义为 <br> 标签
+		4: strip_tags(str)			剥去 str 中的 HTML, XML 以及 PHP 的标签
+		5: addcslashes(str[,c])		在指定的字符 c(默认转义 ' " \ 和 null) 前添加反斜线转义 str 中字符
+		6: stripcslashes(str)		删除由 addcslashes() 添加的反斜线
+		//ASCII 
+		1: chr(ascii)				从指定的 ASCII 值返回字符
+		2: ord(str)					返回 str 第一个字符的ASCII值
+		//比较字符串
+		1: strcasecmp(s1,s2)	 	比较两字符串 s1,s2 (s1 > s2 = 1)(s1 == s2 = 0)(s1 < s2 = -1) //不区分大小写
+		2: strcmp(s1,s2)			比较两字符串 s1,s2 (s1 > s2 = 1)(s1 == s2 = 0)(s1 < s2 = -1) //区分大小写
+		3: strncasecmp(s1,s2,n) 	比较字符串 s1,s2 前 n 个字符 //不区分大小写
+		4: strncmp(s1,s2,n)			比较字符串 s1,s2 前 n 个字符 //区分大小写
+		5: strnatcasecmp(s1,s2)		自然顺序法比较字符串长度  	//不区分大小写
+		6: strnatcmp(s1,s2)			自然顺序法比较字符串长度 	//区分大小写
+		7: similar_text(s1,s2)		返回两字符串相同字符的数量
+		//截取,分割字符串
+		1: chunk_split(str[,len[,end]])		截取 str. len: 截取长度; end: 结束符 
+		2: strtok(str,token)				以子字符串 token 为标志截取 str
+		3: str_split(str[,len]) 			把 str 分割到数组中, 数组每个元素的长度为len(默认1)
+		4: explode(sep,str[,limit])			以标志字符串 sep 分割 str. limit: 限制数组长度 (array)
+		5: substr(str,start[,len])			从 start 开始截取 str. len: 截取长度 
+		6: strrchr(str,s)					返回字符串 s 在 str 中最后一次出现位置开始到末尾的字符串
+		7: strchr(srt,s[,bool])				返回字符串 s 在 str 中开始位置到结束的字符串
+		   strstr(srt,s[,bool]) 		
+		8: wordwrap(str,len)				按照指定长度 len 对 str 进行折行处理
+		//替换字符串
+		1: str_ireplace(s,r,str[,num]) 			将 str 中的字符串 s 替换为字符串 r //不区分大小写
+		2: str_replace(s,r,str[,num])			将 str 中的字符串 s 替换为字符串 r //区分大小写
+		3: substr_replace(str,r,start[,len])	替换 str 中以 start 开头的 len 长度的字符串为字符串 r
+		//拼接成字符串
+		1: implode([str,]arr)		同 join(),将数组 arr 用 str 连接成字符串
+		2: str_pad(str,len[,c]) 	把 str (使用字符c(默认为' '))填充为指定的长度len
+		3: str_repeat(str,num) 		返回 str 重复拼接 num 次
+	c: 数组函数
+		//创建数组
+		1: array(a,b,...)					生成一个数组
+		   array(key=>value,...)  		
+		2: array_combine(arr1,arr2)			组合数组, 用数组 arr1 的值作为 key,数组 arr2 的值作为 value
+		3: range(min,max,step)				创建包含指定范围([min,max], 步长 step) 的元素的数组
+		4: compact(s1,s2,...)				创建一个由参数所带变量组成的数组 (变量名为键,变量值为值的数组)
+					eg: $arr = array(1,2,3);  $name = "Griffin";  $age = 38;
+						$result = compact("arr", "name", "age"); $result: { "arr"=>{1,2,3},"name"=>"Griffin","age"=>38 }
+		5: array_fill(key,num,value)		用给定的 key(num个),value 填充成数组
+		//合并拆分数组
+		1: array_chunk(arr,num)				把 arr 分割为新的数组块, 每个数组包含 num 个元素
+		2: array_merge(a1,a2,..)			把两个或多个数组合并为一个数组
+		3: array_slice(arr,start,len)		获取 arr 中从 start 开始的 len 个元素组成的新数组
+		//比较
+		1: array_diff(a1,a2)				返回两个数组的差集数组
+		2: array_intersect(a1,a2,..) 		返回两个或多个数组的交集数组 
+		3: array_sum(arr)					返回数组 arr 中所有值的总和
+		//查找替换删除
+		1: array_search(value,arr)			在数组中查找一个 value,返回一个 key,没有返回 false
+		2: array_splice(a1,start,len[,a2])	删除数组 a1 从 start 开始的 len 个元素[,将数组 a2 的值替换进去]
+		3: in_array(value,arr)				判断数组 arr 中是否有给定的值 value //区分大小写
+		4: array_key_exists(key,arr)		判断数组 arr 中是否存在指定的 key
+		//数组指针操作
+		1: key(arr)							返回数组内部指针当前指向元素的键名 　　　
+		2: current(arr) 					返回数组中的当前元素(单元). 　　　
+		3: next(arr)						把指向当前元素的指针移动到下一个元素的位置,并返回当前元素的值 　　　
+		4: prev(arr)						把指向当前元素的指针移动到上一个元素的位置,并返回当前元素的值 　　　
+		5: end(arr)							将数组内部指针指向最后一个元素, 并返回该元素的值(如果成功) 　　　
+		6: reset(arr)						把数组的内部指针指向第一个元素, 并返回这个元素的值 　　　
+		7: list(arr)						用数组中的元素为一组变量赋值	eg: list($a, $b, $c) = array("Dog","Cat","Horse");
+		8: array_shift(arr)					删除数组中的第一个元素, 并返回被删除元素的值
+		9: array_unshift(arr,a,b,..)		在数组 arr 开头插入一个或多个元素
+		10: array_push(arr,a,b,..)			向数组 arr 最后压入一个或多个元素
+		11: array_pop(arr)					取得(删除)数组 arr 中的最后一个元素
+		//数组键值操作
+		1: shuffle(arr)						将数组打乱,保留键名
+		2: count(arr)						计算数组 arr 中的元素个数
+		3: array_flip(arr)					返回一个键值反转后的数组
+		4: array_keys(arr)					返回数组所有的键,组成一个数组
+		5: array_values(arr)				返回数组中所有值,组成一个数组
+		6: array_reverse(arr)				返回一个元素顺序相反的数组(键名和键值依然匹配)
+		7: array_count_values(arr)			统计数组中所有的值出现的次数.返回数组原键值为新键名,次数为新键值
+		8: array_rand(arr,num)				从数组中随机抽取 num 个 key
+		9: array_unique(arr)				删除重复值, 返回剩余数组
+		//排序
+		1: sort(arr)						按升序对给定数组的值排序,不保留键名 (boolean)
+		2: rsort(arr)						对数组逆向排序,不保留键名 (boolean)
+		3: asort(arr)						对数组排序,保持索引关系 (boolean)
+		4: arsort(arr)						对数组逆向排序,保持索引关系 (boolean)
+		5: ksort(arr)						按键名对数组排序   (boolean)
+		6: krsort(arr)						将数组按照键逆向排序   (boolean)
+		7: natsort(arr)						用自然顺序算法对数组中的元素排序 (boolean)　//区分大小写 
+		8: natcasesort(arr)					自然排序 (boolean) //不区分大小写
+	d: 文件系统函数
+		//打开关闭
+		1: fopen(filename,model)			打开文件或者URL. 如果打开失败, 则返回 false
+				model: "r": 读; "w": 写; "x": 执行
+		2: fclose(file)						关闭一个已打开的文件指针 file  (boolean)
+		3: file(filename)					把整个文件读入一个数组中,数组中的每个单元都是文件中相应的一行
+		//文件信息
+		1: file_exists(filename)			检查文件或目录是否存在  (boolean)
+		2: filesize(filename)				取得文件大小
+		3: is_readable(filename)			判断给定文件是否可读
+		4: is_writable(filename)			判断给定文件是否可写
+		5: is_executable(filename)			判断给定文件是否可执行
+		6: filectime(filename)				获取文件的创建时间
+		7: filemtime(filename)			 	获取文件的修改时间
+		8: fileatime(filename)				获取文件的上次访问时间
+		9: stat(filename)					获取文件大部分属性值
+		//文件读写
+		1: fwrite(file,str[,len])			将 str 写入文件 file. len: 指定写入的长度
+		   fputs(file,str[,len])
+		2: fread(file,len)					读取文件. len: 读取的字节数
+		3: fgets(file[,len])				从文件指针中读取一行. len: 限制最长长度
+		4: fgetc(file)						从文件指针中读取1个字符
+		5: readfile(filename)				读入一个文件并写入到输出缓冲. 返回从文件中读入的字节数
+		6: file_get_contents(filename)		将整个文件读入到一个字符串
+		7: file_put_contents(filename,data) 将一个字符串 data 写入文件
+		//文件指针
+		1: ftell(file) 						返回文件指针读/写的位置
+		2: fseek(file,index)				设置文件指针位置为 index
+		3: rewind(file)						倒回文件指针的位置
+		4: feof(file)						检测文件指针是否到了文件末尾
+		//删除复制重命名
+		1: rmdir(dirname )					删除目录
+		2: unlink(filename)					删除文件
+		3: copy(f1,f2)						拷贝文件
+		4: rename(oldname,newname)			重命名一个文件或目录
+		//文件的上传与下载
+		1: is_uploaded_file(filename)			判断文件是否是通过 HTTP POST上传的
+		2: move_uploaded_file(filename,path)	将上传的文件移动到新位置
+		//其他
+		1: flock(file,operation)			轻便的执行文件锁定. 
+				operation 取值: LOCK_SH: 共享锁; LOCK_EX: 独立锁; LOCK_NB: 附加锁; LOCK_UN: 释放锁
+		2: basename(path[,suffix])			返回路径中的文件名部分. suffix: 指定文件后缀 
+		3: dirname(path)					返回路径中的目录部分
+		4: pathinfo(path)					返回文件路径的信息
+		5: opendir(path)					打开目录句柄
+		6: readdir(dir)						从目录句柄中读取条目
+		7: closedir(dir)					关闭目录句柄
+		8: rewinddir(dir)					倒回目录句柄
+	e: 时间函数
+		1: time()							返回当前的时间戳
+		2: mktime([hour[,min[,sec[,month,[day,[year[,[is_dst]]]]]]])	取得一个日期的时间戳
+		3: date(str)						根据 str 格式化一个本地时间/日期	eg: date('Y年m月d日 H:i:s')
+		4: checkdate(month,day,year) 		验证给出的日期是否有效
+		5: date_default_timezone_set(str)	设定用于一个脚本中所有日期时间函数的默认时区 str
+		6: getdate()						取得日期/时间信息   (array)
+		7: strtotime(str)					将任何英文文本的日期时间描述解析为时间戳
+					eg: echo strtotime("now");
+						echo strtotime("10 September 2000");
+						echo strtotime("+1 day");
+						echo strtotime("+1 week");
+						echo strtotime("+1 week 2 days 4 hours 2 seconds");
+						echo strtotime("next Thursday");
+						echo strtotime("last Monday");
+		8: microtime([bool $get_as_float ])	返回当前时间戳和微秒数
+							
+		
+		
+		
+		
+		
+		
+		
+		
 	

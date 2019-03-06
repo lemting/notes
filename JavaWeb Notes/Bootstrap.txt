@@ -1,0 +1,26 @@
+
+
+一: Bootstrap 全局样式
+	A: 排版
+		//标题
+		a: h1 ~ h6 / .h1 ~ .h6
+		b: small (副标题)
+		//文本
+		a: 对齐方式
+			1: .text-left			左对齐
+			2: .text-center			居中
+			3: .text-right			右对齐
+		b: 大小写
+			1: .text-lowercase		小写
+			2: .text-uppercase		大写
+			3: .text-capitalize		首字母大写
+		//表格
+		a: 
+			1: .table-bordered		带边框表格
+			2: .table-striped		条纹状表格
+			3: .table-hover			悬停变色
+	B: 表格
+	
+	C: 表单
+	
+	D: 图片

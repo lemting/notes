@@ -13,6 +13,20 @@ JavaScript最初叫"LiveScript",是网景公司(Netscape)开发的,为自己的�
 	引入外部JS代码
 		<script language="javascript" src=路径></script>
 	
+/* 判断手机端访问
+//返回true表示为pc端打开，返回false表示为手机端打开
+function check() { 
+	var userAgentInfo=navigator.userAgent; 
+	var Agents =new Array("Android","iPhone","SymbianOS","Windows Phone","iPad","iPod"); 
+	var flag=true; 
+	for(var v=0;v<Agents.length;v++) { 
+		if(userAgentInfo.indexOf(Agents[v])>0) { 
+			flag=false; break; 
+		} 
+	} 
+	return flag; 
+}
+*/	
 
 一: 变量
 	A: 语法: var 变量名 = 值;
@@ -37,7 +51,7 @@ JavaScript最初叫"LiveScript",是网景公司(Netscape)开发的,为自己的�
 			g: 对象: object
 			h: 方法: function
 		特殊数据类型
-			d: 未定义型:  undefined
+			d: 未定义型:  undefined	
 			e: 空型:	  null(可以给变量赋值,清除其数据)
 	
 	C: 运算符

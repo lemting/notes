@@ -75,6 +75,9 @@ CSS选择器
 				eg: a:link,a:visited{color: blue;text-decoration: none;}
 					a:hover{color: red;text-decoration: underline;}
 CSS属性
+	a: 阴影 
+		box-shadow: <水平偏移值> <垂直偏移值> <阴影模糊值> <阴影半径> <颜色>;
+
 	A: 布局
 		a: float: 元素是否及如何浮动,取值: none(不浮动),left,right
 			浮动元素不再占空间,且其层级高于普通元素,浮动元素一定是"块元素"(不管他原来是什么元素).若浮动元素未指定宽度,则其会尽可能的变窄
@@ -119,7 +122,14 @@ CSS属性
 		d: border-left: 左边框线.复合属性(border-left-width,border-left-style,border-left-color).格式: border-left: 粗细 线型 线的颜色;
 		e: border-right: 有边框线.复合属性.类似
 		f: border-top: 上边框线.复合属性.类似
-		g: border-bottom: 下边框线.复合属性.类似		
+		g: border-bottom: 下边框线.复合属性.类似
+		h: border-radius: <1> , <2> , <3> , <4>
+			1: border-top-left-radius: 设置左上角边框的圆角样式
+			2: border-top-right-radius: 设置右上角边框的圆角样式
+			3: border-bottom-left-radius: 设置左下角边框的圆角样式
+			4: border-bottom-right-radius: 设置右下角边框的圆角样式
+
+
 	F: 背景
 			background: 复合属性(background-color,background-image,background-repeat,background-attachment,background-position)
 		a: background-color: 背景颜色

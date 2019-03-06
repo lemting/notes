@@ -1,3 +1,35 @@
+/* 判断手机端访问
+	function isMobile() {
+		// 如果有HTTP_X_WAP_PROFILE则一定是移动设备
+		if (isset ($_SERVER['HTTP_X_WAP_PROFILE'])) return true;
+		//此条摘自TPM智能切换模板引擎，适合TPM开发
+		if(isset ($_SERVER['HTTP_CLIENT']) &&'PhoneClient'==$_SERVER['HTTP_CLIENT']) return true;
+		//如果via信息含有wap则一定是移动设备,部分服务商会屏蔽该信息
+		if (isset ($_SERVER['HTTP_VIA']))
+			return stristr($_SERVER['HTTP_VIA'], 'wap') ? true : false; //找不到为flase,否则为true
+		//判断手机发送的客户端标志,兼容性有待提高
+		if (isset ($_SERVER['HTTP_USER_AGENT'])) {
+			$clientkeywords = array(
+				'nokia','sony','ericsson','mot','samsung','htc','sgh','lg','sharp','sie-','philips','panasonic','alcatel','lenovo','iphone','ipod','blackberry','meizu','android','netfront','symbian','ucweb','windowsce','palm','operamini','operamobi','openwave','nexusone','cldc','midp','wap','mobile'
+			);
+			//从HTTP_USER_AGENT中查找手机浏览器的关键字
+			if (preg_match("/(" . implode('|', $clientkeywords) . ")/i", strtolower($_SERVER['HTTP_USER_AGENT']))) 
+				return true;
+		}
+		//协议法，因为有可能不准确，放到最后判断
+		if (isset ($_SERVER['HTTP_ACCEPT'])) {
+			// 如果只支持wml并且不支持html那一定是移动设备
+			// 如果支持wml和html但是wml在html之前则是移动设备
+			if ((strpos($_SERVER['HTTP_ACCEPT'], 'vnd.wap.wml') !== false) && (strpos($_SERVER['HTTP_ACCEPT'], 'text/html') === false || (strpos($_SERVER['HTTP_ACCEPT'], 'vnd.wap.wml') < strpos($_SERVER['HTTP_ACCEPT'], 'text/html')))) 
+				return true;
+		}
+		return false;
+	}
+*/
+
+
+//instanceof: 检测对象是否属于某个类		eg: echo ($i instanceof Integer) ? "yes" : "no";
+
 A: PHP
 	a: 代码格式
 		1: <?php   ?>		
@@ -34,7 +66,19 @@ B: 变量(需要 '$' 进行标识)
 									标识符(保持一致);
 		5: Null(空类型) 
 		6: Resource(资源)	//资源是由专门的函数来建立和使用的, 例如打开文件,数据连接, 图形画布
-C: 运算符
+C: 数组
+	a: 数组的创建
+		1: array(a,b,...)					生成一个数组
+		2: array(key=>value,...)  	
+	b: 访问数组元素
+		1: []	 	eg: $arr[1] = 1;  $arr[1][2] = 3;
+		2: {}		eg: $arr{2} = 2;
+	c: 增,删,改 数组元素
+		1: eg:  $arr = array(1); $arr[] = 2; $arr(3) = 3;   ==> $arr{1,2,3}; 
+		2: eg:  $arr[1] = 1; 
+		3: eg:  unset($arr(1));
+		
+D: 运算符
 	a: 赋值运算符
 		1: = 	
 		2: & (引用赋值, 相当于取别名)		eg: $b = &$a;
@@ -46,7 +90,8 @@ C: 运算符
 		1: .
 		2: .= (连接赋值运算符)
 	g: 错误控制运算符	@ (忽略表达式可能产生的任何错误信息)	eg:  $conn = @mysql_connect("l","u","p");
-D: 语言结构
+
+E: 语言结构
 	a: 选择结构
 		1: if(){}else{}
 		   if(){}else if(){} ...
@@ -59,17 +104,56 @@ D: 语言结构
 		1: for(;;){}
 		2: foreach(数组 as 值){}
 		   foreach(数组 as 下标 => 值){}
+		   foreach(数组 as 键 => 值){}
 		3: while(){}
-		   do{}while()
-	
+		   do{}while();
+
+F: 自定义函数
+	a: 函数定义
+		function <name>([<args>]) {
+			<code>
+			[return <value>;]
+		}
+		
+			eg: function max($a, $b) { return $a > $b ? $a : $b; }
+ 	b: 函数调用
+		<name>([<args>]);
+	c: 值传递, 引用传递
+		1: 值传递  		eg: function ee($a){}
+		2: 引用传递		eg: function ee(&$a){}
+		
+G: 类
+	a: 类的定义
+		class <name> {
+			成员变量		(修饰符: public var protected private)
+			成员方法		(修饰符: public protected private)
+		}
+	b: $this 
+		eg: function setName($name){ $this->$name = $name; }
+	c: 构造函数, 析构函数
+		1: 构造函数
+			function __construct([<args>]){ <code> }
+		2: 析构函数
+			function __destruct(){ <code> }
+	d: 类对象
+		1: 创建对象 new 
+			eg: $user = new User();
+		2: 访问对象成员 ->
+			eg: echo $user->getName();
+	e: 操作符  ::
+			操作符 ::  可以通过类名直接访问静态变量, 静态方法, 常量
+		eg: User::getName();
+			
+			
 	
 -------------------------------------------------------------------------------------------------------------------------
 	
 A: 系统常量
 	1: __FILE__ 		PHP程序文件名. 它可以帮助我们获取当前文件在服务器的物理位置
 	2: __LINE__			PHP程序文件行数. 它可以告诉我们, 当前代码在第几行
-	3: PHP_VERSION		当前PHP解析器的版本号. 
-	4: PHP_OS			执行当前PHP版本的操作系统名称
+	3: __FUNCTION__		存储该常量所在的函数名称
+	4: PHP_VERSION		当前PHP解析器的版本号. 
+	5: PHP_OS			执行当前PHP版本的操作系统名称
 	
 B: 常用函数
 		memory_get_usage(): 获取内存占用大小
@@ -81,6 +165,13 @@ B: 常用函数
 		unset($var): 释放变量
 		define(常量名,常量值[,$case_sensitive = true]): 定义常量,$case_sensitive: 是否大小写不敏感 (bool)
 		constant(常量名): 获取常量值
+		
+		include(filename): 引入文件代码(括号可省)
+		include_once(filename): 引入文件代码, 不会引入已定义代码
+		require(filename): 引入文件代码, 引入失败会导致致命错误
+		require_once(filename): 引入文件代码, 不会引入已定义代码, 引入失败会导致致命错误
+		
+		
 	a: 数学函数
 		1: abs(n) 				求n绝对值
 		2: ceil(n) 				向上取整
@@ -152,8 +243,6 @@ B: 常用函数
 		3: str_repeat(str,num) 		返回 str 重复拼接 num 次
 	c: 数组函数
 		//创建数组
-		1: array(a,b,...)					生成一个数组
-		   array(key=>value,...)  		
 		2: array_combine(arr1,arr2)			组合数组, 用数组 arr1 的值作为 key,数组 arr2 的值作为 value
 		3: range(min,max,step)				创建包含指定范围([min,max], 步长 step) 的元素的数组
 		4: compact(s1,s2,...)				创建一个由参数所带变量组成的数组 (变量名为键,变量值为值的数组)
@@ -186,24 +275,24 @@ B: 常用函数
 		10: array_push(arr,a,b,..)			向数组 arr 最后压入一个或多个元素
 		11: array_pop(arr)					取得(删除)数组 arr 中的最后一个元素
 		//数组键值操作
-		1: shuffle(arr)						将数组打乱,保留键名
-		2: count(arr)						计算数组 arr 中的元素个数
-		3: array_flip(arr)					返回一个键值反转后的数组
-		4: array_keys(arr)					返回数组所有的键,组成一个数组
-		5: array_values(arr)				返回数组中所有值,组成一个数组
-		6: array_reverse(arr)				返回一个元素顺序相反的数组(键名和键值依然匹配)
-		7: array_count_values(arr)			统计数组中所有的值出现的次数.返回数组原键值为新键名,次数为新键值
-		8: array_rand(arr,num)				从数组中随机抽取 num 个 key
-		9: array_unique(arr)				删除重复值, 返回剩余数组
+		1: count(arr)						计算数组 arr 中的元素个数
+		2: array_flip(arr)					返回一个键值反转后的数组
+		3: array_keys(arr)					返回数组所有的键,组成一个数组
+		4: array_values(arr)				返回数组中所有值,组成一个数组
+		5: array_reverse(arr)				返回一个元素顺序相反的数组(键名和键值依然匹配)
+		6: array_count_values(arr)			统计数组中所有的值出现的次数.返回数组原键值为新键名,次数为新键值
+		7: array_rand(arr,num)				从数组中随机抽取 num 个 key
+		8: array_unique(arr)				删除重复值, 返回剩余数组
 		//排序
 		1: sort(arr)						按升序对给定数组的值排序,不保留键名 (boolean)
-		2: rsort(arr)						对数组逆向排序,不保留键名 (boolean)
-		3: asort(arr)						对数组排序,保持索引关系 (boolean)
-		4: arsort(arr)						对数组逆向排序,保持索引关系 (boolean)
-		5: ksort(arr)						按键名对数组排序   (boolean)
-		6: krsort(arr)						将数组按照键逆向排序   (boolean)
+		2: rsort(arr)						对数组降序,不保留键名 (boolean)
+		3: asort(arr)						对数组升序,保持索引关系 (boolean)
+		4: arsort(arr)						对数组降序,保持索引关系 (boolean)
+		5: ksort(arr)						按键名对数组升序   (boolean)
+		6: krsort(arr)						按键名对数组降序   (boolean)
 		7: natsort(arr)						用自然顺序算法对数组中的元素排序 (boolean)　//区分大小写 
 		8: natcasesort(arr)					自然排序 (boolean) //不区分大小写
+		9: shuffle(arr)						将数组打乱,保留键名
 	d: 文件系统函数
 		//打开关闭
 		1: fopen(filename,model)			打开文件或者URL. 如果打开失败, 则返回 false

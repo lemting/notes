@@ -1,11 +1,35 @@
 
+一: Bootstrap 颜色
+	A: 信息颜色
+		a: primary			蓝,主要 
+		b: secondary		灰,次要
+		c: success			绿,成功
+		d: info				淡蓝,信息
+		e: warning			黄,警告
+		f: danger			红,危险
+		g: light			白,光明
+		h: dark				黑,黑暗
+	B: 颜色
+		a: blue				蓝	
+		b: indigo			靛蓝	
+		c: purple			紫
+		d: pink				粉红
+		e: red				红
+		f: orange			橙
+		g: yellow			黄
+		h: green			绿
+		i: teal				绿		
+		j: cyan				青
+		k: white			白
+		l: gray				灰
+		m: gray-dark		黑灰
 
-一: Bootstrap 全局样式
-	A: 排版
-		//标题
+二: Bootstrap 全局样式
+		//Bootstrap 定义了 HTML 标签名的类
+	A: 排版: 标题
 		a: h1 ~ h6 / .h1 ~ .h6
 		b: small (副标题)
-		//文本
+	B: 排版: 文本
 		a: 对齐方式
 			1: .text-left			左对齐
 			2: .text-center			居中
@@ -13,14 +37,90 @@
 		b: 大小写
 			1: .text-lowercase		小写
 			2: .text-uppercase		大写
-			3: .text-capitalize		首字母大写
-		//表格
-		a: 
+			3: .text-capitalize		首字母大写	
+	B: 表格
+		a: 表格
 			1: .table-bordered		带边框表格
 			2: .table-striped		条纹状表格
 			3: .table-hover			悬停变色
-	B: 表格
-	
+		b: 表格/行/单元格
+			1: .table-信息颜色		让单元格/行/表格 变色  
+				//.table-dark 黑	.table-primary 蓝	.table-danger 红
 	C: 表单
+		1: .form-group			表单控件分组(类似 div)
+		2: .form-inline			表单控件处于一行
+		3: .form-control		表单控件, 作用于 <input>,<select>,<textarea>
+		4: .form-control-lg		大控件
+		5: .form-control-sm		小控件
+		
+			eg: <form>
+					<div class="form-group form-inline">
+						<label for="">这是一个输入框: </label>
+						<input type="text" class="form-control" placeholder="这是一个输入框" >
+					</div>
+					<div class="form-group">
+						<label for="">地区:&nbsp;&nbsp;</label>
+						<select class="form-control">
+							<option>北京</option> <option>上海</option>
+						</select>
+					</div>
+				</form>
 	
-	D: 图片
+	D: 按钮	 //也适用于 <a>
+		1: .btn				
+		2: .btn-信息颜色		改变颜色
+		3: .btn-lg  .btn-sm		改变大小
+		4: .btn-block			全屏显示(宽度 100%)	
+	E: 图片
+		1: .img-thumbnail		带边框的圆角图片
+
+三: 栅格样式	 	//Bootstrap 将页面分为 12 栅格
+	A: @media	当满足条件时, 发生改变;不满足时, 不发生
+			@media xxx and (xxx: xxx) [and (xxx: xxx)..] { 改变样式 } 
+		a: screen   屏幕
+			1: min-width	最小宽度
+			2: max-width	最大宽度
+		
+		eg: @media screen and (min-width: *px) and (max-width: *px){}
+	B: 栅格 (* ∈ [1,12])
+		a: .col					
+			1: .col-*			元素占据栅格个数
+			2: .col-auto		自动分配栅格个数
+		b: .col-sm			超小屏幕 手机 (≥576px)
+		c: .col-md			小屏幕 平板 (≥768px)	
+		d: .col-lg			中等屏幕 桌面显示器 (≥992px)
+		e: .col-xl			大屏幕 大桌面显示器 (≥1200px)
+	C: 列偏移
+		1: .offset-*			向右偏移
+		2: .offset-sm-*
+		3: .offset-md-*
+		4: .offset-lg-*
+		5: .offset-xl-*
+	
+四: Bootstrap 组件
+	A: 下拉菜单
+		a: .dropdown				控制组件为下拉
+		b: .dropdown-menu-right		右对齐
+		c: .dropdown-divider		分割线
+	B: 警告框
+	C: 弹出框
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

@@ -1,5 +1,17 @@
 字体: Unicode->Consolas
 
+/* HTML5 viewport
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no,maximum-scale=1,minimum-scale=1">
+	属性: initial-scale: 初始化内容大小;		user-scalable: 是否允许用户放大缩小, no为不允许;
+		  maximum-scale: 允许放大时最大倍数;	minimum-scale: 允许缩小时最小倍数;
+		
+*/
+
+//单位
+1: px		相对于显示屏幕分辨率的长度单位
+2: em		相对于当前文本内的字体尺寸
+3: rem		与 em 类似, 相对于 HTML 根节点的字体单位
+
 HTML: Hypertext Markup Langusge,超文本标注语言
 
 	HTML代码: 主要控制网页结构

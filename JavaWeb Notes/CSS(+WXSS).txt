@@ -1,5 +1,7 @@
 字体: Unicode->Consolas
 
+// body { font-size: 14px; text-align: center; padding: 0; margin: 0; } /* 设置全局字体14px,文本居中,无内外填充 */
+
 CSS: Cascading Style Sheets 层叠样式表
 
 CSS的主要目的: 是能给HTML标记添加各式各样的表现(格式,样式). 比如: 文字样式,背景,文本样式,链接样式,...

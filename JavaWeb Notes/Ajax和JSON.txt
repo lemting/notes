@@ -81,16 +81,17 @@ Ajax
 				1: type: 类型,取值: "GET"(默认)或"POST"
 				2: url: 发送请求的地址
 				3: data: 一个对象,连同请求发送到服务器的数据
-				4: dataType: 预期服务器返回的数据类型.如果不指定,jQuery将自动根据HTTP包MIME信息来智能判断,一般我们采用json格式,可以设置为"json"
-				5: success: 一个方法,请求成功后的回调函数.传入返回后的数据,以及包含成功代码的字符串
-				6: error: 一个方法,请求失败时回调此函数,回调函数会传入XMLHttPRequest对象
+				4: async: 是否异步, true: 异步; false: 同步;
+				5: dataType: 预期服务器返回的数据类型.如果不指定,jQuery将自动根据HTTP包MIME信息来智能判断,一般我们采用json格式,可以设置为"json"
+				6: success: 一个方法,请求成功后的回调函数.传入返回后的数据,以及包含成功代码的字符串
+				7: error: 一个方法,请求失败时回调此函数,回调函数会传入XMLHttPRequest对象
 					eg: $.ajax({
 						  url: "/api/getWeather",
 						  data: {
 							zipcode: 97201,
 							name: "张三"
 						  },
-						  success: function(result) {$("#weather-temp").html("<strong>" + result + "</strong> degrees");}
+						  success: function(result) {$("#weather-temp").html("<strong>" + result + "</strong> degrees");},
 						  error: function(jqXHR) {alert("发生错误: " + jqXHR.status);}
 						});
 	e: 跨域

@@ -30,6 +30,9 @@
 
 //instanceof: 检测对象是否属于某个类		eg: echo ($i instanceof Integer) ? "yes" : "no";
 
+//重定向 header(<url>);
+//转发
+
 A: PHP
 	a: 代码格式
 		1: <?php   ?>		
@@ -143,8 +146,43 @@ G: 类
 	e: 操作符  ::
 			操作符 ::  可以通过类名直接访问静态变量, 静态方法, 常量
 		eg: User::getName();
+		
+D: 
+		
+		
+E: 数据库
+	A: mysqli
+			//mysqli_query("set names 'utf8'"): 设置字符集
+			//mysql_select_db(<database>,<mysqli>): 设置数据库
+		a: 连接,关闭
+			1: mysqli_connect(<host>,<username>,<password>[,<database>]): 连接数据库 (mysqli)
+			2: mysqli_close(<mysqli>): 关闭数据库
+		b: 事务
+			1: mysqli_begin_transaction(<mysqli>[,<flag>]): 开启事务
+				//flag 取值: MYSQLI_TRANS_START_READ_ONLY, MYSQLI_TRANS_START_READ_WRITE, MYSQLI_TRANS_START_WITH_CONSISTENT_SNAPSHOT
+			2: mysqli_commit(<mysqli>): 提交事务
+			3: mysqli_rollback(<mysqli>): 回滚事务
+		c: 增删改查
+			1: mysqli_affected_rows(<mysqli>): 返回受上一次 insert,update,replace 或 delete 查询影响的行数
+			2: mysqli_query(<mysqli>,<sql>): 查询 (mysqli_result)
+			3: mysqli_insert_id(<mysqli>): 返回对表 insert 自动生成的 id 
+		
+	B: mysqli_result
+			mysqli_num_rows(<mysqli_result>): 返回结果集的行数
+			mysqli_fetch_lengths(<mysqli_result>): 返回当前记录的每一列的长度的数组
+		a: 单条记录
+			1: mysqli_fetch_row(<mysqli_result>): 返回与当前记录对应的索引数组
+			2: mysqli_fetch_assoc(<mysqli_result>): 返回与当前记录对应的关联数组
+			3: mysqli_fetch_array(<mysqli_result>): 返回与当前记录对应的索引和关联的混合数组
+			4: mysqli_fetch_object(<mysqli_result>): 返回与当前记录对应的对象中
+		b: 单个字段
+			1: mysqli_result(<mysqli_result>,<row>,<field>): 返回结果集中第row个记录的字段值
+		c: 指针
+			1: mysqli_data_seek(<mysqli_result>,<row>): 将指针调整为任意行
+		d: 释放
+			1: mysqli_free_result(<mysqli_result>): 释放结果集
 			
-			
+	
 	
 -------------------------------------------------------------------------------------------------------------------------
 	
@@ -156,6 +194,7 @@ A: 系统常量
 	5: PHP_OS			执行当前PHP版本的操作系统名称
 	
 B: 常用函数
+		json_encode(<var>): 返回json数据
 		memory_get_usage(): 获取内存占用大小
 		var_dump(<var>): 获取变量数据类型
 		fopen("f.txt","r"):	打开文件

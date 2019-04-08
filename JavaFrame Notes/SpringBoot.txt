@@ -152,7 +152,12 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 			eg: @Controller 
 				@CrossOrigin(origins = {"*"},allowCredentials = "true")
 				public AA {...}
-
+			
+		b: @ComponentScan 
+			自动扫描项目中包含的所有组件
+				
+				
+				
 	D: 测试类
 		@RunWith(SpringRunner.class)
 		@SpringBootTest
@@ -208,8 +213,12 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 			2: logging.file=myapp.log 		//日志文件名
 			3: logging.config= # location of config file (default classpath:logback.xml for logback) 
 			4: logging.level.*= # levels for loggers, e.g. “logging.level.org.springframework=DEBUG” (TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF)
-					
-	B: 获取 application.properties 里的变量
+				
+		e: devtools
+			1: spring.devtools.livereload.port		//服务器端口
+			2: spring.devtools.restart.enabled		//是否启用自动重启
+				
+	F: 获取 application.properties 里的变量
 		a: 在变量定义时加上 @Value 
 			@Value("${变量名}")
 			private String 变量;

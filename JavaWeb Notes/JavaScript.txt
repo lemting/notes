@@ -28,6 +28,8 @@ function check() {
 }
 */	
 
+//js重定向: window.location.href="url"; 
+
 一: 变量
 	A: 语法: var 变量名 = 值;
 		var系统内部的关键字用于声明变量

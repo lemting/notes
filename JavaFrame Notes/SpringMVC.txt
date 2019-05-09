@@ -14,6 +14,15 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 	b: 返回 Json
 		1: 使用 @RestController 注解类
 		2: 使用 @Controller 注解类 (返回视图), 使用 @ResponseBody 注解方法 (代表该方法不返回视图而返回 Json 数据)
+		
+	@Controller 重定向和转发
+		返回的视图中加上前缀: redirect(重定向),forward(转发)
+			eg: @Controller @RequestMapping("/index")
+				public String index() { return "redirect:/hello"; }
+				
+	RedirectAttributes: (参数绑定,自动注入)用于重定向之后还能带参数跳转的
+		1: attr.addAttribute(key, value): 重定向之后,在 url 后面拼接参数
+		2: attr.addFlashAttribute(key, value): (更安全)暂时放到 session, 在跳转完成后, 在 session 中清除
 */
 
 
@@ -370,7 +379,7 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 					}
 					return .....
 				}
-		2: 所有的 Controller 继承自 BaseController, 实现处理全局异常
+			2: 所有的 Controller 继承自 BaseController, 实现处理全局异常
 	
 	C: 图片的上传	
 		a: form 中提交 enctype="multipart/form-data" 的数据时,需要 SpringMVC 对 multipart 类型进行解析

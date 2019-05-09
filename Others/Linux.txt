@@ -13,6 +13,9 @@ b: 模式表达式  //模式之间 '|' 隔开
 	5: !(<pattern>..)		0次
 	
 	
+//&	 		加在一个命令的最后, 可以把这个命令放在后台执行
+//nohup	 	不挂断的运行命令
+
 	
 一: Linux 常用命令
 		//命令格式:  $ command [-options] [arguments]
@@ -229,15 +232,64 @@ b: 模式表达式  //模式之间 '|' 隔开
 		a: read <var>..						//从键盘读取数据,并赋值给变量
 		b: echo 
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	I: 流程控制
+		//选择结构
+		a: if 
+			if <exp1>		// ==> if() 
+			then <code1>	// ==> {}
+			elif <exp2>		// ==> else if()
+			then <code2>	// ==> {}
+				...		
+			else <code3>	// ==> else {}
+			fi				// ==> end if
+		b: case 
+			case <str> in
+			<model1>): <code1> ;;
+			<model2>): <code2> ;;
+			...
+			esac
+					eg: read a
+						case $a in 
+						1) echo "input 1";;
+						2) echo "input 2";;
+						3|4) echo "input $a";;
+						*) echo "error input";;
+						esac
+		//循环结构
+		/* break [n], continue [n]	//退出n重循环, 跳过n重的循环  */
+		a: while
+			while <exp> do <code> done
+		b: until
+			until <exp> do <code> done
+		c: for 
+			1: for <var> [ in 值表 ]; do <code> done	//类似增强 for 循环
+			2: for(( ; ; )) do <code> done				//类似普通 for 循环
+			
+	J: 条件测试 test
+			/* (): 优先级最高,需要转义  eg: [ \("$a" -ge 0\) -a \("$b" -le 100\) ]  */
+		a: 格式
+			1: test <options> <args>
+			2: [ <options> <args> ]
+			3: [[ <options> <args> ]]
+		b: 文件测试
+			1: -r, -w, -x	//可读,可写,可执行		eg: [ -r "$1" ]  //若为可读文件, 则返回 true
+			2: -f, -d		//文件, 目录			eg: [ -d "$1" ]	 //若为文件夹, 则返回 true
+			3: -s			//长度大于0				eg: [ -s "$1" ]  //若文件长度大于0, 则返回 true
+		c: 字符串测试
+			1: -z <str>		//字符串长度是否为 0
+			2: -n <str>		//字符串长度是否大于 0
+			3: <str>		//字符串是否不是空串
+			4: =  !=  <  >	//字符串比较	eg: [ s1 < s2 ]
+		d: 数值测试
+			1: -eq, -ne, -lt, -le, -gt, -ge		//相等,不等,小于,小等,大于,大等	eg: [ n1 -le n2 ]
+		e: 逻辑运算
+			1: -a, -o, !	且,或,非
+			
+	K: 函数
+		[function] <name>() { [return [n]] }
+		a: 函数定义不需要参数, 调用时直接传参, 可以通过位置参数直接获取
+		b: 可以使用函数外部变量
+		c: 函数调用不需要加括号
 	
 	
 	

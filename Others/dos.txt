@@ -42,7 +42,7 @@ C: 网络IP
 		2: -n				以数字形式显示地址和端口号
 		3: -r				显示路由表
 		4: -t				一直 ping, 直到停止: 若要查看统计信息并继续操作, 请键入 Ctrl+Break; 若要停止, 请键入 Ctrl+C
-							//ping -t -l 65550 <ip> : 死亡之 ping, 发送大于64K的文件并一直 ping
+							//ping -t -l 65500 <ip> : 死亡之 ping, 发送大于64K的文件并一直 ping
 		5: -l <size>        发送缓冲区大小	
 	b: ipconfig			//查看 IP
 		1: -all				显示全部

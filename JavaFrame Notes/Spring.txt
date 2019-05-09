@@ -165,34 +165,53 @@ Spring 解决post乱码
 	E: Spring的bean管理(注解)
 			通过基于XML的Spring配置如下标签(请注意包含上下文命名空间)
 				[http://www.springframework.org/schema/context]和[http://www.springframework.org/schema/context/spring-context.xsd]
-		a: 开启注解扫描
+		a: 开启注解扫描 (xml配置)
 				<context:component-scan>: 会扫描类,方法,属性上的注解
 				<context:annotation-config>: 只会扫描属性上的注解
 			1: <context:component-scan base-package="要自动扫描的包"></context:component-scan>
 			2: <context:annotation-config></context:annotation-config>
-		b: 注解创建对象
+		b: 开启注解扫描 (注解配置)
+			1: @ComponentScan(value="要扫描的包")	//将其注解到配置类上, 即可自动扫描包下的所有 bean
+		c: 注解创建对象
 				在创建对象的类上添加注解(@Component,@Repository,@Service,@Controller)
 				属性: value: bean的id.不加该属性,则id值默认为首字母小写的类名		eg: @Component([value=]"user")public class User{}
 			1: 添加注解创建对象
 				@Component: 是一个通用注解,可用于任何bean
-				@Repository: 通常用于注解DAO类,即持久层
-				@Service: 通常用于注解Service类,即服务层
-				@Controller: 通常用于注解Controller类,即控制层(MVC)
+				@Repository: 通常用于注解 DAO 类,即持久层
+				@Service: 通常用于注解 Service 类,即服务层
+				@Controller: 通常用于注解 Controller 类,即控制层(MVC)
 			2: 添加作用范围注解
 				@Scope([value=]"作用范围"). 作用范围取值: singleton,prototype,request,session,global session
 					eg: @Session("user")@Scope("session")public class User{}
-		c: 注解属性注入
+		d: 注解属性注入
 			1: @Autowired: 自动装配
 				注解在成员变量上: (通过类名装配,与设置的id无关)成员变量可以不用声明setXxx()方法,会自动装配bean对象
 			2: @Resource(name="bean的id"): 通过id注入
-				注解在成员变量上: 通过name属性值注入指定id的bean
+				注解在成员变量上: 通过 name 属性值注入指定id的bean
 	F: Spring的bean管理(配置文件和注解混合使用)
 			创建对象操作使用配置文件实现;注入属性操作使用注解方式实现
+	G: @ImportResource 和 @Value 
+		@ImportResource注解用于加载资源文件
+		@Value注解用于对资源文件的配置
+			eg: @Configuration
+				@ImportResource("calsspath: properties-config.xml")
+				public class AppConfig{
+					@Value("$(jdbc.url)")
+					private String url;
+					@Value("$(jdbc .username)")
+					private String username;
+					@Value("$(jdbc.password)")
+					private String password;
+					@Bean
+					public DataSource dataSource(){
+						return new DriverManagerDataSource(url,username,password);
+					}
+				}
 		
 三: Spring AOP
 		Aspect Oriented Programming,面向切面,通过预编译方式和运行期动态代理实现程序功能的统一维护的一种技术.AOP采取横向抽取机制,取代了传统的纵向继承体系重复性代码
 		主要功能: 日志记录,性能统计,安全控制,事务处理,异常处理等等
-		注意: 所有基于配置文件的Aspects,只支持单例模式(singleton model)
+		注意: 所有基于配置文件的 Aspects,只支持单例模式(singleton model)
 	A: AOP实现方式
 		a: 预编译
 			AspectJ
@@ -512,8 +531,7 @@ Spring项目构建过程
 	2: 对着项目右键  ->  [properties](属性)
 	3: 搜索[spring]找到 [Project Facets](项目构面)
 	4: 勾选[Spring] ,点击OK完成
-	
-	
+
 一: IOC及Bean容器
 	A: 面向接口编程
 		a: 结构设计送,分清层次及调用关系,每层只向外(上层)提供一组功能接口,各层之间仅依赖接口而非实现类

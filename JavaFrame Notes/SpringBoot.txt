@@ -18,9 +18,21 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 				error: function(data) { alert("error"); }
 			});
 */
+/* 集成 Thymeleaf
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+	导入 Thymeleaf Layout
+		<dependency>
+            <groupId>nz.net.ultraq.thymeleaf</groupId>
+            <artifactId>thymeleaf-layout-dialect</artifactId>
+        </dependency>
+*/
 
 一一一: SpringBoot + MyBatis		//参考文档 (https://blog.csdn.net/winter_chen001/article/details/77249029)
 	1: 创建 SpringBoot 项目, 添加 Web, MySQL, JDBC, MyBatis 依赖(开启热部署)
+		//mysql 的配置需要删除 runtime 的作用域
 	2: pom.xml 添加 连接池 依赖
 		//c3p0 连接池
 		<dependency>
@@ -49,7 +61,7 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 					driver-class-name: com.mysql.cj.jdbc.Driver
 			mybatis:
 				mapper-locations: classpath:mapper/*.xml  //(##*/##)//扫描 XxxMapper.xml //一定要对应mapper映射xml文件的所在路径
-				type-aliases-package: com.lemting.springbootmybatisdemo.domain  	//对应实体类的路径
+				type-aliases-package: com.lemting.springbootmybatisdemo.domai	n  	//对应实体类的路径
 	4: SpringBoot 启动类,添加 @MapperScan //扫描 mapper 类
 		@SpringBootApplication
 		@MapperScan("com.lemting.mapper")  //将项目中对应的 mapper 类的路径加进来就可以了
@@ -89,6 +101,38 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 	5: 在 application.properties(或 yml) 中添加 JSP 的前缀和后缀
 		spring.mvc.view.prefix=/WEB-INF/jsp/	//页面默认前缀目录
 		spring.mvc.view.suffix=.jsp				//页面默认后缀目录
+	
+三三三: 打包成 jar   //webapp并不会一起打包.如果需要, 则需在pom.xml配置 <resources> 插件
+	1: 配置 pom.xml    
+		<groupId>xxx</groupId>
+		<artifactId>xxxx</artifactId>
+		<version>xxxx</version>
+		<packaging>jar</packaging>	//打包方式: jar
+		
+		<build>
+        <plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<fork>true</fork>
+				</configuration>
+			</plugin>
+			</plugins>
+			/**   
+				<resources>
+					<resource>
+						<directory>src/main/webapp</directory>   //webapp的路径
+						<targetPath>META-INF/resources</targetPath>  //
+						<includes>
+							<include> **/** </include> 
+						</includes>
+					</resource>
+				</resources>
+			*/
+		</build>
+	2: 运行 maven 打包
+		
 	
 	
 一: 获取 SpringBoot 项目
@@ -152,11 +196,12 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 			eg: @Controller 
 				@CrossOrigin(origins = {"*"},allowCredentials = "true")
 				public AA {...}
-			
 		b: @ComponentScan 
 			自动扫描项目中包含的所有组件
-				
-				
+		c: @Enable*		//启用xx功能
+			1: @EnableConfigurationProperties: 启用可以把配置文件的属性注入到bean中,常与 @ConfigurationProperties 一起使用
+			2: @EnableAsync: 启用异步, 常与 @Async 一起使用
+			
 				
 	D: 测试类
 		@RunWith(SpringRunner.class)

@@ -86,13 +86,22 @@ Ajax
 				6: success: 一个方法,请求成功后的回调函数.传入返回后的数据,以及包含成功代码的字符串
 				7: error: 一个方法,请求失败时回调此函数,回调函数会传入XMLHttPRequest对象
 					eg: $.ajax({
-						  url: "/api/getWeather",
-						  data: {
-							zipcode: 97201,
-							name: "张三"
-						  },
-						  success: function(result) {$("#weather-temp").html("<strong>" + result + "</strong> degrees");},
-						  error: function(jqXHR) {alert("发生错误: " + jqXHR.status);}
+							type: "POST",
+							url: "loginCheck.php",
+							async: false,
+							data: { 
+								"username": username.value,
+								"password": password.value
+							},
+							success: function(data) {
+								flag = data == "true"; 
+								if(!flag) {
+									alert("用户名或密码错误!!!");
+								}
+							},
+							error: function(jqXHR) {
+								alert("发生错误: " + jqXHR.status);
+							}
 						});
 	e: 跨域
 			一个域名地址的组成

@@ -27,16 +27,18 @@
 	}
 */
 
+/*  MySQL 库 php5.5 已废弃, php7 已移除 (被 MySQLi,PDO MySQL 取代)  */
 
 //instanceof: 检测对象是否属于某个类		eg: echo ($i instanceof Integer) ? "yes" : "no";
 
-//重定向 header(<url>);
+//重定向 header("location:"+<url>);
 //转发
 
 A: PHP
 	a: 代码格式
 		1: <?php   ?>		
 		2: <?      ?>		//简短风格, 需要 php.ini 文件中的 short_open_tag = On (默认开启)
+		   <?= ?>			//输出变量或函数返回值
 		3: <script language='php'>  </script>
 		4: <%      %>
 	b: 注释
@@ -147,7 +149,20 @@ G: 类
 			操作符 ::  可以通过类名直接访问静态变量, 静态方法, 常量
 		eg: User::getName();
 		
-D: 
+D: Web 交互
+	a: $_POST			获取 POST 方式的 HTTP 请求信息
+	b: $_GET			获取 GET 方式的 HTTP 请求信息
+	c: $_SESSION		存取该次会话的信息
+		1: session_start(): 	开启 session 功能 //该方法前面不能有任何代码输出到浏览器, 最好放在页面最开头
+		2: session_id():		返回当前会话 session 的 id
+	d: $_COOKIE			存取用户的信息
+		1: setcookie(<name>,<value>[,<outtime>][,<path>][,<domain>][,<secure>]):	存入 Cookie
+			//outtime: 过期时间; eg: setcookie("age",14,time()+60): 60s后过期
+			//outtime 设置为过去的时间时, 会删除 Cookie
+	e: $_REQUEST		包含 $_GET,$_POST,$_COOKIE
+	f: $_SERVER			获取 HTTP 请求中的环境变量信息
+	g: $_FILE			通过 POST 方式上传文件时的相关信息(多维数组)
+	h: $_ENV			获取服务器名称或系统 shell 等与服务器有关的信息
 		
 		
 E: 数据库

@@ -147,7 +147,7 @@ CSS属性
 			font: 复合属性(font-style,font-variant,font-weight,font-size,line-height,font-family)
 		a: font-size: 文字大小.	eg: font-size: 14px; 
 		b: font-family: 字体.	eg: font-family: 微软雅黑;
-		c: font-style: 斜体.	eg: font-style: italic
+		c: font-style: 斜体.	eg: font-style: italic;
 		d: font-weight: 粗体	eg: font-style: bold;
 	H: 文本
 		a: color: 文本颜色

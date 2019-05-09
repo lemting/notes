@@ -1,0 +1,194 @@
+Thymeleaf: 是面向Web和独立环境的现代服务器端Java模板引擎, 能够处理 HTML,XML,JavaScript,CSS 甚至纯文本
+			//HTML 页面要求严格格式, 一定要有封闭标签: /> 或 </>
+	可处理的模板: 
+		两种标记模板模式(HTML,XML),
+		三个文本模板模式(text,JavaScript,CSS),
+		无操作模板模式(RAW)
+		
+/* HTML 文件的 <html> 必须引入 xmlns:th="http://www.thymeleaf.org"
+		<html xmlns:th="http://www.thymeleaf.org"> 
+		
+	Themeleaf Layout 必须引入  xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+		<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"> 
+*/
+
+A: 注释
+	a: 标准 HTML/XML注释 
+		1: <!--   -->
+	b: 解析器级注释块
+			//thymeleaf解析时会移除代码  
+		1: <!--/*    */-->		
+		2:  <!--/*-->
+				xxxx
+			<!--*/-->	
+	c: 针对原型的注释
+		1: <!--/*/    /*/-->
+
+		
+一: Thymeleaf 标准表达式 (Standard Expression Syntax)
+	A: 简单表达式
+		a: ${...}		//变量表达式
+				原理类似 OGNL/SpringEL 表达式
+		b: *{...}		//选择变量表达式 
+				*{} 将选定所选对象
+			eg: <div th:object="${session.user}">
+					<p>Name: <span th:text="*{firstName}">Sebastian</span></p>	
+				</div>
+				<div><p><span th:text="${session.user.firstName}">Sebastian</span></p></div>
+		c: #{...}		//消息表达式 
+				message 国际化支持
+		d: @{...}		//链接网址表达式 
+			1: 绝对 URL
+				eg: <a th:href="@{http://www.thymeleaf/documentation.html}"></a>
+			2: 上下文相关的 URL 	//"/"表示从应用程序根路径开始访问, 去掉"/"表示相对路径
+				eg: <a th:href="@{/order/list}"></a>
+			3: 相对于服务器的 URL
+				eg: <a th:href="@{~/billing-app/showDetails.htm}"></a>
+			4: 协议相对 URL
+				eg: <script th:src="@{//scriptserver.example.net/myscript.js}">...</script>
+			5: 带参数的 URL 表达式
+				eg: <a th:href="@{/order/details(id=${order.id},action='show_all')}"></a>
+		e: ~{...}		//片段表达式
+				该选择器 类似于 XPath 表达式或 CSS 选择器
+			1: ~{<templatename>::<selector>}
+			2: ~{<templatename>}
+			3: ~{::<selector>} / ~{this::<selector>}
+		
+	B: 文字 (literals)
+		a: 文本文字: 'one text','Another one!',...
+		b: 数字文字: 0, 34, 3.0, 12.3,...
+		c: 布尔文字: true,false
+		d: 空字面:  null
+		e: 文字标记: one, sometext, main, ...
+		
+	C: 操作符	
+		a: 文本操作符
+			1: +	连接符 
+			2: |	文本替换符
+				eg: th:text="|name is ${name}|" //在 || 里面的变量会被替换成变量值
+		
+		b: 算术运算 	+, -, *, /, %
+		c: 布尔运算		and, or, !, not
+		d: 比较和相等	>, <, >=, <=, ==, !=, gt, lt, ge, le, eq, ne/neq 
+		e: 条件运算符	(if)?(then)  (if)?(then):(else)
+	
+二: th:*
+		a: th:remove    	删除标签  　　　　				eg: <tr th:remove="all"> 
+				1: all:				删除包含标签和所有的孩子
+				2: body:			不包含标记删除,但删除其所有的孩子
+				3: tag:				包含标记的删除,但不删除它的孩子
+				4: all-but-first:	删除所有包含标签的孩子,除了第一个
+				5: none:			什么也不做.这个值是有用的动态评估
+	A: 替换文本
+		a: th:text    　	文本替换    　　　　		eg: <p th:text="${collect.description}">description</p>
+				//(只能在html5中使用) 可对表达式或变量求值,并将结果显示在其被包含的 html 标签体内替换原有html文本
+		b: th:utext    		非转义文本替换   			eg: <p th:utext="${htmlcontent}">conten</p>
+	B: 设置标签属性
+		a: th:attr    		设置标签属性, 多个属性可以用逗号分隔    eg: th:attr="src=@{/image/aa.jpg},title=#{logo}", 此标签不太优雅, 一般用的比较少。
+		c: th:id    　　	替换id						eg: <input th:id="'xxx' + ${collect.id}"/>
+		d: th:value    		属性赋值					eg: <input th:value="${user.name}" />
+		e: th:style    		设置样式					eg: th:style="'display:' + @{(${sitrue} ? 'none' : 'inline-block')} + ''"
+		f: th:href    		链接地址					eg: <a th:href="@{/login}" th:unless=${session.user != null}>Login</a>/>
+			//替换连接地址,配合 @{..} 使用
+		g: th:selected    	selected 选择框 选中    	eg: th:selected="(${xxx.id} == ${configObj.dd})"
+		h: th:src   	 	图片类地址引入				eg: <img class="img-responsive" alt="App Logo" th:src="@{/img/logo.png}" />
+		i: th:action    	表单提交的地址    　　　　	eg: <form action="subscribe.html" th:action="@{/subscribe}">
+		......
+	C: 定义,赋值变量
+		a: th:with    		定义,赋值变量(多个以','隔开)	eg: <div th:with="isEven=${prodStat.count}%2==0"></div>
+	D: 流程控制
+		//条件控制
+		a: th:if    		判断条件					eg: <a th:if="${userId == collect.userId}" >
+		b: th:unless    	和 th:if 判断相反			eg: <a th:href="@{/login}" th:unless=${session.user != null}>Login</a>		
+		c: th:switch    	多路选择 配合th:case 使用	eg: <div th:switch="${user.role}">
+		d: th:case			配合 th:switch 使用 //默认值: th:case="*"			
+			eg:	<div th:switch="${role}">
+					<p th:case="'admin'">User is an administrator</p>
+					<p th:case="'manaer'">User is a manager</p>
+				</div>
+		//循环控制
+		f: th:each    		循环迭代					eg: <tr th:each="user,userStat:${users}">
+			1: th:each="<item>[,<stat>]:{<Array>|<List>|<Map>}"
+				//<stat>的属性: index(索引),count(index+1),size(元素个数),current(当前元素),
+							//  first(是否第一个元素),last(是否最后一个),even(index是否偶数),odd(index是否奇数)
+					eg: <tr th:each="prod,iterStat: ${prods}" th:class="${iterStat.odd}? 'odd'">
+							<td th:text="${prod.name}">Onions</td>
+							<td th:text="${prod.price}">2.41</td>
+							<td th:text="${prod.inStock}? #{true} : #{false}">yes</td>
+						</tr>
+	E: 布局标签
+		a: th:fragment    	定义一个代码片段,方便其它地方引用    	eg: <div th:fragment="alert">
+		b: th:include    	替换内容到引入的文件					eg: <head th:include="layout::htmlhead" th:with="title='xx'"></head> />
+		c: th:replace    	替换整个标签到引入的文件				eg: <div th:replace="fragments/header :: title"></div>
+	F: 其他常用 th 标签
+		a: th:object    	替换对象    　　　　		eg: <div th:object="${session.user}">
+		c: th:onclick    	点击事件					eg: th:onclick="'getCollect()'"
+		d: th:inline    	定义js脚本可以使用变量		eg: <script type="text/javascript" th:inline="javascript">
+		
+三: Themeleaf 内联	
+		[[...]]		内联文本的表示格式, 但需要使用th:inline属性(分为text,javascript,none)激活.
+	A: 文本内联
+		<p th:inline="text">Hello,[[${session.user.name}]]!</p> 
+	B: 脚本内联
+		a: /*[+   +]*/			JavaScript 附加代码	
+			eg: /*[+
+					var msg  = 'This is a working application';
+				+]*/
+		b: /*[- */   /* -]*/	JavaScript 移除代码
+			eg: /*[- */
+					var msg  = 'This is a non-working template';
+				/* -]*/
+			
+四: 表达式对象
+	A: 表达式基本对象 (Expression Basic Objects)
+		a: #ctx: 上下文对象
+		b: #vars: 上下文变量
+		c: #locale: 上下文区域设置
+		d: #request: (仅在Web上下文中)HttpServletRequest对象
+		e: #response: (仅在Web上下文中)HttpServletResponse对象
+		f: #session: (仅在Web上下文中)HttpSession对象
+		g: #servletContext: (仅在Web上下文中)ServletContext对象
+	B: 表达式实用对象 (Expression Utility Objects)	
+		a: #execInfo		有关正在处理的模板的信息。
+		b: #messages		在变量表达式中获取外部化消息的方法, 与使用 #{...} 语法获得的方式相同
+		c: #uris			转义URL / URI部分的方法
+		d: #conversions		执行配置的转换服务(如果有)的方法
+		e: #dates			java.util.Date对象的方法: 格式化,组件提取等
+			1: #dates.format(<data>,<format>): 将时间日期格式化		
+					eg: ${#dates.format(dd.data, 'yy-MM-dd HH:mm:ss')}
+		f: #calendars		类似于 #dates 但是 java.util.Calendar 对象
+		g: #numbers			用于格式化数字对象的方法
+		h: #strings			String对象的方法: contains,startsWith,prepending / appending等
+		i: #objects			一般对象的方法
+		j: #bools			布尔评估的方法
+		k: #arrays			数组方法
+		l: #lists			列表的方法
+		m: #sets			集合的方法
+		n: #maps			地图方法
+		o: #aggregates		在数组或集合上创建聚合的方法
+		p: #ids				处理可能重复的id属性的方法 (eg: 作为迭代的结果)
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			

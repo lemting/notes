@@ -108,7 +108,7 @@ jQuery的css设置多个属性: $ele.css({"": "","": "",...})
 		a: val()
 			1: val(): 无参数,获取匹配的元素集合中第一个元素的当前值
 			2: val(value): 设置匹配的元素集合中每个元素的值
-			3:val(function): 一个用来返回设置值的函数
+			3: val(function): 一个用来返回设置值的函数
 		注意: 1: 通过.val()处理select元素,当没有选择项被选中,它返回null
 			  2: val()方法多用来设置表单的字段的值
 			  3: 如果select元素有multiple(多选)属性,并且至少一个选择项被选中,.val()方法返回一个数组,这个数组包含每个选中选择项的值
@@ -424,13 +424,30 @@ jQuery的css设置多个属性: $ele.css({"": "","": "",...})
 		1: jQuery|$.getJSON(url[,data][,callback]): 异步加载JSON格式数据
 	C: getScript()
 		1: jQuery|$.getScript(url[,callback]): 异步加载并执行js文件
-	D: get()
-		1: $.get(url[,callback]): 以GET方式从服务器获取数据
-	E: post()
-		1: $.post(url[,data][,callback]): 以POST方式从服务器发送数据
-	F: serialize()
+	D: get()	//查
+		1: $.get(url,data,success(data, textStatus, jqXHR),dataType): 以 GET 方式从服务器获取数据
+	E: post()	//增
+		1: $.post(url,data,success(data, textStatus, jqXHR),dataType): 以 POST 方式从服务器发送数据
+				eg: $.post("/login",{name:"John",time:"2pm"},function(data){
+						$(".result").html(data);
+					});
+				eg: $.post({
+                        url: "/login",
+                        data: { "name": name, "pwd": pwd },
+                        success: function(data) {
+							if(!data.data) { alert("读者名或密码错误"); } else { alert("登录成功"); }
+						},
+                        error: function(jqXHR) {
+                            alert("error: " + jqXHR.status);
+                        }
+                    });
+	F: put()	//改
+		1: $.put(url,data,success(data, textStatus, jqXHR),dataType): 以 PUT 方式从服务器获取数据
+	G: delete()	//删
+		1: $.delete(url,data,success(data, textStatus, jqXHR),dataType): 以 DELETE 方式从服务器获取数据
+	H: serialize()
 		1: $(selector).serialize(): 序列化表单元素值,生成标准URL编码文本字符串,直接可用于ajax请求
-	G: ajax()
+	I: ajax()
 		1: jQuery|$.ajax([settings]): 加载服务器数据
 			settings参数: 
 				type: 类型,取值: "GET"(默认)或"POST"
@@ -448,10 +465,10 @@ jQuery的css设置多个属性: $ele.css({"": "","": "",...})
 				  success: function(result) {$("#weather-temp").html("<strong>" + result + "</strong> degrees");}
 				  error: function(jqXHR) {alert("发生错误: " + jqXHR.status);}
 				});
-	H: ajaxSetup()
+	J: ajaxSetup()
 		1: jQuery|$.ajaxSetup([options]): 设置全局Ajax默认选项
 			options参数取值与ajax([settings])方法的参数一样
-	I: ajaxStart(),ajaxStop()方法
+	K: ajaxStart(),ajaxStop()方法
 		1: $(selector).ajaxStart(function()): 在Ajax请求发出前触发函数
 		2: $(selector).ajaxStop(function()): 在Ajax请求完成后触发函数
 

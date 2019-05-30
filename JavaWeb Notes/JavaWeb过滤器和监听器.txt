@@ -36,7 +36,7 @@ Session的钝化机制:
 		</filter>
 		<filter-mapping>
 			<filetr-name>Filter的名字</filetr-name>
-			<url-pattern>URL</url-pattern>	(当用户请求的URL和指定的URL匹配时将触发过滤器工作. *: 任意匹配器,eg: /*(代表该项目下的任意网页))
+			<url-pattern>URL</url-pattern>	(当用户请求的URL和指定的URL匹配时将触发过滤器工作. *: 任意匹配器,eg: /* (代表该项目下的任意网页))    /********/
 			<dispatcher></dispatcher>	(可以是0对或多对,值为: REQUEST(未设定的默认值)/INCLUDE/FORWARD/ERROR)
 		</filter-mapping>
 		

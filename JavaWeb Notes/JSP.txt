@@ -7,7 +7,7 @@ web.xml错误页面配置
 	</error-page>
 	
 
-JSp注释: 
+JSP注释: 
 	1: HTML注释: <!-- html注释 -->  客户端可见
 	2: JSP注释: <%-- jsp注释 --%> 客户端不可见
 	3: JSP脚本注释: //单行 /*多行*/
@@ -63,7 +63,7 @@ E: JSP动作
 				3: param: 给页面传递参数,常常与<jsp:forward>一起使用,作为其的子标签(给URL页面传递(name,value))
 					<jsp:param name="参数名" value="参数值" />
 					
-	第三类: JSP2.0新增的元素,主要与JSp Document有关,包括6个元素
+	第三类: JSP2.0新增的元素,主要与JSP Document有关,包括6个元素
 			包括: <jsp:root><jsp:declaration><jsp:scriptlet><jsp:expression><jsp:text><jsp:output>
 	第四类: JSP2.0新增的动作元素,主要是用来动态生成XML元素标签的值,包括3个动作
 			包括: <jsp:attribute><jsp:body><jsp:element> 
@@ -130,7 +130,7 @@ F: JSP内置对象
 				当一个客户访问一个服务器时,可能会在服务器的几个页面之间切换,服务器应当通过某种方法知道这是一个客户,就需要session对象(在服务器的内存中保存着不同用户的session)
 			常用方法: 
 				1: long getCreationTime(): 返回session创建时间
-				2: String getId(): 返回session创建是JSp引擎为它设的唯一ID号
+				2: String getId(): 返回session创建是JSP引擎为它设的唯一ID号
 				3: void setAttribute(String name,Object value): 使用指定名称将对象绑定到此会话
 				4: Object getAttribute(String name): 返回此会话中的指定名称绑定在一起的对象,如果没有对象绑定在该名称下,则返回null
 				5: String[] getValueNames(): 返回一个包含此session中所有可用属性的数组
@@ -161,11 +161,11 @@ F: JSP内置对象
 				1: void setAttribute(String name,Object value): 使用指定名称将对象绑定到此会话
 				2: Object getAttribute(String name): 返回此会话中的指定名称绑定在一起的对象,如果没有对象绑定在该名称下,则返回null
 				3: Enumeration getAttributeNames(): 返回所有可用属性的枚举
-				4: String getServerInfo(): 返回JSp(Servlet)引擎名及版本号
+				4: String getServerInfo(): 返回JSP(Servlet)引擎名及版本号
 		
 	其他内置对象: 
 		f: page
-				page对象就是值当前JSp页面本身,有点类似类中的this指针,他是java.lang.Object类的实例
+				page对象就是值当前JSP页面本身,有点类似类中的this指针,他是java.lang.Object类的实例
 			常用方法: 
 				1: class getClass(): 返回此Object的类
 				2: int hashCode(): 返回此Object的hash码

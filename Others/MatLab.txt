@@ -1,0 +1,287 @@
+help [function]		//查看帮助
+who/whos			//查看工作空间中 建立的变量/变量的详细信息
+quit/exit			//退出
+save [filename]		//存档
+load [filename]		//读档
+clear [var]			//清除[指定]变量
+input([title])		//从键盘获取矩阵
+what				//查看工作目录中的 M 文件
+dir					//列出工作目录的所有文件
+
+一: Matlab 基本用法
+	A: Matlab 基本用法
+		a: 矩阵		//Matlab 的矩阵元素可以是任何数值表达式
+			1: A=[1 2 3 ; 4 5 6 ; 7 8 0]	//元素之间用 ' ' 或 ',' 隔开, 行与行之间用 ';' 隔开
+			2: A=[1 2 3					//大的矩阵可以分行输入, 用回车键代替分号
+				  4 5 6
+				  7 8 0]
+	B: 运算符
+		a: 算术运算符		//只有在矩阵的除法时左除和右除才有区别
+			1: +,-,*	加,减,乘
+			2: /		右除
+			3: \		左除	// 1/4 = 4\1 = 0.25 (1\4=4)	
+			4: ^		幂
+	C: 复数
+			输入复数首先应该建立复数单位 i=sqrt(-1)
+	D: 输出格式
+			format [mode]	//使用该命令切换输出格式
+		1: format				短格式,缺省格式
+		2: format short			短格式,缺省格式	(5位  十进制数)
+		3: format long			长格式			(15位 十进制数)
+		4: format short e		短格式e方式		(5位  浮点数)		//long e
+		5: format short g		短格式g方式		(15位 最好的固定或浮点格式)	//long g
+		6: format hex			16进制格式	
+		7: format rat			有理数格式
+		8: format +				+格式			('+','-',' ' 显示 正数,负数,零元素)
+		9: format compact		压缩格式		(压缩显示矩阵)
+
+二: 向量与矩阵运算
+	A: 向量及矩阵的生成
+		a: 向量的产生 ':'	
+			1: x=a:b		//x = a a+1 a+2 ... b 		eg: z=1:5 (z = 1 2 3 4 5)
+			2: x=a:n:b		//x = a a+n a+2n ... b		eg: x=0:2:4 (x = 0 2 4)		y=6:-1:1(y = 6 5 4 3 2 1)
+		b: 矩阵的产生(函数)
+			1: zeros(n[,m])		产生一个零矩阵 n*n [n*m]
+			2: ones(n[,m])		生成全1矩阵 n*n [n*m]
+			3: eye(n[,m])		生成单位矩阵 n*n [n*m]
+			4: magic(n)			生成 n 阶魔术方阵
+			5: diag				产生一个对角矩阵
+			6: tril				取一个矩阵的下三角
+			7: triu				取一个矩阵的上三角
+			8: pascal			生成 PASCAL 矩阵
+		c: 矩阵的产生(.m 文件)
+			data [filename]		//读取文件中的矩阵, 并生成
+	B: 矩阵操作
+		a: ':'
+			1: A(:)				将 A 按列的方向拉成1列(向量) 
+			2: A(:,:)			代表 A 的所有元素
+			3: A(:,J)			代表 A 的第J列
+			4: A(J:K)			代表 A(J),A(J+1),..,A(K) (等价 A(:) 的第 J 到第 K 个元素)
+			5: A(:,J:K)			代表 A(:,J),A(:,J+1),..,A(:,K)
+			...
+		b: '''	转置
+			eg: A=[1 2 3;4 5 6;7 8 0]
+				B=A'
+				B=[1 4 7;2 5 8;3 6 0]	
+		c: inv(A) 逆矩阵	
+	C: 矩阵的基本运算
+		a: 加减			+,-		
+		b: 乘			*
+		c: 除			/,\
+			1: 右除: B/A = B*inv(A)		
+			2: 左除: A\B = inv(A)*B
+		d: 乘方		^
+	D: 数组的运算
+		a: 加减			+,-
+		b: 乘,除,乘方	.* ./ .\ .^
+			eg: x=[1 2 3]
+				y=[4 5 6]
+				z=x+y =[1+4 2+5 3+6]=[5 7 9]
+				z=x.*y=[1*4 2*5 3*6]=[4 10 18]
+				z=x.^y=[1^4 2^5 3^6]=[1 32 729]
+	E: 矩阵函数
+		a: 三角分解		lu(A)	eg: [L,U]=lu(A)
+		b: 正交变换		qr(A)	eg: [Q,R]=qr(A)
+		c: 特征值变换	eig(A)	eg: [X,D]=eig(A)
+		d: 奇异值分解	svd(A)	eg: [U,S,V]=svd(A)
+			
+三: Matlab 中的图形
+	A: 二维作图
+		a: x-y坐标图
+			1: plot([x,]y)		//plot(y) ==> plot([1,2,..,n],y)
+			2: plot(x1,y1,x2,y2,..,xN,yN)	//绘制多重线, xN,yN 相互配对
+			3: title(s)			//图形标题
+			4: xlabel(s)		//x 坐标轴标注 
+			5: ylabel(s)		//y坐标轴标注
+			6: text(x,y,s)		//标注数据点(x,y)
+			7: grid				//给图形加上网格	 //开启: grid on; 关闭: grid off; 切换: grid
+			8: hold				//保持图形窗口的图形 //开启: hold on; 关闭: hold off; 切换: hold
+			
+		b: 极坐标图
+			1: polor
+	
+	
+四: Matlab 编程
+		注释: %
+	A: 运算符
+		a: 比较运算符	<  >  <=  >=  ==  ~=
+		b: 逻辑运算符	&  |  ~
+	B: 控制结构
+		a: 选择结构
+			1: if <exp1> 
+					<code1> 
+				elseif <exp2>
+					<code2>
+				...
+				else 
+					<codeN>
+				end 
+		b: 循环结构	
+			1: for <var> = <exp>
+					<code>
+					[break]
+				end
+					eg: for i = 1:5, x(i)=i, end
+			2: while <exp>
+					<code>
+					[break]
+				end
+	C: 命令文件和函数文件
+		a: 命令文件
+				M 文件中有一系列命令, 该文件中的变量会留在工作空间中
+		b: 函数文件
+				M 文件 第一行包含 function, 该文件的变量作为 局内变量
+			function [返回变量] = 函数名([参数列表])
+				eg: function r=rank(x,tol)
+					function [mean,stdev]=stat(x)
+	D: 字符串, 输入输出
+			字符串用单引号引起: 'hello'
+		a: 相关函数
+			1: echo					打印 
+			2: input([提示])		获取输入
+			3: keyboard				与 input 相同, 但是更强
+			4: pause([n])			暂停一个程序, 按任意键恢复执行 [等待 n 秒后继续执行]				
+			
+五: Matlab 符号运算	
+	A: 核心工具
+		a: sym(): 构造符号变量和表达式
+			1: <var> = sym(<value>)
+			2: A = sym('a', n)		//A = [a1_1, a1_2] [a2_1, a2_2]	
+			3: A = sym('a', [n1 ... nM])  //A=sym('a',[2 3])   ==>  A = [a1_1, a1_2, a1_3] [a2_1, a2_2, a2_3]	 (2行3列)
+		b: syms: 构造符号对象的简捷方式
+			1: syms <var1> <var2> ..
+		c: 符号变量确定原则
+			1: 除了i 和 j 之外, 字母位置最接近 x 的字母: 若距离相等, 则取 ASCII 码大的
+			2: 若没有除了 i 与 j 以外的字母, 则视 x 为默认的符号变量
+			3: 可利用函数 symvar(<exp>,N) 来询问在众多符号中, 哪 N 个为符号变量		eg: symvar(3*a*b+y^2,2) ==>  [y,b]
+	B: Matlab 六大常见符号运算
+		a: 因式分解
+			1: factor(exp) 		//syms x; f=x^6+1; s=factor(f) ==>  s=(x^2+1)*(x^4-x^2+1)
+		b: 计算极限
+			1: limit(exp,x,a)	//syms h x; L=limit((log(x+h)-log(x))/h,h,0) ==> L=1/x
+			2: limit(exp,x,a,'left')
+			2: limit(exp,x,a,'right')
+		c: 计算导数
+				//syms a x; y=sin(a*x);
+			1: diff(x)		  	//求导		//A=diff(y)  ==>  A = cos(a*x)*a			
+			2: diff(x,n)		//对变量 n 求导		//B=diff(y,a)  ==>  B = cos(a*x)*x
+			3: diff(x,n,dim)	//对变量 n 求 dim 阶导		//C=diff(y,x,2)  ==>   C = -sin(a*x)*a^2  
+		d: 计算不定积分、定积分、反常积分
+			1: int(exp)				//不定积分
+			2: int(exp,a,b) 		//定积分
+		e: 符号求和
+			1: symsum(exp,k)
+			2: symsum(exp,k,a,b)
+		f: 解代数方程和常微分方程
+			1: solve(exp)			//解代数方程   当 exp=0 时, 解符号变量
+					//syms a x b c; f=a*x^2+b*x+c; A=solve(f)  ==>  A = -(b + (b^2 - 4*a*c)^(1/2))/(2*a) , -(b - (b^2 - 4*a*c)^(1/2))/(2*a)
+			2: solve(exp,var)		//解变量 var 的方程,  当 exp=0 时, 获得 var 关于符号变量的表达式
+					//A=solve(f,a)  ==>  A = -(c + b*x)/x^2
+			3: dsolve(exp,con)		//求微分方程通解	//Dy 为 y 的一阶导, D2y 为二阶导
+					//syms x y; f='Dy=x'; A=dsolve(f,x)  ==>  A=x^2/2 + C5
+			4: dsolve(exp,exp1,..,expN,con)		//求微分方程的特解
+					//syms x y; A=dsolve('D2y=x+Dy','y(0)=1','Dy(0)=0','x')  ==>  A=-1/2*x^2+exp(x)-x
+			5: [y1,..,yN] = dsolve(exp)		// 求微分方程组 的通解
+					//syms x y; [x,y]=dsolve('Dx=y+x,Dy=2*x')  ==>  x = 1/3*C1*exp(-t)+2/3*C1*exp(2*t)+1/3*C2*exp(2*t)-1/3*C2*exp(-t); y = 2/3*C1*exp(2*t)-2/3*C1*exp(-t)+2/3*C2*exp(-t)+1/3*C2*exp(2*t)
+		
+六: 常用
+	A: 常用工具箱
+		a: Matlab Main Toolbox						matlab 主工具箱	
+		b: Control System Toolbox					控制系统工具箱
+		c: Communication Toolbox					通讯工具箱	
+		d: Financial Toolbox						财政金融工具箱
+		e: System Identification Toolbox			系统辨识工具箱	
+		f: Fuzzy Logic Toolbox						模糊逻辑工具箱
+		g: Higher-Order Spectral Analysis Toolbox	高阶谱分析工具箱	
+		h: Image Processing Toolbox					图象处理工具箱
+		i: computer vision system toolbox			计算机视觉工具箱	
+		j: LMI Control Toolbox						线性矩阵不等式工具箱
+		k: Model predictive Control Toolbox			模型预测控制工具箱
+		l: μ-Analysis and Synthesis Toolbox			μ 分析工具箱
+		m: Neural Network Toolbox					神经网络工具箱
+		n: Optimization Toolbox						优化工具箱
+		o: Partial Differential Toolbox				偏微分方程工具箱
+		p: Robust Control Toolbox					鲁棒控制工具箱
+		q: Signal Processing Toolbox				信号处理工具箱
+		r: Spline Toolbox							样条工具箱
+		s: Statistics Toolbox						统计工具箱	
+		t: Symbolic Math Toolbox					符号数学工具箱
+		u: Simulink Toolbox							动态仿真工具箱
+		v: Wavele Toolbox							小波工具箱
+		w: DSP system toolbox						DSP处理工具箱
+	B: 常用函数
+		a: 整数
+			1: fix(x)				无论正负, 舍去小数至相邻整数
+			2: floor(x)				下取整, 即舍去正小数至相邻整数
+			3: ceil(x)				上取整, 即加入正小数至相邻整数
+			4: rat(x)				将实数x化为多项分数展开
+			5: rats(x)				将实数x化为分数表示
+			6: sign(x)				符号函数(Signum function) //当x<0时, sign(x)=-1; 当x=0时, sign(x)=0; 当x>0时, sign(x)=1。
+			7: rem(x,y)				求x除以y的余数
+			8: gcd(x,y)				整数x和y的最大公因数
+			9: lcm(x,y)				整数x和y的最小公倍数
+			10: exp(x) 				自然指数
+			11: pow2(x)				2的指数
+			12: log(x)				以e为底的对数, 即自然对数或
+			13: log2(x)				以2为底的对数
+			14: log10(x)			以10为底的对数
+		b: 三角函数
+			1: sin(x)				正弦函数
+			2: cos(x)				余弦函数
+			3: tan(x)				正切函数
+			4: asin(x)				反正弦函数
+			5: acos(x)				反余弦函数
+			6: atan(x)				反正切函数
+			7: atan2(x,y)			四象限的反正切函数
+			8: sinh(x)				双曲正弦函数
+			9: cosh(x)				双曲余弦函数	
+			10: tanh(x)				双曲正切函数	
+			11: asinh(x)			反双曲正弦函数	
+			12: acosh(x)			反双曲余弦函数
+			13: atanh(x)			反双曲正切函数
+		c: 适用于向量的常用函数
+			1: min(x)					向量x的元素的最小值	
+			2: max(x)					向量x的元素的最大值	
+			3: mean(x)	 				向量x的元素的平均值
+			4: median(x) 				向量x的元素的中位数	
+			5: std(x)					向量x的元素的标准差	
+			6: diff(x)	 				向量x的相邻元素的差
+			7: sort(x)	 				对向量x的元素进行排序(Sorting)	
+			8: length(x) 				向量x的元素个数	
+			9: norm(x) 					向量x的欧氏(Euclidean)长度
+			10: sum(x)	 				向量x的元素总和	
+			11: prod(x) 				向量x的元素总乘积	
+			12: cumsum(x) 				向量x的累计元素总和
+			13: cumprod(x)	 			向量x的累计元素总乘积	
+			14: dot(x, y) 				向量x和y的内积	
+			15: cross(x, y) 			向量x和y的外积
+		d: 矩阵函数
+			1: inv(A)					得到 A 的逆矩阵
+			2: det(A)					得到 A 的行列式
+			3: rank(A)					得到 A 的秩
+			4: lu(A)					三角分解,得到 A 分解出的上三角与下三角矩阵	eg: [L,U]=lu(A)	 (L : 下三角矩阵的置换; U : 上三角矩阵的正交变换)
+			5: qr(A)					正交变换,得到 A 的正交-三角分解		eg: [Q,R]=qr(A)
+			6: svd(A)					奇异值分解		eg: [U,S,V]=svd(A)
+			7: eig(A)					特征值分解		eg: [X,D]=eig(A)
+			
+		e: 绘图函数
+			1: plot						x轴和y轴均为线性刻度(Linear scale)
+			2: loglog					x轴和y轴均为对数刻度(Logarithmic scale)
+			3: semilogx					x轴为对数刻度, y轴为线性刻度
+			4: semilogy					x轴为线性刻度, y轴为对数刻度
+			5: plot绘图函数的参数
+				字元	颜色 	字元图线型态
+				y 		黄色		. 点
+				k 		黑色		o 圆
+				w 		白色		x x
+				matlab插值和样条
+				matlab插值和样条
+				b 		蓝色		+ +
+				g 		绿色		* *
+				r 		红色
+				- 		实线
+				c 		亮青色
+				: 		点线
+				m 		锰紫色
+				-. 		点虚线
+				-- 		虚线 

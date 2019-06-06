@@ -114,7 +114,7 @@ E: 语言结构
 		   do{}while();
 
 F: 自定义函数
-	a: 函数定义
+	a: 函数定义		//参数可以设置默认值: function test($a='',$b=0){}
 		function <name>([<args>]) {
 			<code>
 			[return <value>;]

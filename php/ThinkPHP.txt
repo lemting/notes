@@ -1,0 +1,311 @@
+ThinkPHP: 免费开源, 快速简单, 面向对象, 轻量级 PHP 开发框架
+//环境需求	(PHP >= 5.4.0) (PDO MbString CURL PHP Extension)
+
+/* ThinkPHP 安装
+	1: Git 方式安装		( https://github.com/top-think )
+	2: Composer 方式	( https://getcomposer.org/download )
+	3: Download 方式	( www.thinkphp.cn ) (官网下载)
+*/
+
+//命名空间 (类似 package) 	// namespace app\<module>\controller;				eg: namespace app\index\controller;
+//导入文件 (类似 import)	// use app\<module>\controller\<Class> [as 别名];	eg: use app\common\controller\Index as commonIndex;
+
+// http://<serverName>/index.php/<module>/controller/<action>/<param>/<value>/...
+
+/* URL 隐藏入口文件 index.php
+	a: 编辑 apache 服务器配置文件 httpd.conf
+		1: 取消注释 LoadModule rewrite_module modules/mod_rewrite.so (删除行首的 #)
+		2: AllowOverride None 改为 AllowOverride All
+	b: 编辑 \public\.htaccess
+		<IfModule mod_rewrite.c>
+		  Options +FollowSymlinks -Multiviews
+		  RewriteEngine On
+
+		  RewriteCond %{REQUEST_FILENAME} !-d
+		  RewriteCond %{REQUEST_FILENAME} !-f
+		  RewriteRule ^(.*)$ index.php/$1 [QSA,PT,L]
+		</IfModule>
+		
+		//若使用的是 phpStudy 则要修改为  RewriteRule ^(.*)$ index.php [L,E=PATH_INFO:$1]    
+*/
+
+//开启 session 功能: config: 'session' => [ 'httponly' => true, 'secure' => false ] (删除 session.httponly, session.secure)
+
+//config:  'default_return_type' => 'html'	//默认返回的格式类型, 取值: html, json, xml, ..
+//config:  'default_ajax_return' => 'json'	//默认 Ajax 返回的格式, 取值: json, xml, ..
+/*	方便管理的返回格式
+	use think\Config;
+	class Index {
+		//this_url?type=xml: 获取 xml 格式数据;  this_url: 获取 json 格式数据
+		public function getUserInfo($type='json') {		
+			if(!in_array($type, ['json', 'xml', 'jsonp'])) { $type = 'json'; }	//默认使用 json 格式
+			Config::set('default_return_type',$type);	//修改返回格式
+			...
+		}
+	}
+	
+*/
+
+一: ThinkPHP
+	A: ThinkPHP 目录结构
+		a: ThinkPHP 5
+				├─ application     应用目录
+				├─ extend          扩展类库目录(可定义)
+				├─ public          网站对外访问目录
+				├─ runtime         运行时目录(可定义)
+				├─ vendor          第三方类库目录(Composer)
+				├─ thinkphp        框架核心目录
+				├─ build.php       自动生成定义文件(参考)
+				├─ composer.json   Composer定义文件
+				├─ LICENSE.txt     授权说明文件
+				├─ README.md       README 文件
+				├─ think           命令行工具入口
+			
+			1: application	应用目录
+					├─ index			前台模块
+					├─ command.php		控制台配置文件,配合命令行启动使用
+					├─ common.php		项目公用文件, 可将全局函数定义在此
+					├─ config.php		应用的配置文件
+					├─ database.php		数据库配置文件
+					├─ route.php		路由配置文件
+					├─ tags.php			应用行为扩展文件
+	
+	B: ThinkPHP 规范
+		a: 目录命名
+			1: 目录使用 (小写+下划线) 命名		eg: admin_list
+		b: 文件命名
+			1: 类库函数文件名均以 (.php) 结尾		eg: Admin.php
+			2: 类的文件名均以 (命名空间) 定义, 且命名空间和类库文件所在的路径一致
+			3: 类文件采用 (驼峰命名 首字母大写), 其他文件为 (小写+下划线)
+			4: 类名和文件名保持一致, 采用 (驼峰式 首字母大写), 不需要加后缀		eg: Index (不需要写成 IndexController)
+		c: 函数, 类属性命名
+			1: 函数使用 (驼峰命名 首字母小写) 		eg: getUserName()
+			2: 属性名采用 (驼峰命名 首字母小写)		eg: $tableName
+			3: 以 (双下划线) 开头的函数或方法为 魔术方法
+		d: 常量和配置
+			1: 常量以 (大写字母+下划线) 命名		eg: APP_PATH
+			2: 配置参数以 (小写字母+下划线) 命名
+		e: 其他规范
+			1: 表和字段采用 (小写+下划线) 命名, 不能以下划线开头
+			2: 应用类库的命名空间统一使用 app (可配置)
+	
+	C: 模块设计
+			ThinkPHP 5.0 默认采用多模块的构架
+		a: 模块创建
+			1: 在 application 目录下创建模块
+				application
+					├─ module			//模块
+						├─  controller		//控制层
+						├─  model			//模型层
+						├─  view			//视图层
+			2: common 共用模块, 该模块不能通过 url 访问到(安全)
+	
+	D: ThinkPHP 配置	
+		/* 不同环境场景的自由快速切换
+			1: \CONF_PATH\config.php
+				<?php  use think\Env;
+				return [
+					'app_status' => Env::get('status','dev')	//读取环境变量 status 对应的场景配置文件, 默认使用 \CONF_PATH\dev.php (自定义默认环境)
+				];
+			2: \.env
+				status=prod		//使用 \CONF_PATH\prod.php (更改该项,可快速切换场景配置) */
+		//扩展配置 优先级高于 应用配置:  \CONF_PATH\extra\<xxx>.php > \CONF_PATH\config.php
+		//定义配置文件目录: 在 \public\index.php 中添加  define('CONF_PATH', __DIR__ . '/../conf/'); (配置文件目录为: \conf\)
+		a: 惯例配置(默认配置)
+			1: 配置文件路径		// \thinkphp\convention.php
+			2: 修改 convention.php 可以修改惯例配置
+		b: 应用配置  
+			//应用配置会覆盖惯例配置  \CONF_PATH\config.php (需要手动创建)
+				eg: <?php
+					return [
+						//与惯例配置文件类似
+						'app_email'  =>  '1234@qq.com',
+						'app_phone'  =>  '12345678901'
+					];
+		c: 扩展配置	
+			//扩展配置目录下的所有配置文件覆盖惯例配置 	\CONF_PATH\extra\<xxx>.php (需要手动创建)
+			//数据库配置文件 可以直接写在 \CONF_PATH\database.php , 无需放在 \CONF_PATH\extra\database.php
+			扩展配置文件名 会变成 key,文件的返回值变成 value
+				eg: // \conf\extra\email.php
+					<?php
+						return [												["email"] => array(2) {
+							'host' => '123@qq.com',				===>   				["host"] => string(10) "123@qq.com",
+							'name' => '111@qq.com'									["name"] => string(10) "111@qq.com"
+						];														}
+		d: 场景配置(应用模式状态)
+			//在 \CONF_PATH\config.php 中修改 app_status 的值
+			//ThinkPHP 5 会根据 app_status 的值去调用对应的 \CONF_PATH\xxx.php
+		e: 模块配置(仅在对应模块下有效)
+			//配置文件目录为 \CONF_PATH\<module>\config.php
+			//模块配置 目录下可以继续使用 扩展配置 \CONF_PATH\<module>\extra\<xxx>.php
+		f: 动态配置
+			//可以通过 config(key,value) 方法动态配置
+		g: Config 类和助手函数 config()
+				//Config 类路径  \thinkphp\library\think\Config.php	
+				//Config 类命名空间	think
+				//使用 Config 类方法	use think\Config;  Config::get(); Config::has('ddd');
+			1: get($name=null,$range): 获取配置参数, $name 为空则获取所有配置
+			2: set($name,$value=null,$range=''): 设置配置参数, $name 为数组则为批量设置
+			3: reset($range=''): 重置配置参数
+			4: has($name,$range=''): 检测配置是否存在
+			5: range($range): 设定配置参数的作用域
+			6: parse($config,$type='',$name='',$range=''): 解析配置文件或内容
+			7: load($file,$name='',$range=''): 加载配置文件(PHP格式)
+		h: 环境变量配置
+				// $_ENV: 系统环境变量数组
+				// think\Env::get($name,$default=null)	获取环境变量值
+			//自定义环境变量配置文件  \.env  
+			1: key=value => 环境变量变成: 'PHP_' + strtoupper(key), 值为 value; 可以通过 Env::get(key) 获取 value
+			
+				eg: // \.env	
+					email=13.@qq.com		==>  PHP_EMAIL, Env::get('email')
+					
+					[database]
+					hostname=localhost		==>  PHP_DATABASE_HOSTNAME, Env::get('database.hostname') | Env::get('database_hostname')
+					username=root			==>  PHP_DATABASE_USERNAME, Env::get('database.username') | Env::get('database_username')
+					password=root			==>  PHP_DATABASE_PASSWORD, Env::get('database.password') | Env::get('database_password')
+				
+					number=11				==>  PHP_NUMBER, Env::get('number')
+			
+	E: URL
+		//config: 'auto_bind_module' => true //开启自动绑定模块. 开启后, \public\xxx.php 在有名字相同的模块时, 会自动绑定模块(相当于 define("BIND_MODULE",module))
+		//define("BIND_MODULE","<module>"): 绑定模块. 绑定后,可以省略模块名,但是只能访问该模块
+		eg: //  \public\api.php  与 \public\index.php 一样, 但是限制只能访问 api 模块	
+			<?php
+				define("APP_PATH", __DIR__ . '/../application/');
+				define("BIND_MODULE", 'api');
+				require __DIR__ . '/../thinkphp/start.php';
+			
+	F: 路由
+			//config: 'url_route_on' => true, //开启路由
+			//config: 'url_route_must' => false, //关闭强制使用路由		
+		a: 路由配置文件
+			// \CONF_PATH\route.php
+			<?php
+			return [
+				//配置路由后, 对应的 url 将不能访问, 只能通过路由方式访问
+				'' => '<module>/<controller>/<action>',	
+				...
+			];
+		b: url() 路由助手函数
+
+三: Request 请求 和 Response 响应
+	A: Request	(think\Request)
+		a: 获取方式
+			1: request() 获取	 
+					eg: class Index { public function index(){ $request = request(); } }
+			2: think\Request::instance() 获取
+					eg: use think\Request; 
+						class Index { public function index(){ $request = Request::instance(); } }
+			3: 参数注入方式
+					eg: use think\Request; 
+						class Index { public function index(Request $request){} }
+		b: 成员方法
+			//URL
+			1: domain($domain=null) 		//设置或获取当前 包含协议的域名 (=协议+域名) (不传参数为获取, 传入为设置)
+			2: pathinfo()					//获取当前请求 URL 的 pathinfo 信息 (含 URL 后缀) (=URL-协议-域名) 
+			3: path()						//获取当前请求 URL 的 pathinfo 信息(不含 URL 后缀)(=URL-协议-域名) 
+			4: url(true)					//获取完整 URL, 包括 Query_String
+			5: url($url)					//设置当前 URL
+			5: baseUrl($url=null)			//设置或获取当前 URL, 不包括 Query_String
+			//请求类型
+			1: method()						//获取当前的 请求类型 ("GET","POST",..)
+			2: isGet(),isPost(),..			//判断是否为 GET,POST,.. 请求
+			3: isAjax()						//判断当前是否为 Ajax 请求
+			//请求参数
+			1: param($name='')				//获取当前 请求的参数(可以获取 pathinfo 中的参数), 找不到 $name 参数时返回 $default
+			2: get($name='') 				//获取 POST 参数, 不传参数则获取所有 GET 参数的数组
+			3: post($name='') 				//获取 GET 参数, 不传参数则获取所有 POST 参数的数组
+			4: session($name='')			//获取 session 中的数据		eg: $request->session();
+			5: cookie($name='')				//获取 cookie 中的数据
+			//获取 模块(module) 控制器(controller) 操作(action)
+			1: module($module=null)			//设置或获取当前的 模块名, 不传参时获取, 传参时设置
+			2: controller($ctrl=null)		//设置或获取当前的 控制器名
+			3: action($action=null)			//设置或获取当前的 操作名
+	
+	B: Response	(think\Response)
+		a: 获取方式
+			1: 参数注入方式
+					eg: use think\Response; 
+						class Index { public function index(Response $response){} }
+		b: 返回 json 格式
+			1: 修改返回类型后, 直接返回任意数据  // \think\Config::set('default_return_type','json');
+			
+四: View 视图 和 模板
+	A: View
+		a: 获取 view
+			1: 助手函数 view()
+			2: controller 继承 think\Controller, 通过 Controller 成员方法获取
+		b: view(): 助手函数,返回视图层页面
+			1: view()				//默认模板地址: app/<module>/view/<controller>/<action>.html
+			2: view('upload')			//app/<module>/view/<controller>/upload.html
+			3: view('att/upload')		//app/<module>/view/att/upload.html
+			4: view('./index/upload')	//public/index/upload.html
+			5: view($view, $data)	//转到 $view 页面, 并携带数据 $data 	
+					eg: class Index {
+							public function index() {
+								$data = ['email'=>'123@qq.com', 'user'=>'ss'];
+								return view('index',$data);	//转到 app/<module>/index/index.html, 并携带数据 $data
+							}
+						}
+			6: view($view,$data,$replace)	//转到页面,携带数据, 并将 view 里,与 $replace 里的变量名相同的东西, 全部替换为对应的变量值
+					eg: class Index {
+							public function index() {
+								$replace = ['EMAIL'=>'123@qq.com', 'USER'=>'ss'];
+								return view('index',[], $replace);	//view 里的所有 'EMAIL' 将替换为 '123@qq.com'; 'USER' 将替换为 'ss'
+							}
+						}
+		b: Controller 成员方法 (think\Controller)
+			//页面渲染
+			1: fetch($template,$data,$replace)			//获取 view, 使用与助手函数 view() 相似
+					eg: use think\Controller;
+						class Index extends Controller { public function index(){ return $this->fetch('index',['email'=>'123@qq.com'],['USER'=>'ss']); } } 
+			2: display($content,$data,$replace)		//将 $content 作为页面内容渲染页面
+					eg: return $this->display('这是{$name}页面',['name'=>'index']);	
+			//变量赋值
+			1: fetch()/display() 中传入 $data
+			2: assign($name,$value)					//变量赋值
+			3: $this->view->key = value				//变量赋值 	eg: public function index(){ $this->view->name = '123'; return $this->fetch(); }
+			4: think\View::share($name,$value)		//变量赋值	eg: use think\View;   public function index(){ View::share('name', '123'); return $this->fetch(); }
+			//变量替换
+			1: fetch()/display() 中传入 $replace
+			2: config: 'view_replace_str' => [ '__CSS__' => '/static/css' ]
+			/* View 中的默认替换
+				'__ROOT__' 		=> 	$root 
+				'__URL__'		=>	$base . '/' . $request->module() . '/' . Loader::parseName($request->controller())
+				'__STATIC__'	=>	$root . '/static'
+				'__CSS__'		=>	$root . '/static/css'
+				'__JS__'    	=> 	$root . '/static/js' */
+					
+	B: 模板 template
+		a: 系统变量  {$Think.<var>}
+			1: $Think.env		//env 环境变量 			eg: {$Think.env.PATH}			获取环境变量 PATH
+			2: $Think.const		//系统常量
+			3: $Think.server	//server 变量			eg: {$Think.server.HTTP_HOST}	获取 http host
+			4: $Think.session	//session 变量			eg: {$Think.session.email}		获取 session 中的变量 email
+			5: $Think.cookie	//cookie 变量			eg: {$Think.cookie.email}		获取 cookie 中的变量 email
+			6: $Think.request	//request 请求			eg: {$Think.request.id}			获取 request 请求中的 id 参数值
+			7: $Think.get		//GET 请求
+			8: $Think.post		//POST 请求
+		b: 原生标签  <?php ?>	
+			模板文件中不建议 使用原生标签, 业务逻辑尽量在 controller 中完成
+					
+					
+六: helper.php 方法(助手函数)
+	a: request()					//获取 Request 对象
+	b: session($name,$value='')		//获取,设置或删除 session 数据
+		1: session($name)				获取 session 数据
+		2: session($name,$value)		设置 session 数据
+		3: session($name,null)			删除 session 数据
+	c: cookie($name,$value='',$options=null)	//获取,设置或删除 cookie 数据
+		1: cookie($name)							获取 cookie 数据 
+		2: cookie($name,$value,$time)				设置 cookie 数据, 有效 $time 秒
+	d: input($key='',$default=null)		//获取参数, $key 不存在则返回 $default		
+		// get, post, param, request, session, cookie, env, file
+		1: input($key)						获取 $key 的值		eg: $res = input('id');
+		2: input("$method.$key")			指定方法获取值		eg: $res = input('post.id');  $res = input('param.id');
+			
+			
+			
+
+

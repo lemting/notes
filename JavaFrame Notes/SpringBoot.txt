@@ -80,7 +80,7 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 		<dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <!-- <scope>provided</scope> --> //注意，这个scope需要被注释掉
+            <!-- <scope>provided</scope> --> //注意, 这个scope需要被注释掉
         </dependency>
         //JSP 标签库
         <dependency>
@@ -220,55 +220,97 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 			}
 		}
 
-	E: application.properties		//参考文档(https://blog.csdn.net/je_ge/article/details/54783184)
-		a: Spring Config
-			1: spring.config.name   	//配置文件名称,默认为 application 
-			2: spring.config.location 	//配置文件存放位置,默认为 classpath 目录下
-		b: Spring MVC (WebMvcProperties)
-			1: spring.mvc.view.prefix 	//指定mvc视图的前缀. 
-			2: spring.mvc.view.suffix	//指定mvc视图的后缀. (实际视图名 = prefix + 视图名 + suffix)
-			3: spring.mvc.async.request-timeout    	//设定async请求的超时时间(ms),如果没有设置的话,以具体实现的超时时间为准
-			4: spring.mvc.date-format 				//设定日期的格式，比如dd/MM/yyyy. 
-			5: spring.mvc.favicon.enabled 				//是否支持favicon.ico，默认为: true 
-			6: spring.mvc.ignore-default-model-on-redirect //在重定向时是否忽略默认model的内容,默认为true
-			7: spring.mvc.locale 							//指定使用的Locale. 
-			8: spring.mvc.message-codes-resolver-format 	//指定message codes的格式化策略(PREFIX_ERROR_CODE,POSTFIX_ERROR_CODE). 
-		c: Server	
-			1: server.port					//服务器端口号
-			2: server.servlet.context-path	//访问路径前缀
-		d: MyBatis		
-			1: mybatis.config-location		//mybatis 核心配置文件所在路径
-			2: mybatis.type-aliases-package //mybatis 别名扫描包
-			3: mybatis.mapper-locations		//所有的mapper映射文件
-		c: DataSource (数据源)
-			1: spring.datasource.type		//连接池数据源	eg: com.mchange.v2.c3p0.DriverManagerDataSource
-			2: spring.datasource.driver-class-name = com.mysql.jdbc.Driver	//数据库驱动类
-			3: spring.datasource.url		
-			4: spring.datasource.username
-			5: spring.datasource.password
-			6: spring.datasource.data	
-		c: Http
-			1: spring.hateoas.apply-to-primary-object-mapper   	//设定是否对object mapper也支持HATEOAS,默认为: true 
-			2: spring.http.converters.preferred-json-mapper 	//是否优先使用JSON mapper来转换. 
-			3: spring.http.encoding.charset 	//指定http请求和相应的Charset,默认: UTF-8 
-			4: spring.http.encoding.enabled 	//是否开启http的编码支持,默认为true 
-			5: spring.http.encoding.force  		//是否强制对http请求和响应进行编码,默认为true
-		d: logging
-			1: logging.path=/var/logs 		//日志文件路径
-			2: logging.file=myapp.log 		//日志文件名
-			3: logging.config= # location of config file (default classpath:logback.xml for logback) 
-			4: logging.level.*= # levels for loggers, e.g. “logging.level.org.springframework=DEBUG” (TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF)
-				
-		e: devtools
-			1: spring.devtools.livereload.port		//服务器端口
-			2: spring.devtools.restart.enabled		//是否启用自动重启
-				
-	F: 获取 application.properties 里的变量
-		a: 在变量定义时加上 @Value 
-			@Value("${变量名}")
-			private String 变量;
-			
+三: SpringBoot 拦截器
+	A: 创建拦截器配置类 
+		a: 实现 WebMvcConfigurer 接口, 添加 @Configuration 注解
+		b: 实现 addResourceHandlers(), addInterceptors() 方法
+			1: addResourceHandlers(): 用来配置静态资源的,比如 html,js,css 等等
+			2: addInterceptors(): 用来注册拦截器, 写好的拦截器需要通过这里添加注册才能生效
 		
+		eg: @Configuration
+			public class WebConfigurer implements WebMvcConfigurer {
+				// 这个方法是用来配置静态资源的, 比如html, js, css, 等等
+				public void addResourceHandlers(ResourceHandlerRegistry registry) {}
+				// 这个方法用来注册拦截器, 我们自己写好的拦截器需要通过这里添加注册才能生效
+				public void addInterceptors(InterceptorRegistry registry) { }
+			}
+			
+	B: 创建拦截器
+		a: 实现 HandlerInterceptor 接口, 添加 @Component 注解
+		b: 实现 preHandle(), afterCompletion(), postHandle(), afterCompletion() 方法
+			1: preHandle():在请求被处理之前调用, 可用于判断是否执行拦截器. 返回值 是否放行(boolean)
+			2: postHandle(): 在请求被处理后, 视图渲染之前调用
+			3: afterCompletion(): 在整个请求结束后调用
+			
+			eg: @Component
+				public class LoginInterceptor implements HandlerInterceptor {
+					public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {return false;}
+					public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {}
+					public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {}
+				}
+
+	C: 在 拦截器配置类 中添加拦截器
+		a: 注入拦截器 (@Autowired)
+		b: 在 addInterceptors() 方法中添加拦截器, 添加拦截路径, 添加白名单路径
+			//registry 为 InterceptorRegistry 类对象
+			//addPathPatterns(): 设置拦截路径, 可填入多个参数
+			//excludePathPatterns(): 设置白名单路径, 可填入多个参数
+			1: registry.addInterceptor(拦截器对象).addPathPatterns("").excludePathPatterns("","",""); 
+			
+			eg: //拦截器配置类 
+				public void addInterceptors(InterceptorRegistry registry) {
+					registry.addInterceptor(loginInterceptor).addPathPatterns("/").excludePathPatterns("/login","/register","/logout");
+				}
+	
+四: application.properties		//参考文档(https://blog.csdn.net/je_ge/article/details/54783184)
+		/* 获取 application.properties 里的变量	//在变量定义时加上 @Value 
+			@Value("${变量名}")
+			private String 变量;   */
+	a: Spring Config
+		1: spring.config.name   	//配置文件名称,默认为 application 
+		2: spring.config.location 	//配置文件存放位置,默认为 classpath 目录下
+	b: Spring MVC (WebMvcProperties)
+		1: spring.mvc.view.prefix 	//指定mvc视图的前缀. 
+		2: spring.mvc.view.suffix	//指定mvc视图的后缀. (实际视图名 = prefix + 视图名 + suffix)
+		3: spring.mvc.async.request-timeout    	//设定async请求的超时时间(ms),如果没有设置的话,以具体实现的超时时间为准
+		4: spring.mvc.date-format 				//设定日期的格式, 比如dd/MM/yyyy. 
+		5: spring.mvc.favicon.enabled 				//是否支持favicon.ico, 默认为: true 
+		6: spring.mvc.ignore-default-model-on-redirect //在重定向时是否忽略默认model的内容,默认为true
+		7: spring.mvc.locale 							//指定使用的Locale. 
+		8: spring.mvc.message-codes-resolver-format 	//指定message codes的格式化策略(PREFIX_ERROR_CODE,POSTFIX_ERROR_CODE). 
+	c: Server	
+		1: server.port					//服务器端口号
+		2: server.servlet.context-path	//访问路径前缀
+	d: MyBatis		
+		1: mybatis.config-location		//mybatis 核心配置文件所在路径
+		2: mybatis.type-aliases-package //mybatis 别名扫描包
+		3: mybatis.mapper-locations		//所有的mapper映射文件
+	c: DataSource (数据源)
+		1: spring.datasource.type		//连接池数据源	eg: com.mchange.v2.c3p0.DriverManagerDataSource
+		2: spring.datasource.driver-class-name = com.mysql.jdbc.Driver	//数据库驱动类
+		3: spring.datasource.url		
+		4: spring.datasource.username
+		5: spring.datasource.password
+		6: spring.datasource.data	
+	c: Http
+		1: spring.hateoas.apply-to-primary-object-mapper   	//设定是否对object mapper也支持HATEOAS,默认为: true 
+		2: spring.http.converters.preferred-json-mapper 	//是否优先使用JSON mapper来转换. 
+		3: spring.http.encoding.charset 	//指定http请求和相应的Charset,默认: UTF-8 
+		4: spring.http.encoding.enabled 	//是否开启http的编码支持,默认为true 
+		5: spring.http.encoding.force  		//是否强制对http请求和响应进行编码,默认为true
+	d: logging
+		1: logging.path=/var/logs 		//日志文件路径
+		2: logging.file=myapp.log 		//日志文件名
+		3: logging.config= # location of config file (default classpath:logback.xml for logback) 
+		4: logging.level.*= # levels for loggers, e.g. “logging.level.org.springframework=DEBUG” (TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF)
+			
+	e: devtools
+		1: spring.devtools.livereload.port		//服务器端口
+		2: spring.devtools.restart.enabled		//是否启用自动重启
+				
+	
+			
+	
 	
 	
 	

@@ -46,6 +46,14 @@ ThinkPHP: 免费开源, 快速简单, 面向对象, 轻量级 PHP 开发框架
 	
 */
 
+/* Controller 层通过继承 think\Controller 可以方便返回 View */
+/* Model 层的类, 继承 think\Model, 类名与数据库表名关联 */	
+/* Controller 层获取 Model 层的类实例化对象
+	1: 导入 Model 类, 直接通过 new 的方式获取	(推荐使用)
+	2: think\Loader::model($modelName) 
+	3: model($modelName)
+*/
+
 一: ThinkPHP
 	A: ThinkPHP 目录结构
 		a: ThinkPHP 5
@@ -278,6 +286,8 @@ ThinkPHP: 免费开源, 快速简单, 面向对象, 轻量级 PHP 开发框架
 				'__JS__'    	=> 	$root . '/static/js' */
 					
 	B: 模板 template
+			// {literal} .. {/literal}	该标签引起的内容不会编译成 PHP 代码
+			// {/*  ..  */}				注释,该标签引起的内容会被丢弃
 		a: 系统变量  {$Think.<var>}
 			1: $Think.env		//env 环境变量 			eg: {$Think.env.PATH}			获取环境变量 PATH
 			2: $Think.const		//系统常量
@@ -287,10 +297,213 @@ ThinkPHP: 免费开源, 快速简单, 面向对象, 轻量级 PHP 开发框架
 			6: $Think.request	//request 请求			eg: {$Think.request.id}			获取 request 请求中的 id 参数值
 			7: $Think.get		//GET 请求
 			8: $Think.post		//POST 请求
-		b: 原生标签  <?php ?>	
-			模板文件中不建议 使用原生标签, 业务逻辑尽量在 controller 中完成
-					
-					
+		b: 管道符 '|'
+			1: 使用占位符 ###, 可作为函数任意位置的参数
+				eg: {$time|date="Y-m-d",###}	==>		date("Y-m-d",$time);
+					{$str|substr=###,0,8}		==>   	substr($str, 0, 8);
+			2: 若变量是第一个参数, 则占位符可省略
+				eg: {$str|substr=0,8}	==>   substr($str, 0, 8);
+					{$str|md5}			==>   md5($str);
+			3: 管道符可以连续使用
+				eg: {$str|md5|strtoupper}		==>		strtoupper(md5($str));
+		c: 内置函数
+			1: default($var,$default)		当变量不存在时, 使用设置的默认值	eg: {$email|default="123@qq.com"}
+		d: 原生标签  {php} {/php}	<?php  ?>
+			模板文件中不建议 使用原生标签, 业务逻辑尽量在 controller 中完成	
+		//循环标签
+		a: {volist} 	 //{volist name="" id="" offset="" length="" mod="" empty="" key="i"}  {$i},{$mod} {/volist}	
+			1: name			要遍历的变量名
+			2: id 			遍历元素变量
+			3: offset 		遍历开始位置(index)
+			4: length 		最大的遍历长度
+			5: mod			产生一个变量 $mod, 每次 $mod 为循环计算索引对给出值的余 
+			6: empty		当变量为空的时候, 输出该值, 允许变量
+			7: key			索引变量,默认 i(即使用 $i)
+					eg: {volist name="userList" id="user" offset="3" length="4" mod="3" key="i" }  <p>{$i}:{$mod}:{$user.name}</p>  {/volist}
+						==> 3:0:xxx  4:1:xxx  5:2:xxx  6:0:xxx  
+		b: {foreach}	//{foreach $list as $var} {/foreach}    原生 foreach 方式
+				//{foreach name="list" item="" key="key"} {/foreach} 
+			1: name			要遍历的变量名
+			2: item			遍历元素变量
+			3: key			(默认 key)索引数组: index; 关联数组: key
+					eg: {foreach $userList as $user}  <p>{$key}:{$user.name}</p>  {/foreach}
+						{foreach name="userList" item="user" key="key"} <p>{$key}:{$user.name}</p> {/foreach}
+		c: {for}		//{for start="" end="" name="i" step=""}  {/for}	
+			1: start		变量初始值
+			2: end			循环变量 < end
+			3: name			循环变量(默认 i)
+			4: step			每次循环 循环变量的增长值
+					eg: {for start="0" end="5" name="i" step="2"} <p>{$i}</p> {/for}	==>    0 2 4
+		//比较标签 {xx name="" value=""} {else/} {/xx}	//name 默认使用变量, 可以不加 $  //value 默认使用字符串, 需要加上 $
+		a: {eq} 		//name == value		等价于 {equal} 	 	
+		b: {neq}		//name != value		等价于 {notequal} 
+		c: {gt}			//name >  value
+		d: {egt}		//name >= value
+		e: {lt}			//name <  value
+		f: {elt}		//name <= value
+					eg: {eq name="a" value="$b"} $a==$b {else/} $a!=$b {/eq} 
+		//选择标签
+		a: {switch}		//{switch name=""} {case value=""}{/case} {default/} {/switch}
+			1: name			要比较的变量
+			2: value		分支选择的值	//在 value 中使用管道符 '|', 可以实现一个分支多个选择	eg: {case value="1|2|3"}  
+		b: {in}			//{in name="" value=""} {else/} {/in}
+			1: name			要比较的变量
+			2: value		多个值 ',' 隔开, 判断是否在这些值中
+		c: {notin}		//{notin name="" value=""} {else/} {/notin}
+			1: value		多个值 ',' 隔开, 判断是否不在这些值中
+		d: {between}	//{between name="" value=""} {else/} {/between}
+			1: value		两个值 ',' 隔开, 判断是否在两值之间(闭区间)
+		e: {notbetween}	//{notbetween name="" value=""} {else/} {/notbetween}
+			1: value		两个值 ',' 隔开, 判断是否不在两值之间(开区间)
+		e: {range}		//{range name="" value="" type=""} {else/} {/range}
+			//type 值
+			1: in/notin				等价于 {in} / {notin}
+			3: between/notbetween	等价于 {between} / {notbetween}
+		f: {defined}	//判断变量是否定义 {defined name=""} {else/} {/defined}
+			1: name			要判断的变量
+		g: {if}			//{if condition=""} {else/} {/if}
+			1: condition	判断条件	eg: condition="($Think.get.level == 1) OR ($Think.get.level == 2)"
+		//模板的布局
+
+五: Model 模型层
+	A: think\Db 	//用于操作数据库的类
+		//连接数据库
+		a: connect()	//静态 //连接数据库, 返回 连接变量
+			1: 在 config 配置数据库信息, 直接调用 connect() 方法获取连接
+			2: 通过 connect("mysql://<username>:<password>@<host>:<port>/<database>#utf8") 获取连接
+					eg: $link = connect("mysql://root:root@127.0.0.1:3306/demo#utf8"); 
+		//执行 sql 语句
+		a: execute($sql,$bind=[])	//返回 受影响的行数
+		b: query($sql,$bind=[])	//返回 查询结果(数组)	
+			1: 在 $sql 中可以使用 ? 作为占位符, 在 $bind 数组中设置占位符对应的变量 //字符串 会在 $sql 中自动添加 引号
+					eg: $res = Db::query("select * from user where id=? and name like ?",[1,'%q%']); //select * from user where id=1 and name like '%q%'
+		//指定表, 返回 Query
+		a: table($table)		//静态 //加前缀指定表
+		b: name($table)			//静态 //不加前缀指定表(需要配置前缀 config: 'database' => [ 'prefix' => '' ])
+	
+	B: think\db\Query	
+				//$data 数组的 key 对应字段名, value 对应字段值;  $dataSet 是一个包含多个 $data 的二维数组
+		a: 条件构造器	/* 推荐使用 3: where($filed,$op,$value), 返回 $this, 可以链式编程 */
+			//and 条件构造
+			1: where($str)					//$str 作为条件			eg: where("id=1")	==>		id = 1
+			2: where($filed,$value)			//$field = $value		eg: where("id",1)	==>		id = 1
+			3: where($filed,$op,$value)		//根据 $op 操作符比较 $filed 和 $value	
+				//$op 取值: eq,=, neq,<>, lt,<, elt,<=, gt,>, egt,>=, between,notbetween, in,notin
+				//当 $op='between'|'notbetween', $value 为 "?,?" 或 [?,?]		eg: where('id','notbetween',[1,5])		==>		id not between 1 and 5
+				//当 $op='in'|'notin', $value 为 "?,?,.." 或 [?,?,..]			eg: where('id','notin','1,3,4,5,6')		==>		id not in (1,3,4,5,6)
+			4: where([$filed=>$value,..])	//多个字段值的比较
+			5: where([$f=>[$op,$value],..])	//多个字段值的根据操作符的比较
+					eg: where([ 'id'=>1,'age'=>['between',[1,2]] ]);	===>	id = 1 and age between 1 and 2
+			6: where($field,'exp',$exp)		//条件为 $field.$exp	eg: where('id','exp','not in (1,2,3)')		==>		id not in (1,2,3)
+			//or 条件构造
+			1: whereOr(..)					//or 一个条件,跟 where() 一样		eg: where('id',1)->whereOr('id',2)	==>		id = 1 or id = 2
+		a: 查询	
+			1: select()					//执行查询, 返回 记录集 (二维数组)
+			2: find()					//执行查询, 返回 一条记录 (一维数组)
+			3: column($field)			//执行查询, 返回 一条记录的单个字段 (字段值)
+			4: value($field)			//执行查询, 返回 记录集的单个字段的数组	(一维数组)
+		b: 插入
+			1: insert($data=[])			//执行插入, 返回 受影响的行数
+			2: insertGetId($data=[])	//执行插入, 返回 自增 ID
+			3: insertAll($dataSet)		//批量插入记录, 返回 受影响的行数
+		c: 修改
+			1: update($data=[])			//执行修改, 返回 受影响的行数
+			2: setField($field,$value='')	//修改字段	($field 为字符串时, 修改单个字段; $filed 为数组时, 修改多个字段)
+			3: setInc($field,$step=1)	//修改单个字段 自增 $step, 返回 受影响的行数
+			4: setDec($field,$step=1)	//修改单个字段 自减 $step, 返回 受影响的行数
+		d: 删除
+			1: delete()					//执行删除, 返回 受影响的行数
+			2: delete(主键值)			//根据主键删除, 返回 受影响的行数
+		e: 聚合函数
+			1: count()					//获取记录条数		eg: Db::table("user")->where('id','>',3)->count();
+			2: max($field)				//获取字段的最大值	eg: Db::table("user")->where('id','>',3)->max('id');
+			3: min($field)				//获取字段的最小值
+			4: avg($fiel)				//获取字段的平均值	eg: Db::table("user")->where('id','>',3)->avg('id');
+			5: sum($field)				//获取字段的和
+		f: 其他
+			1: buildSql()				//返回 SQL 语句
+			2: field($field)			//指定 查询字段		eg: Db::table("user")->field("id,name,age")->select();
+			3: order($field,$order)		//指定 排序条件		eg: order('id','desc')	或	order(['id'=>'desc','age'=>'asc'])
+			4: limit($off,$len=null)	//指定 查询数量		eg: limit(5,10)	 ==>  从 5 开始的 10 条记录
+			5: page($page,$row=null)	//指定 分页			eg: page(5,10)	 ==>  第 5 页每页 10 条记录
+			6: group($group)			//指定 group		eg: group('age') ==>  根据 age 字段分组
+		
+	C: think\Model		//混合 Query,可以使用 Query 的方法 //查询返回的每条记录 为 Model 对象 (单条为对象,多条为对象数组
+		a: Model 对象
+			1: 对象->字段名				//获取该对象对应字段的字段值	eg: $id = User::get(1)->user_id
+			2: 对象->toArray()			//将对象的所有字段转成一个一维数组(字段名为 key,字段值为 value)		eg: $res = User::get(1)->toArray();
+			3: 对象->getData()			//与 toArray() 一样, 但是该方法获取原始数据, 不通过 getXxxAttr()
+		b: 条件构造 		//返回 Query 后, 可以直接使用 Query 的方法, 执行增删改查, 但是返回的每条记录是 Model 对象
+			1: where()					//静态 //返回 Query, 方法与 Query 的 where() 一致	
+			2: whereOr()				//静态 //返回 Query, 方法与 Query 的 whereOr() 一致	
+		c: 模型查询
+			//$data 为主键值, 则查询主键的记录;  $data 为 function($query){ $query->where(); .. }, 则为添加条件查询
+			1: get($data)				//静态 //查询单条记录, 返回 Model 对象
+			2: all($data)				//静态 //查询所有记录, 返回 Model 对象数组	//$data 主键可以通过 [?,?,..] 方式查询多个主键记录
+			3: value()					//静态 //Query, 返回 字段值
+			4: column()					//静态 //Query, 返回 数组
+		d: 模型插入
+			//$data 为数据数组, key 对应字段名, value 对应字段值
+			1: create($data,$field=null)	//静态 //插入单条记录, 返回 Model 对象	//$field = true, 自动排除不存在的字段; $field=[..], 允许插入的字段
+			2: save($data=[])				//插入/更新 单条记录, 返回 受影响的行数. $data=[],保存当前对象的数据; $data!=[] 保存 $data 中的数据. 未填写主键时为插入操作
+			3: saveAll($dataSet)			//插入/更新 多条记录, 返回 Model 对象数组. $dataSet 二维数组, 元素为 数据数组
+		e: 模型修改
+			//$data 为数据数组, key 对应字段名, value 对应字段值;  当 $data 中存在主键, 会根据主键更新, 则不需要添加查询条件
+			//$where=[..], 则根据数组数据查询; $where 为 function($query){ $query->where(); .. }, 则为添加条件查询		eg: update(User::get(1),['id'=>1],true)
+			1: update($data,$where=[],$field=[])	//静态 //更新单条记录, 返回 Model 对象. $field = true, 自动排除不存在的字段; $field=[..], 允许插入的字段								
+			2: where()->update($data)		//Query, 返回 受影响的行数	(建议使用)
+			3: save($data=[],$where=[])		//返回 受影响的行数. $data=[],当前对象则需要提供 主键
+			4: saveAll($dataSet)			//返回 Model 对象数组. $dataSet 中的每个元素都应当提供 主键
+		f: 模型删除 
+			//$data 为主键值,单个删除;  $data 主键列表, 批量删除;  $data 为 function($query){ $query->where(); .. }, 将查询的所有记录删除
+			1: destroy($data)			//静态 //删除, 返回 受影响的行数
+			2: delete()					//删除当前对象
+			3: where()->delete()		//Query, 返回 受影响的行数
+		g: 其他
+			1: allowField($field)		//设置允许写入的字段, 返回 $this  //$field = true, 自动排除不存在的字段; $field=[..], 允许插入的字段
+			2: count()					//静态 //Query, 获取记录条数
+			3: max,min,avg,sum			//静态 //Query, 获取字段的最大值,最小值,平均值,和
+			
+	D: 模型获取器,修改器,自动完成,模型时间戳,软删除
+		a: 模型获取器: getXxxAttr()  获取字段的方法
+			1: public function getXxxAttr($val) { return $val; }	//修改返回值后, getData() 可以获取原始数据
+					eg: class User extends Model { 
+							public function getSexAttr($val){ 
+								switch($val){ case '0': return '男'; case '1': return '女'; default: return '未知'; } 
+							} 
+						}
+			2: public function getXxxAttr($val,$data) { return $val; }		//$data 为获取数据时的数据数组
+		b: 模型修改器: setXxxAttr()  设置字段的方法
+			1: public function setXxxAttr($val) { return $val; }			//设置字段值的方法
+			2: public function setXxxAttr($val,$data) { return $val; }		//$data 为设置数据时的数据数组
+		c: 自动完成
+			1: protected $auto = [ '','',.. ];		//在执行 insert/update 操作时, 自动调用配置的字段的 setXxxAttr()
+			2: protected $insert = [ '','',.. ];	//在执行 insert 操作时, 自动调用配置的字段的 setXxxAttr()
+			3: protected $update = [ '','',.. ];	//在执行 update 操作时, 自动调用配置的字段的 setXxxAttr()
+					eg: class User extends Model {
+							protected $insert = [ 'time_insert' ];	//设置在 insert 时,自动调用 setTimeInsertAttr()
+							public function setTimeInsertAttr() { return time(); } 
+						}
+		d: 模型时间戳
+			//不建议开启 1: config: 'database' => ['auto_timestamp' => false]		//全局修改, 自动写入时间戳字段
+			2: protected $autoWriteTimestamp = true;			//开启自动写入时间戳. insert 时写入 $createTime 和 $updateTime;  update 时写入 $updateTime
+			3: protected $createTime = 'create_time'			//创建时间字段. 当为 false 时, 关闭自动写入创建时间戳
+			4: protected $updateTime = 'update_time';			//更新时间字段. 当为 false 时, 关闭自动写入更新时间戳
+		e: 软删除
+			//添加一个删除时间戳字段 delete_time, delete_time = NULL 代表未删除, delete_time != NULL 代表软删除
+			//开启软删除后, 删除操作变成更新 delete_time; 查询时,若 delete_time 不为 NULL, 则不能查询出该数据
+			1: 开启软删除  traits\model\SoftDelete
+					eg: use traits\model\SoftDelete;
+						class User extends Model {
+							use SoftDelete;
+						}
+			2: protected $deleteTime = 'delet_time'				//Model 类更改软删除字段.
+			2: think\Model::withTrashed(true)					//可以查询软删除数据, 返回 Query
+					eg: class Index { public function index() { $res = User::withTrashed(true)->where()->select(); } }
+			3: think\Model::onlyTrashed()						//只获取软删除的数据, 返回 Query	eg: $res = User::onlyTrashed()->select();
+			4: think\Model::destroy($data,true)					//彻底删除
+			5: delete(true)										//Query, 彻底删除 
+			
 六: helper.php 方法(助手函数)
 	a: request()					//获取 Request 对象
 	b: session($name,$value='')		//获取,设置或删除 session 数据

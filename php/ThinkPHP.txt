@@ -54,6 +54,116 @@ ThinkPHP: 免费开源, 快速简单, 面向对象, 轻量级 PHP 开发框架
 	3: model($modelName)
 */
 
+/* 统一返回类型(json)	//Controller 返回类型类, 包含请求是否成功 和 {json数据|错误信息}
+	class ReturnType {
+		private $status;	//表明对应请求的返回处理结果 "success" 或 "fail"	
+		private $data;		//若 status=="success", 则 data 为前端需要的 json 数据; 若 status=="fail", 则 data 为通用的错误码格式
+
+		//通用创建方法
+		public static function create($result,$status='success'){
+			$type = new ReturnType;
+			$type->setData($result);
+			$type->setStatus($status);
+			return $type->toArray($type);	//转为数组返回
+		}
+
+		public function getStatus() { return $this->status; }
+		public function setStatus($status) { $this->status = $status; }
+		public function getData() { return $this->data; }
+		public function setData($data) { $this->data = $data; }
+
+		//转为数组
+		public static function toArray($obj) {
+			$array = [ 'status'  => $obj->getStatus(), 'data'  => $obj->getData() ];
+			return $array;
+		}
+	}
+*/
+
+/* 统一异常处理
+	1: 创建 error 层
+	2: 创建 异常处理类接口 CommonError
+		namespace app\<module>\error;
+		//异常处理类接口
+		interface CommonError {
+			function getErrorCode();  //获取错误代码
+			function getErrorMsg();  //获取错误信息
+			function setErrorMsg($errorMsg); //设置错误信息, 并返回 该对象
+		}
+	3: 创建 异常枚举类 EmBusinessError, 实现 异常处理类接口 CommonError
+		namespace app\<module>\error;
+		use app\<module>\error\CommonError;
+		//异常枚举类
+		class EmBusinessError implements CommonError {
+			//1000 开头为通用错误
+			public static function UNKNOWN_ERROR(){ return new EmBusinessError(10001,'未知错误'); }			//10001 未知错误
+			public static function PARAMETER_ERROR(){ return new EmBusinessError(10002,'参数错误'); }		//10002 参数错误
+			//2000 开头为用户错误
+			public static function USER_NOT_EXIST(){ return new EmBusinessError(20001,'用户不存在'); }		//20001 用户不存在
+
+			private $errorCode;	//错误代码
+			private $errorMsg;	//错误信息
+			//构造函数
+			function __construct($errorCode = 10001, $errorMsg = '未知错误') {
+				$this->errorCode = $errorCode; $this->errorMsg = $errorMsg;
+			}
+			
+			public function getErrorCode() { return $this->errorCode; }	//获取错误代码
+			public function getErrorMsg() { return $this->errorMsg; } //错误错误信息
+			
+			//设置错误信息,并返回 $this
+			public function setErrorMsg($errorMsg) { 
+				$this->errorMsg = $errorMsg; return $this; 
+			}
+		}
+	4: 创建异常类 BusinessException, 继承 Exception, 实现 CommonError 接口
+		namespace app\<module>\error;
+		use app\<module>\error\CommonError;
+		use app\<module>\error\EmBusinessError;
+		use think\Exception;
+		//异常类
+		class BusinessException extends Exception implements CommonError {
+			private $commonError;	//异常处理类接口实例化对象
+
+			//直接接收 EmBusinessError 的传参 用于构造业务异常
+			//接受自定义 errorMsg 的方式构造业务异常
+			public function __construct($commonError = null, $errorMsg='') { 
+				$this->commonError = $commonError; 
+				if($errorMsg != '') $this->commonError->setErrorMsg($errorMsg);
+			}
+			
+			public function getErrorCode() { return $this->commonError->getErrorCode(); }	//获取错误代码
+			public function getErrorMsg() { return $this->commonError->getErrorMsg(); }	//获取错误信息
+			//设置错误信息,并返回 $this->commonError
+			public function setErrorMsg($errorMsg) { 
+				$this->commonError->setErrorMsg($errorMsg); return $this->commonError; 
+			}
+		}
+	5: config:  'unkonwn_error'  => false,	//是否显示未知错误, 开发时设置为 false, 发布后设置为 true
+				// 异常处理handle类 留空使用 \think\exception\Handle
+				'exception_handle' => function(Exception $e){
+										$responseData = [];
+										if($e instanceof BusinessException){    //判断是否是自定义异常
+											$businessException = $e;
+											$responseData[] = [ 
+												'errorCode' => $businessException->getErrorCode(),  //设置错误代码
+												'errorMsg' => $businessException->getErrorMsg(),    //设置错误信息
+											];
+										} else {
+											$UNKNOWN_ERROR = EmBusinessError::UNKNOWN_ERROR();  //显示未知错误
+											$responseData[] = [ 
+												'errorCode' => $UNKNOWN_ERROR->getErrorCode(),  
+												'errorMsg' => $UNKNOWN_ERROR->getErrorMsg(),
+											];
+											if(!Env::get('unkonwn_error')) return;  //若不显示未知错误, 则直接返回, 最终会看到错误信息
+										}
+										$re = ReturnType::create($responseData,'fail');
+										return json($re, 200);
+									},
+	
+*/
+
+
 一: ThinkPHP
 	A: ThinkPHP 目录结构
 		a: ThinkPHP 5
@@ -487,7 +597,7 @@ ThinkPHP: 免费开源, 快速简单, 面向对象, 轻量级 PHP 开发框架
 		d: 模型时间戳
 			//不建议开启 1: config: 'database' => ['auto_timestamp' => false]		//全局修改, 自动写入时间戳字段
 			2: protected $autoWriteTimestamp = true;			//开启自动写入时间戳. insert 时写入 $createTime 和 $updateTime;  update 时写入 $updateTime
-			3: protected $createTime = 'create_time'			//创建时间字段. 当为 false 时, 关闭自动写入创建时间戳
+			3: protected $createTime = 'create_time';			//创建时间字段. 当为 false 时, 关闭自动写入创建时间戳
 			4: protected $updateTime = 'update_time';			//更新时间字段. 当为 false 时, 关闭自动写入更新时间戳
 		e: 软删除
 			//添加一个删除时间戳字段 delete_time, delete_time = NULL 代表未删除, delete_time != NULL 代表软删除

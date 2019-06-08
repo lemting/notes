@@ -25,6 +25,29 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 		2: attr.addFlashAttribute(key, value): (更安全)暂时放到 session, 在跳转完成后, 在 session 中清除
 */
 
+/*  //统一返回类型 (json) 	Controller 返回类型类, 包含请求是否成功 和 {json数据|错误信息}
+	public class CommonReturnType {
+		private String status;	//表明对应请求的返回处理结果 "success" 或 "fail"
+		private Object Data;	//若 status=="success", 则 data 为前端需要的 json 数据; 若 status=="fail", 则 data 为通用的错误码格式
+
+		//通用创建方法
+		public static CommonReturnType create(Object result){ return CommonReturnType.create(result,"success"); }
+		public static CommonReturnType create(Object result,String status){
+			CommonReturnType type = new CommonReturnType();
+			type.setData(result);
+			type.setStatus(status);
+			return type;
+		}
+
+		public String getStatus() { return status; }
+		public void setStatus(String status) { this.status = status; }
+		public Object getData() { return Data; }
+		public void setData(Object data) { Data = data; }
+	}
+
+
+*/
+
 
 一一一: Spring, SpringMVC 与 MyBatis 的整合
 	A: 整合思路

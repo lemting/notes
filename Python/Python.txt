@@ -1,0 +1,274 @@
+Python中的变量不需要声明,变量的赋值操作即是变量声明、定义的过程
+Python 文件以 .py 为扩展名
+
+//del var1[,var2[....,varN]]:		删除单个或多个对象
+//字符串列表元祖 取值顺序: 从左往右: [0,len-1);  从右往左: [-1,-len];
+//range(n): 创建一个 [0,1,2,...,n] 的列表
+
+/* 	[] 	1: 字符串		str[i]: 字符串第i个字符; str[a:b]: 取[a,b)的字符串; str[a:]: 取[a,len)的字符串; str[:b]: 取[0,b)的字符串
+		2: 列表元组		list[i]: 列表的第i个元素; list[a:b] list[a:] list[:b] 
+	+	1: 字符串		s1+s2		2: 列表元组  list1+list2
+	*   1: 字符串		str*2 => str+str
+		2: 列表元组		tuple*2 => tuple+tuple		*/
+
+
+一: 变量和数据类型
+	A: 变量赋值
+		a: 单个变量赋值
+			1: counter = 100
+			2: miles = 1000.0
+			3: name = "Sherlock"
+		b: 多个变量赋值
+			1: a=b=c=6
+			2: a,b,c = 1,2,"Sherlock"
+	B: 标准数据类型
+		a: Numbers		数字	//数字数据类型用于存储值.数字类型是不可改变的数据类型,这意味着改变数字数据类型会分配一个新的对象
+									eg: a=1; b=12L; c=1.2; d=1+2j; 
+			1: int			有符号整型
+			2: long			长整型,也可以代表八进制和十六进制(长整型使用 l L,建议 L)
+			3: float		浮点型
+			4: complex		复数(实部a和虚部b,可以用 a+bj,或者 complex(a,b) 表示, a,b为浮点型)
+		b: String		字符串	//'' ""  由数字,字母,下划线组成
+			1: []		//var[i]: 字符串第i个字符; str[a:b]: 取[a,b)的字符串; str[a:]: 取[a,len)的字符串; str[:b]: 取[0,b)的字符串
+							eg: str='Hello World!'; str[2]=>'l'; str[2:4]=>'ll'; str[2:]=>'llo World!'; str[:4]=>'Hell'
+			2: + 			字符串连接运算符
+			3: * 			重复操作 		eg: 'abc'*2 => abcabc
+			4: in			成员运算符		eg: 'h' in 'hello' => True
+			5: not in 		成员运算符		eg: 'h' not in 'hello' => False
+			6: r/R			原始字符串		eg: r'\n' => \n //不进行转义
+			7: len()		字符串长度		eg: len('ddd')=>3
+			8: 字符串格式化					eg: "%-10s%d%c%.2f" % ('Sherlock',60,'c',1.2);  '%%s%d' % (1) % ('s') => '1s'
+			9: ''' """		三引号, 三引号允许一个字符串跨多行, 字符串中可以包含换行符,制表符以及其他特殊字符
+			0: Unicode字符串				eg: u'Hello World !'
+			
+		c: List			列表	//list[] 元素可以是: 字符,数字,字符串,列表(列表嵌套)	eg: list = ['coding',786,2.23,'Sherlock',['ssss',11]]
+			1: []
+			2: +
+			3: *
+			4: append()		添加列表项		eg: list=[]; list.append('Google'); list.append('coding'); => ['Google', 'coding']
+			5: del 			删除列表项		eg: list=['physics','chemistry',1997,2000]; del list[2]; => ['physics','chemistry',2000]
+			6: len()		获取长度		eg: len(['p','c',1,2])=>4
+			7: in			成员运算符		eg: 1 in [1,2,3] => True
+			8: for			迭代			eg: for x in [1,2,3]: print x;
+		d: Tuple		元组	//tuple() 类似列表,元组不能二次赋值,相当于只读列表 	eg: tuple = ('coding',786,2.23,'Sherlock',('ssss',11))
+					//只有一个元素时加逗号: tup1 = (50,) 
+			1: []
+			2: +
+			3: *
+			4: del			可以直接删除元组	eg: tup=(1,'2'); del tup 
+			5: len()		元祖长度
+		e: Dictionary	字典	//dic{}  键: 数字,字符串或元组充当		eg: tinydict = {'name':'Sherlock','code':6734,('dept','qqq'):'sales',2:'dddd'} 
+			1: [key]		获取对应 key 的 value	eg: tinydict['code']=>6734; tinydict[2]=>'dddd'
+			2: keys()		获取所有 key			eg: tinydict.keys()=> ['name','code','dept',2]
+			3: values()		获取所有 value			eg: tinydict.values()=> ['Sherlock',6734,'sales','dddd']
+			4: del			删除字段元素			eg: del tinydict['name'];
+
+二: 运算符
+	A: 算术运算符
+		a: + - * / %
+		b: ** 				幂 x**y => x^y
+		c: //				取整除,商的整数部分	 eg: 5/2=2  5//2=2  5.0/2=2.5  5.0//2=2.0   
+	B: 比较运算符
+		a: == != <> > < >= <=
+	C: 赋值运算符
+		a: = += -= *= /= %= **= //=
+	D: 位运算符
+		a: & | ^ ~ << >>
+	E: 逻辑运算符
+		a: and or not 
+	F: 身份运算符
+		a: is 		判断两个标识符是不是引用自一个对象	eg: x,y='x','y'; x is y;
+		b: is not	判断两个标识符是不是引用自不同对象	eg: x,y=1,2.0; x is not y;
+		
+三: 语言结构
+			//非0和非空(null)值为 True, 0 或 null 为 False
+	A: 选择结构
+		a: 	if()：
+				<code>
+			elif(): 
+				<code>
+			else：
+				<code>
+		b:  if(): <code>
+			elif(): <code>
+			else: <code>
+	B: 循环结构
+		a:  while():
+				<code>
+				[continue][break]
+				<code>
+			else: 
+				<code>
+		b:  for <i> in <var>: 		//for 循环可以遍历字符串的每个字符: for s in 'sss': print s;
+				<code>
+				[continue][break]
+				<code>
+			else: 
+				<code>
+
+四: 日期/时间
+	
+
+五: 函数
+
+六: 切片 迭代 列表生成式
+
+
+
+
+
+
+
+: 常用函数
+	A: 数据类型转换
+		a: int(x [,base])			将 x 转换为一个整数
+		b: long(x [,base] )			将 x 转换为一个长整数
+		c: float(x)					将 x 转换到一个浮点数
+		d: complex(real [,imag])	创建一个复数
+		e: str(x)					将对象 x 转换为字符串
+		f: repr(x)					将对象 x 转换为表达式字符串
+		g: eval(str)				用来计算在字符串中的有效Python表达式,并返回一个对象
+		h: tuple(s)					将序列 s 转换为一个元组
+		i: list(s)					将序列 s 转换为一个列表
+		j: set(s)					转换为可变集合
+		k: dict(d)					创建一个字典. d 必须是一个序列 (key,value)元组.
+		l: frozenset(s)				转换为不可变集合
+		m: chr(x)					将一个整数转换为一个字符
+		n: unichr(x)				将一个整数转换为 Unicode 字符
+		o: ord(x)					将一个字符转换为它的整数值
+		p: hex(x)					将一个整数转换为一个十六进制字符串
+		q: oct(x)					将一个整数转换为一个八进制字符串
+		
+	B: 数学函数	
+			数字常量: pi e
+		a: 通常
+			1: abs(x)				返回数字的绝对值	eg: abs(-10)=>10
+			2: ceil(x)				返回数字的上入整数	eg: math.ceil(4.1)=>5
+			3: cmp(x, y)			x<y => -1, x==y => 0, x>y => 1
+			4: exp(x)				e的x次幂			eg: math.exp(1)=>2.718281828459045
+			5: fabs(x)				数字的绝对值		eg: math.fabs(-10)=>10.0
+			6: floor(x)				数字的下舍整数		eg: math.floor(4.9)=>4
+			7: log(x)				如math.log(math.e)返回1.0,math.log(100,10)返回2.0
+			8: log10(x)				返回以10为基数的x的对数,如math.log10(100)返回 2.0
+			9: max(x1, x2,...)		返回给定参数的最大值,参数可以为序列.
+			0: min(x1, x2,...)		返回给定参数的最小值,参数可以为序列.
+			1: modf(x)				返回x的整数部分与小数部分,两部分的数值符号与x相同,整数部分以浮点型表示.
+			2: pow(x, y)			x^y 运算后的值
+			3: round(x [,n])		返回浮点数x的四舍五入值,如给出n值,则代表舍入到小数点后的位数.
+			4: sqrt(x)				返回数字x的平方根,数字可以为负数,返回类型为实数,如math.sqrt(4)返回 2+0j
+			5: range(n)				创建一个 [0,1,2,...,n] 的列表
+		b: 随机数
+			1: choice(seq)			从序列的元素中随机挑选一个元素		eg: random.choice(range(10))=>从0到9中随机挑选一个整数
+			2: randrange([start,]stop[,step])	从指定范围内,按指定基数递增的集合中获取一个随机数,基数缺省值为1
+			3: random()				随机生成下一个实数,它在[0,1)范围内
+			4: seed([x])			改变随机数生成器的种子 seed.
+			5: shuffle(lst)			将序列的所有元素随机排序
+			6: uniform(x, y)		随机生成下一个实数,它在[x,y]范围内
+		c: 三角函数
+			1: acos(x)				返回x的反余弦弧度值
+			2: asin(x)				返回x的反正弦弧度值
+			3: atan(x)				返回x的反正切弧度值
+			4: atan2(y, x)			返回给定的 X 及 Y 坐标值的反正切值
+			5: cos(x)				返回x的弧度的余弦值
+			6: hypot(x, y)			返回欧几里德范数 sqrt(x*x + y*y)
+			7: sin(x)				返回的x弧度的正弦值
+			8: tan(x)				返回x弧度的正切值
+			9: degrees(x)			将弧度转换为角度	eg: degrees(math.pi/2)=>90.0
+			10: radians(x)			将角度转换为弧度
+	
+	C: 字符串内建函数
+		a: 查找字符串
+			1: str.count(s,beg=0,end=len)		返回 s 在 str[beg:end] 里面出现的次数
+			2: str.find(s,beg=0,end=len)		检测 s 是否包含在 str[beg:end] 中, 返回 第一个字符的索引值/-1
+			3: str.rfind(s,beg=0,end=len)		类似于 find()函数,不过是从右边开始查找.
+			4: str.index(s,beg=0,end=len)		跟 find()方法一样,只不过如果 s 不在 str 中会报一个异常.
+			5: str.rindex(s,beg=0,end=len)		类似于 index(),不过是从右边开始.
+			6: max(str)							返回字符串 str 中最大的字母.
+			7: min(str)							返回字符串 str 中最小的字母.
+		b: 判断字符串
+			1: str.isalnum()						判断 str 至少有一个字符并且所有字符都是字母或数字,返回 True/False
+			2: str.isalpha()						判断 str 至少有一个字符并且所有字符都是字母,返回 True/False
+			3: str.isdecimal()						判断 str 只包含十进制数字,返回 True/False
+			4: str.isdigit()						判断 str 只包含数字,返回 True/False 
+			5: str.islower()						判断 str 中所有这些(区分大小写的)字符都是小写,返回 True/False
+			6: str.isnumeric()						判断 str 中只包含数字字符,返回 True/False 
+			7: str.isspace()						判断 str 中只包含空格,返回 True/False 
+			8: str.istitle()						判断 str 是标题化的(单词:大写开头其余小写),返回 True/False 
+			9: str.isupper()						判断 str 中所有这些(区分大小写的)字符都是大写,返回 True/False 
+			0: str.endswith(obj,beg=0,end=len)		判断 str[beg:end] 是否以 obj 结束,返回 True/False.
+			1: str.startswith(obj,beg=0,end=len)	判断 str[beg:end] 是否以 obj 开头,返回 True/False.
+		c: 字符串替换
+			1: str.format()								格式化字符串
+			2: str.lower()								转换 str 中所有大写字符为小写.
+			3: str.upper()								转换 str 中的小写字母为大写
+			4: str.replace(s1,s2,num=str.count(s1))		把 str 中的 s1 替换成 s2, 替换不超过 num 次.
+			5: str.capitalize()							把字符串的第一个字符大写
+			6: str.swapcase()							翻转 str 中的大小写
+			7: str.title()								"标题化" str,所有单词都是以大写开始,其余字母均为小写
+			8: str.expandtabs(tabsize=8)				把字符串 str 中的 tab 符号转为空格, tab 符号默认的空格数是 8.
+		d: 字符串分割 
+			1: str.lstrip()							截掉 str 左边的空格
+			2: str.rstrip()							删除 str 字符串末尾的空格.
+			3: str.strip([obj])						去掉两端的空格(或者指定的 obg)
+			4: str.split(s="",num=str.count(s))		以 s 为分隔符切片 str,仅分隔 num 个子字符串
+			5: str.splitlines([keepends])			按照行('\r', '\r\n', \n')分隔,返回每一行为元素的列表,如果参数 keepends 为 False,不包含换行符,如果为 True,则保留换行符.
+			6: str.partition(s)						从 s 出现的第一个位置起,把字符串str分成一个3元素的元组(str_pre_s,s,str_post_s),若 str 中不包含 s 则 str_pre_s == str.
+			7: str.rpartition(s)					类似于 partition()函数,不过是从右边开始查找
+		e: 字符串拼接
+			1: str.center(width)		返回一个原字符串居中,并使用空格填充至长度 width 的新字符串
+			2: str.ljust(width)			返回一个原字符串左对齐,并使用空格填充至长度 width 的新字符串
+			3: string.rjust(width)		返回一个原字符串右对齐,并使用空格填充至长度 width 的新字符串
+			4: str.zfill(width)			返回长度为 width 的字符串,原字符串 str 右对齐,前面填充0
+			5: str.join(seq)			以 str 作为分隔符,将 seq 中所有的元素(的字符串表示)合并为一个新的字符串
+		f: 其他
+			1: str.maketrans(intab, outtab])	方法用于创建字符映射的转换表,第一个参数是字符串,表示需要转换的字符,第二个参数也是字符串表示转换的目标.
+			2: str.translate(s, del="")			根据 s 给出的表(包含 256 个字符)转换 str 的字符,要过滤掉的字符放到 del 参数中
+			3: str.decode(encoding='UTF-8')		以 encoding 指定的编码格式解码 str
+			4: str.encode(encoding='UTF-8')		以 encoding 指定的编码格式编码 str
+		
+	D: 列表函数
+		a: 列表函数
+			1: cmp(list1, list2)	比较两个列表的元素
+			2: len(list)			列表元素个数
+			3: max(list)			返回列表元素最大值
+			4: min(list)			返回列表元素最小值
+			5: list(seq)			将元组转换为列表
+		b: 列表方法
+			1: list.append(obj)			在列表末尾添加新的对象
+			2: list.count(obj)			统计某个元素在列表中出现的次数
+			3: list.extend(seq)			在列表末尾一次性追加另一个序列中的多个值（用新列表扩展原来的列表）
+			4: list.index(obj)			从列表中找出某个值第一个匹配项的索引位置
+			5: list.insert(index, obj)	将对象插入列表
+			6: list.pop(obj=list[-1])	移除列表中的一个元素（默认最后一个元素）,并且返回该元素的值
+			7: list.remove(obj)			移除列表中某个值的第一个匹配项
+			8: list.reverse()			反向列表中元素
+			9: list.sort([func])		对原列表进行排序
+	E: 元组函数
+		1: cmp(tuple1, tuple2)	比较两个元组元素.
+		2: len(tuple)			计算元组元素个数.
+		3: max(tuple)			返回元组中元素最大值.
+		4: min(tuple)			返回元组中元素最小值.
+		5: tuple(seq)			将列表转换为元组.
+	
+	F: 字典函数
+		a: 列表函数
+			1: cmp(dict1, dict2)	比较两个字典元素.
+			2: len(dict)			计算字典元素个数,即键的总数.
+			3: str(dict)			输出字典可打印的字符串表示.
+			4: type(variable)		返回输入的变量类型,如果变量是字典就返回字典类型.
+		b: 字典方法
+			1: dict.clear()					删除字典内所有元素
+			2: dict.copy()					返回一个字典的浅复制
+			3: dict.fromkeys(seq[, val])	创建一个新字典,以序列 seq 中元素做字典的键,val 为字典所有键对应的初始值
+			4: dict.get(key,default=None)	返回指定键的值,如果值不在字典中返回default值
+			5: dict.has_key(key)			判断键是否在字典dict里, 返True/False
+			6: dict.items()					以列表返回可遍历的(键, 值) 元组数组
+			7: dict.keys()					以列表返回一个字典所有的键
+			8: dict.setdefault(key,default=None)	和get()类似, 但如果键不存在于字典中,将会添加键并将值设为default
+			9: dict.update(dict2)			把字典dict2的键/值对更新到dict里
+			0: dict.values()				以列表返回字典中的所有值
+			1: pop(key[,default])			删除字典给定键 key 所对应的值,返回值为被删除的值.key值必须给出. 否则,返回default值.
+			2: popitem()					随机返回并删除字典中的一对键和值
+		
+		
+	

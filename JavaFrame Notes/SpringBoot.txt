@@ -61,7 +61,7 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 					driver-class-name: com.mysql.cj.jdbc.Driver
 			mybatis:
 				mapper-locations: classpath:mapper/*.xml  //(##*/##)//扫描 XxxMapper.xml //一定要对应mapper映射xml文件的所在路径
-				type-aliases-package: com.lemting.springbootmybatisdemo.domai	n  	//对应实体类的路径
+				type-aliases-package: com.lemting.springbootmybatisdemo.domain  	//对应实体类的路径
 	4: SpringBoot 启动类,添加 @MapperScan //扫描 mapper 类
 		@SpringBootApplication
 		@MapperScan("com.lemting.mapper")  //将项目中对应的 mapper 类的路径加进来就可以了

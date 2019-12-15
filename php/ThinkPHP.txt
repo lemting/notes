@@ -26,7 +26,7 @@ ThinkPHP: 免费开源, 快速简单, 面向对象, 轻量级 PHP 开发框架
 		  RewriteRule ^(.*)$ index.php/$1 [QSA,PT,L]
 		</IfModule>
 		
-		//若使用的是 phpStudy 则要修改为  RewriteRule ^(.*)$ index.php [L,E=PATH_INFO:$1]    
+		//若使用的是 phpStudy 则要修改为  RewriteRule ^(.*)$ index.php [L,E=PATH_INFO:$1]   
 */
 
 //开启 session 功能: config: 'session' => [ 'httponly' => true, 'secure' => false ] (删除 session.httponly, session.secure)
@@ -407,7 +407,7 @@ ThinkPHP: 免费开源, 快速简单, 面向对象, 轻量级 PHP 开发框架
 			6: $Think.request	//request 请求			eg: {$Think.request.id}			获取 request 请求中的 id 参数值
 			7: $Think.get		//GET 请求
 			8: $Think.post		//POST 请求
-		b: 管道符 '|'
+		b: 管道符 '|': 模板函数
 			1: 使用占位符 ###, 可作为函数任意位置的参数
 				eg: {$time|date="Y-m-d",###}	==>		date("Y-m-d",$time);
 					{$str|substr=###,0,8}		==>   	substr($str, 0, 8);

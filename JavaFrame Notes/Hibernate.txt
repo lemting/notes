@@ -89,7 +89,7 @@ XML引入Hibernate约束:
 			
 			/* set: 在多表映射时,需要的配置项;
 				属性: 1: name: 数据类型为Set<Many>的成员名; 
-					  2: cascade: 加上该属性级联操作可以简化,-取值: saveupdate(级联保存),delete(级联删除) 
+					  2: cascade: 加上该属性级联操作可以简化,-取值: save-update(级联保存),delete(级联删除) 
 					  3: inverse: 放弃关系维护,一对多时建议为true,多对多为false,true: 放弃; false: 默认值 
 					  4: table: 多对多时配置的第三张表的表名	*/
 			<set name="" cascade="save-update" inverse="true">	  //cascade属性要取多个值时,可以用","隔开	eg: cascade="save-update,delete"
@@ -244,7 +244,7 @@ XML引入Hibernate约束:
 			3: 实体类配置映射
 				一个实体类一个配置文件,完成映射最基本的配置
 				在One的配置文件中,通过<set>标签完成映射;在Many的配置文件,通过<many-to-one>标签完成映射
-					eg: Many.hbm.xml: 	<many-to-one name="oneSet" class="oneToMany.One" column="clid"></many-to-one>
+					eg: Many.hbm.xml: 	<many-to-one name="one" class="oneToMany.One" column="clid"></many-to-one>
 						One.hbm.xml:	<set name="manySet" cascade="save-update,delete" inverse="true">
 											<key column="clid"></key>
 											<one-to-many class="oneToMany.Many" />

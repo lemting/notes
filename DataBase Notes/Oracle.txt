@@ -1,8 +1,25 @@
-一: Oracle的基本使用--基本命令
+c:\xx\xx> sqlplus 
+		> sqlplus <username>/<password>@localhost:1521/orcl [as sysdba]
 
+/* 模糊查询替代函数: insert()
+	select * from user where name like '%name%';
+	select * from user where insert(name, 'name', 1) > 0;
+*/
+
+/* 集合运算操作 
+	1: union		并集, 合并两个操作的结果, 去掉重复的部分
+	2: union all	并集, 合并两个操作的结果, 保留重复的部分
+	3: minus		差集, 从前面的操作结果中去掉与后面相同的部分
+	4: intersect	交集, 取两个操作结果中相同的部分	
+		eg: select * from user where id=1;
+			union							 => id in (1,2)
+			select * from user where id=2;
+				
+*/
+一: Oracle的基本使用--基本命令
 	A: 连接命令
 		1.conn[ect]   
-			用法：conn 用户名/密码@网络服务名[as sysdba/sysoper]当用特权用户身份连接时,必须带上as sysdba或是as sysoper 	  
+			用法：conn 用户名/密码@网络服务名[as sysdba/sysoper]当用特权用户身份连接时,必须带上 as sysdba 或是 as sysoper 	  
 		2.disc[onnect]  
 			说明: 该命令用来断开与当前数据库的连接 
 		3.psssw[ord]  
@@ -12,9 +29,9 @@
 		5.exit
 			说明: 该命令会断开与数据库的连接,同时会退出sql*plus
 	B: 文件操作命令
-		1.start和@  
+		1.start 和 @  
 			说明: 运行sql脚本  
-			案例: sql>@ d:\a.sql或是sql>start d:\a.sql 
+			案例: sql>@ d:\a.sql 或是 sql>start d:\a.sql 
 		2.edit  
 			说明: 该命令可以编辑指定的sql脚本  
 			案例: sql>edit d:\a.sql,这样会把d:\a.sql这个文件打开
@@ -41,7 +58,6 @@
 			至于其它环境参数的使用也是大同小异
 			
 二: Oracle用户管理
-
 	A: 创建用户
 		概述：在oracle中要创建一个新的用户使用create user语句,一般是具有dba(数据库管理员)的权限才能使用。   
 		create user 用户名 identified by 密码; 
@@ -57,7 +73,7 @@
 		在删除用户时,注意:	如果要删除的用户,已经创建了表,那么就需要在删除的时候带一个参数cascade;	
 	D: 解锁用户
 		需要管理员身份
-		alter user scott account unlock;
+		alter user 用户名 account unlock;
 		
 三: Oracle表的管理(数据类型,表创建删除,数据CRUD操作)
 	
@@ -205,7 +221,7 @@
 				注意: select ename,max(sal) from emp;这语句执行的时候会报错,说ORA-00937: 非单组分组函数。
 				因为max是分组函数，而ename不是分组函数.......
 				如果列里面有一个分组函数,其它的都必须是分组函数,否则就出错
-		b: group by 和 having子句   
+		b: group by 和 having 子句   
 			group by用于对查询的结果分组统计,  
 			having子句用于限制分组显示结果。
 		
@@ -213,9 +229,48 @@
 			1: 分组函数只能出现在选择列表、having、order by子句中(不能出现在where中)   
 			2: 如果在select语句中同时包含有group by, having, order by 那么它们的顺序是group by, having, order by   
 			3: 在选择列中如果有列、表达式和分组函数,那么这些列和表达式必须有一个出现在group by 子句中,否则就会出错
-		
+		d: 子查询
+			1: 单行查询	  	where xx =,not,<,.. (select xx)
+			2: 多行查询		where xx in() any() all()
+				eg: select empno,ename,job,sal from emp
+					where sal < any(select sal from emp where job='CLERK') and job <> 'CLERK';
+			3: 多列查询		where (xx,xx,..) {=,not,<,..|in(),any(),all()} (select xx,xx,.. ) //子查询查询结果为多列时,比较应当也用多列
+				eg: select empno,ename,sal from emp
+					where (job,deptno)=(select job,deptno from emp where empno=7788);
+				
 	D: 多表查询
-		
+		a: 交叉连接
+			一般不用	eg: select user.user_id,user.user_name,class_name from user,class;
+		b: 内连接
+				根据指定的连接条件进行查询, 只有满足条件的数据才会出现在结果集中
+			1: 相等内连接  使用 = 或 (/* [inner] join */) 指定连接条件的连接查询, 比较列的类型必须相等, 若列名相同则需在列名前加上表名
+					select ... from <tab1> [inner] join <tab2> on <tab1>.<column> = <tab2>.<column>
+				eg: select user.user_id,user.user_name,class_name from user [inner] join class 
+					on user.class_id = class.class_id;
+				eg: select user.user_id,user.user_name,class_name from user,class
+					where user.class_id = class.class_id;	
+			2: 非等内连接	使用等号以外的比较运算符指定链接条件的连接查询, eg: between...and, in(...), >, <, !=
+					select ... from <tab1> [inner] join <tab2> on ...
+				eg: select e.ename,e.sal,s.grade from emp e join salgrade s
+					on e.sal between s.losal and s.hisal;
+			4: 自连接		自己本身连接
+				eg: select worker.ename||' 的经理是 '||manager.ename as 雇员经理
+					from emp worker join emp manager on worker.mgr = manager.empno;
+		c: 外连接
+				在内连接基础上将表中不符合条件的记录加入结果集,一张表最多只能和一张表外连接
+			1: 左外连接		//left [outer] join
+				eg: select e.ename,e.sal,d.dname from emp e left join dept d
+					on e.deptno=d.deptno;
+				eg: select e.ename,e.sal,d.dname from emp e,dept d
+					where e.deptno=d.deptno(+);
+			2: 右外连接		//right [outer] join
+				eg: select e.ename,e.sal,d.dname from emp e right join dept d
+					on e.deptno=d.deptno;
+				eg: select e.ename,e.sal,d.dname from emp e,dept d
+					where e.deptno(+)=d.deptno;
+			3: 全外连接		//full join 左外连接与右外连接的并集
+				eg: select e.ename,e.sal,d.dname from emp e full join dept d
+					on e.deptno=d.deptno;
 
 五: Oracle的函数
 		
@@ -226,6 +281,7 @@
 			d: substr(char c,int m,int n)：从字符串的第m个开始,取n个字符组成的一个子字符串
 			e: replace(char c1,string search_string,string replace_string): 将字符串的指定子字符串用其他字符串替换
 			f: instr(char c1,char c2): 取子串在字符串的位置
+			g: || 连接字符串
 		B: 数学函数
 			a: max(列名/数据): 最大值
 			b: min(列名/数据): 最小值
@@ -246,17 +302,34 @@
 			q: log(数据m,数据n)：对数值 		㏒m(n)
 			r: power(数据m,数据n): m的n次幂 	m^n
 		C: 日期函数
-			默认情况下日期格式是dd-mon-yy 即12-7月-78 
-			 
+			//日期计算可使用 +d/-d 直接加上或减去天数 eg: sysdate-1: 昨天的日期; sysdate+7: 下周的今天的日期
+				默认情况下日期格式是dd-mon-yy 即12-7月-78 
+				修改参数 NLS_DATE_FORMAT 设置当前会话的日期格式, 修改参数 NLS_DATE_LANGUAGE 设置当前日期的字符集
+					eg: alter session set NLS_DATE_FORMAT ='yyyy-mm-dd';
+				1: yyyy: 一个四位数完整的年份
+				2: year: 二位数年份
+				3: mm: 二位数月份
+				4: dy: 三个字母的星期几 eg: mon
+				5: day: 星期几的全名
+				6: dd: 某一天的日期(数字格式)
 			a: sysdate: 该函数返回系统时间  
 			b: add_months(date d,int n): 返回指定日期增加n个月后的日期  
 			c: last_day(d)：返回指定日期所在月份的最后一天的日期
+			d: greatest(d1,d2): 比较日期, 返回较大者的日期
+			e: least(d1,d2): 
+			f: months_between(d1,d2): 返回两个日期相差的月份数
+			g: next_day(d):
+			h: round(d[,fmt]): 
+			i: trunc(d[,fmt]):
+			j: to_char(d[,fmt]):
+			k: to_date(str[,fmt]): 
 		D: 转换函数
 			转换函数用于将数据类型从一种转为另外一种。在某些情况下，oracle server允许值的数据类型和实际的不一样，这时oracle server会隐含的转化数据类型  
 				eg: create table t1(id int); insert into t1 values('10');-->这样oracle会自动的将'10' -->10
-			a: to_char(数据): 将数据转化为字符串形式
-				to_char(日期,'yyyy-mm-dd'): 将日期按照指定格式转化为字符串
-			b: to_date(字符串): 用于将字符串转换成date类型的数据
+			a: to_char(数据[,格式]): 将数据转化为字符串形式
+				to_char(d,'yyyy-mm-dd'): 将日期按照指定格式转化为字符串
+			b: to_date(str[,格式]): 用于将字符串转换成date类型的数据
+			c: to_number(str[,格式]): 将字符串转为数值
 		E: 系统函数
 			sys_context('USERENV','字段')
 			a: terminal: 当前会话客户所对应的终端的标示符  
@@ -398,7 +471,7 @@
 			当以用户的身份连接到数据库时,oracle会自动的激活默认的角色,通过查询数据字典视图dba_role_privs可以显示某个用户具有的所有角色及当前默认的角色		
 			select granted_role,default_role from dba_role_privs where grantee = ‘用户名’;				
 			
-111:数据字典
+111: 数据字典
 	数据字典记录了数据库的系统信息,它是只读表和视图的集合,数据字典的所有者为sys用户
 	用户只能在数据字典上执行查询操作(select语句),而其维护和修改是由系统自动完成的
 	

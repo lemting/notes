@@ -5,6 +5,8 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 
 //找不到 com.mysql.cj.jdbc.Driver 时,注意检查 pom.xml 配置的 <scope>runtime</scope>, 该处删掉即可
 
+//System.getProperty("user.dir"): 获取项目路径
+
 /* 解决 Ajax 不能跨域请求(CORS 头缺少 'Access-Control-Allow-Origin'): 
 	1: 在 Controller 类上加上 @CrossOrigin(origins = {"*"},allowCredentials = "true") 注解
 	2: 在 Ajax 请求体中添加  xhrFields: {withCredentials: true}
@@ -269,6 +271,7 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 	a: Spring Config
 		1: spring.config.name   	//配置文件名称,默认为 application 
 		2: spring.config.location 	//配置文件存放位置,默认为 classpath 目录下
+		3: spring.profiles.active	//根据设置值导入配置文件: application-{spring.profiles.active}.yml 或 application-{spring.profiles.active}.properties
 	b: Spring MVC (WebMvcProperties)
 		1: spring.mvc.view.prefix 	//指定mvc视图的前缀. 
 		2: spring.mvc.view.suffix	//指定mvc视图的后缀. (实际视图名 = prefix + 视图名 + suffix)

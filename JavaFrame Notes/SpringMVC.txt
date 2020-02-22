@@ -387,22 +387,25 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 					public CommonError setErrorMsg(String errorMsg) { this.commonError.setErrorMsg(errorMsg); return this; }
 				}
 		b: 注解处理 Controller 异常
-			1: 创建 BaseController 
-				@ExceptionHandler(Exception.class)	//将所有异常吸收
-				@ResponseStatus(HttpStatus.OK)	//设置前端状态为 200, 不会进入报错页面
-				public Object handlerException(HttpServletRequest request, Exception e){
-					Map<String, Object> responseData = new HashMap<>();	//response 数据
-					if(e instanceof BusinessException) {	//判断是否为自定义异常类
-						BusinessException businessException = (BusinessException) e;
-						responseData.put("errorCode", businessException.getErrorCode()); //错误代码
-						responseData.put("errorMsg", businessException.getErrorMsg());	//错误信息
-					} else {	//不为自定义的异常, 则为 未知异常
-						responseData.put("errorCode", EmBusinessError.UNKNOWN_ERROR.getErrorCode());
-						responseData.put("errorMsg", EmBusinessError.UNKNOWN_ERROR.getErrorMsg());
+			1: 创建 GlobalExceptionHandler 统一异常处理类 
+				@ControllerAdvice
+				public class GlobalExceptionHandler {
+					@ExceptionHandler(Exception.class)	//将所有异常吸收
+					@ResponseStatus(HttpStatus.OK)	//设置前端状态为 200, 不会进入报错页面
+					@ResponseBody
+					public Object handlerException(HttpServletRequest request, Exception e){
+						Map<String, Object> responseData = new HashMap<>();	//response 数据
+						if(e instanceof BusinessException) {	//判断是否为自定义异常类
+							BusinessException businessException = (BusinessException) e;
+							responseData.put("errorCode", businessException.getErrorCode()); //错误代码
+							responseData.put("errorMsg", businessException.getErrorMsg());	//错误信息
+						} else {	//不为自定义的异常, 则为 未知异常
+							responseData.put("errorCode", EmBusinessError.UNKNOWN_ERROR.getErrorCode());
+							responseData.put("errorMsg", EmBusinessError.UNKNOWN_ERROR.getErrorMsg());
+						}
+						return CommonReturnType.create(responseData, "fail");
 					}
-					return .....
 				}
-			2: 所有的 Controller 继承自 BaseController, 实现处理全局异常
 	
 	C: 图片的上传	
 		a: form 中提交 enctype="multipart/form-data" 的数据时,需要 SpringMVC 对 multipart 类型进行解析

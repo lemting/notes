@@ -8,9 +8,11 @@ Thymeleaf: 是面向Web和独立环境的现代服务器端Java模板引擎, 能
 /* HTML 文件的 <html> 必须引入 xmlns:th="http://www.thymeleaf.org"
 		<html xmlns:th="http://www.thymeleaf.org"> 
 		
-	Themeleaf Layout 必须引入  xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	Thymeleaf Layout 必须引入  xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
 		<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"> 
 */
+
+//避免user为空时报错 ${user?.userName}
 
 A: 注释
 	a: 标准 HTML/XML注释 
@@ -156,6 +158,7 @@ A: 注释
 		e: #dates			java.util.Date对象的方法: 格式化,组件提取等
 			1: #dates.format(<data>,<format>): 将时间日期格式化		
 					eg: ${#dates.format(dd.data, 'yy-MM-dd HH:mm:ss')}
+					eg: ${#dates.format((long)1582112480 * 1000, 'yy-MM-dd HH:mm:ss')}
 		f: #calendars		类似于 #dates 但是 java.util.Calendar 对象
 		g: #numbers			用于格式化数字对象的方法
 		h: #strings			String对象的方法: contains,startsWith,prepending / appending等

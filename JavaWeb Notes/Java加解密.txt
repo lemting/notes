@@ -1,0 +1,172 @@
+
+	Base64 加密
+	对称加密
+	非对称加密
+	
+A: Java 加密类
+	a: Java安全组成
+		1: JCA: (Java Cryptography Architecture)
+		2: JCE: (Java Cryptography Extension)
+		3: JSSE: (Java Secure Socket Extension)
+		4: JAAS: (Java Authentication and Authentication Service)
+	b: jdk 提供的加解密类
+		1: jdk默认提供的类可以配置,也可以在该文件配置添加自己的加解密类
+				//配置文件: jdk 根目录/jre/lib/security/java.security
+			# Note: Providers can be dynamically registered instead by calls to either the addProvider or insertProviderAt method in the Security class.
+			# List of providers and their preference orders (see above): //1-10 为 jdk 默认的,按照顺序使用
+			security.provider.1=sun.security.provider.Sun
+			security.provider.2=sun.security.rsa.SunRsaSign
+			security.provider.3=sun.security.ec.SunEC
+			security.provider.4=com.sun.net.ssl.internal.ssl.Provider
+			security.provider.5=com.sun.crypto.provider.SunJCE
+			security.provider.6=sun.security.jgss.SunProvider
+			security.provider.7=com.sun.security.sasl.Provider
+			security.provider.8=org.jcp.xml.dsig.internal.dom.XMLDSigRI
+			security.provider.9=sun.security.smartcardio.SunPCSC
+			security.provider.10=sun.security.mscapi.SunMSCAPI
+			security.provider.11=自己的加解密类
+			...
+		2: 相关 java 包
+			java.security	//消息摘要
+			java.crypto		//安全消息摘要,消息认证(鉴别)码
+			java.net.ssl	//安全套接字
+	c: jar 包扩展的加解密类
+		1: Bouncy Castle
+		2: Commons Codec	(commons-codec.jar)
+		
+B: Base64 加解密
+	a: jdk 的实现
+			//获取加解密对象后,通过对象的方法进行加解密
+		1: Encoder encoder = java.util.Base64.getEncoder(); //获取加密对象
+		2: Decoder decoder = java.util.Base64.getDecoder(); //获取解密对象	
+		3: 获取对应的对象后,根据对应方法进行加解密
+			eg: encoder.encode("加密".getBytes());
+				decoder.decoder("5Yqg5a+G");
+	b: Commons Codec 的实现
+			//通过静态方法进行加解密 (需要导入  commons-codec.jar)
+		1: org.apache.commons.codec.binary.Base64 的静态方法
+			eg: Base64.encodeBase64("加密".getBytes());
+				Base64.decodeBase64("5Yqg5a+G");
+	c: Bouncy Castle 的实现
+			//通过静态方法进行加解密 (需要导入 bcprov-ext-jdk15on-149.jar,bcprov-jdk15on-149.jar)
+		1: org.bouncycastle.util.encoders.Base64 的静态方法
+			eg: Base64.encode("加密".getBytes());
+				Base64.decode("5Yqg5a+G");
+				
+C: 对称加密				
+	a: DES	
+			Data Encryption Standard,数据加密标准
+		1: jdk 方式
+			//生成key
+			KeyGenerator keyGenerator = KeyGenerator.getInstance("DES");
+			keyGenerator.init(56); //设置密钥长度
+			SecretKey secretKey = keyGenerator.generateKey();
+			byte[] byteKey = secretKey.getEncoded();
+			//key转换
+			DESKeySpec desKeySpec = new DESKeySpec(byteKey);
+			SecretKeyFactory factory = SecretKeyFactory.getInstance("DES");
+			Key convertSecretKey = factory.generateSecret(desKeySpec);
+			-------------------------------------------------------------
+			Cipher cipher = Cipher.getInstance("DES/ECB/PKCS5Padding"); //设置为 DES/ECB/PKCS5Padding
+			cipher.init(Cipher.ENCRYPT_MODE, convertSecretKey); //设置加密模式
+			byte[] result = cipher.doFinal("DES加密".getBytes()); //获取加密结果 //该处参数为 需要加密的字节数组
+			cipher.init(Cipher.DECRYPT_MODE,convertSecretKey); //设置解密模式
+			result = cipher.doFinal(result);  //获取解密结果  //该处参数为 加密后的字节数组
+		2: Bouncy Castle 方式
+			Security.addProvider(new BouncyCastleProvider()); //添加Bouncy Castle的加解密类
+			//生成key 
+			KeyGenerator keyGenerator = KeyGenerator.getInstance("DES","BC"); //设置使用Bouncy Castle的加解密类
+			..... //后面跟jdk方式一样
+		
+	b: 3DES
+			DESede 或 Triple DES,三重DES
+		1: jdk 方式
+			//生成key
+			KeyGenerator keyGenerator = KeyGenerator.getInstance("DESede");
+			keyGenerator.init(168); //设置密钥长度
+			SecretKey secretKey = keyGenerator.generateKey();
+			byte[] byteKey = secretKey.getEncoded();
+			//key转换
+			DESedeKeySpec desedeKeySpec = new DESedeKeySpec(byteKey);
+			SecretKeyFactory factory = SecretKeyFactory.getInstance("DESede");
+			Key convertSecretKey = factory.generateSecret(desedeKeySpec);
+			-------------------------------------------------------------
+			Cipher cipher = Cipher.getInstance("DESede/ECB/PKCS5Padding"); //设置为 DESede/ECB/PKCS5Padding
+			cipher.init(Cipher.ENCRYPT_MODE, convertSecretKey); //设置加密模式
+			byte[] result = cipher.doFinal("3DES加密".getBytes()); //获取加密结果 //该处参数为 需要加密的字节数组
+			cipher.init(Cipher.DECRYPT_MODE,convertSecretKey); //设置解密模式
+			result = cipher.doFinal(result);  //获取解密结果  //该处参数为 加密后的字节数组
+		2: Bouncy Castle 方式
+			使用方式跟 DES 一样
+	c: AES
+			DES 的替代者
+		1: jdk 方式
+			//生成key
+			KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+			keyGenerator.init(128);  //设置密钥长度
+			SecretKey secretKey = keyGenerator.generateKey();
+			byte[] byteKey = secretKey.getEncoded();
+			//转换key
+			Key convertSecretKey = new SecretKeySpec(byteKey, "AES");
+			--------------------------------------------------------------
+			Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");	//设置为 AES/ECB/PKCS5Padding
+			cipher.init(Cipher.ENCRYPT_MODE, convertSecretKey); //设置加密模式
+			byte[] result = cipher.doFinal("AES加密".getBytes()); //获取加密结果 //该处参数为 需要加密的字节数组
+			cipher.init(Cipher.DECRYPT_MODE,convertSecretKey); //设置解密模式
+			result = cipher.doFinal(result);  //获取解密结果  //该处参数为 加密后的字节数组
+		2: Bouncy Castle 方式
+			使用方式跟 DES,3DES 一样
+	d: PBE
+			Password Based Encryption,基于口令加密
+		1: jdk 方式
+			
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	
+	
+	
+	

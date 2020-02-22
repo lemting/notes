@@ -1,5 +1,19 @@
 jQuery的css设置多个属性: $ele.css({"": "","": "",...})
 		
+		
+$.ajax({	//使用JQuery内置的Ajax方法
+	type : "post",
+	async : true,	//异步请求
+	url : "echarts/record.action",
+	data : {name:"A0001"},
+	dataType : "json",
+	success : function(result) { 
+	},
+    error : function(errorMsg) {	
+    }
+})
+		
+		
 一: jQuery选择器
 	A: id选择器: $("#id");
 	B: 类选择器: $(".class");

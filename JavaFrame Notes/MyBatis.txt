@@ -2,6 +2,11 @@
 
 MyBatis 是持久型框架
 
+/* 	在执行插入数据之后返回新增数据的ID(自增)
+	<!-- useGeneratedKeys: 获取自动生成的主键值, keyColumn: 数据表字段, keyProperty: 对象成员变量 -->
+	<insert ... useGeneratedKeys="true" keyColumn="user_id" keyProperty="userId"> ... </insert>
+*/
+
 一一一: Spring 和 MyBatis 整合
 		A: 整合思路
 			a: Spring 通过单例方式管理 SqlSessionFactory

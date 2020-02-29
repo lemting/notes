@@ -290,6 +290,7 @@ HTML标记
 			e: maxLength: 最多可以输入多少个字符,超出的就输不进去
 			f: readonly: 只读属性,可以选中但不能修改,取值: readonly --> readonly="readonly"
 			g: disabled: 禁用属性,进禁止选中修改,取值: disabled
+			h: placeholder: 设置提示信息
 		type属性值: 
 			type="text": 单行文本框 
 				eg: <input type="text" name="username">

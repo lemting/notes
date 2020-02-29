@@ -143,6 +143,8 @@ function check() {
 							
 一一一: JavaScript内置对象
 	A:	String: 字符串对象
+			成员变量: 
+				length: 字符串长度
 			构造方法: 
 				String(String str): 一字符串创建字符串
 			成员方法:

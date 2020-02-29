@@ -16,6 +16,7 @@ c:\xx\xx> sqlplus
 			select * from user where id=2;
 				
 */
+
 一: Oracle的基本使用--基本命令
 	A: 连接命令
 		1.conn[ect]   

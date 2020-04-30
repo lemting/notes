@@ -25,7 +25,7 @@ Spring 解决post乱码
 		</init-param>
 		<init-param>
 			<param-name>forceEncoding</param-name>
-			<param-value>true</param-value>
+			<param-value>true</param-vrralue>
 		</init-param>
 	</filter>
 	<filter-mapping>

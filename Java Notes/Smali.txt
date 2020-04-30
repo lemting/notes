@@ -1,0 +1,54 @@
+Smali: Java字节码, 一句 Java 代码会对应多句 Smali 代码
+
+eg: System.out.println("Hello World");
+	//获取 System 类中的 out 字段，存到 v0 中
+	sget-object v0, Ljava/lang/System;->out:Ljava/io/PrintStream;
+	//把 "Hello World" 存到 v1 中
+	const-string v1, "Hello World"
+	//调用虚方法 println，传入参数v0, v1
+	//相当于 v0.println(v1)
+	invoke-virtual {v0, v1}, Ljava/io/PrintStream;->println(Ljava/lang/String;)V
+	
+A: Smali 文件格式
+		在你可以在一个 Xxx.java 中定义多个类(包括匿名内部类), 但一个 smali 文件只能定义一个类
+	a: .class 修饰符 类名
+		1: 修饰符: public, private, protected, static, final
+		2: 类名: L包名路径/类名;				
+			eg: android.widget.TextView.java; => Landroid/widget/TextView;
+	b: .super 父类的类名
+	c: .source 源文件名
+		1: 源文件名: 编译这个类的 java 文件名
+	d: .implements 接口类名
+	e: annotation xxxxxxx			//注解
+			xxxxxx
+		.end annotation
+	f: .field 描述符 字段名:字段类型	//字段				
+			eg: public String text; => .field public text:Ljava/lang/String;
+		1: 引用字段: 类名->字段名:字段类名
+			eg: sget-object v0, Ljava/lang/System;->out:Ljava/io/PrintStream;
+	g: .method 描述符 方法名(参数类型)返回类型	//方法
+			方法代码...
+		.end method
+	h: 类名->方法名(参数类型)返回类型  //调用方法
+		eg: invoke-virtual {v0, v1}, Ljava/io/PrintStream;->println(Ljava/lang/String;)V  
+			//invoke-方法类型 {方法参数}, 类名->方法名(参数类型)返回类型
+			
+	
+B: 类型 Java	=>  Smali
+	a: 基本数据类型
+		void		V
+		boolean		Z
+		byte		B
+		short		S
+		char		C
+		int			I
+		long		J
+		float		F
+		double		D
+	b: 数组类型
+		int[]		[I
+		int[][]		[[I
+		String[]	[Ljava/lang/String;
+		
+C: 寄存器
+	v0,v1,v2,p0,p1,p2

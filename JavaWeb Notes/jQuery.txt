@@ -95,7 +95,7 @@ $.ajax({	//使用JQuery内置的Ajax方法
 	M: 特殊选择器this
 		this，表示当前的上下文对象是一个html对象，可以调用html对象所拥有的属性和方法。
 		$(this),代表的上下文对象是一个jquery的上下文对象，可以调用jQuery的方法和属性值
-	
+		
 二: jQuery属性和样式
 	A: attr();removeAttr(): 
 			jQuery中用attr()方法来获取和设置元素属性,attr是attribute(属性)的缩写,在jQuery DOM操作中会经常用到attr()
@@ -427,7 +427,7 @@ $.ajax({	//使用JQuery内置的Ajax方法
 	C: jQuery.trim(str): 用于去除字符串两端的空白字符
 	D: get([index]): 获取DOM元素
 	E: index([selector|element]): 获取DOM元素的索引
-
+	
 七: jQuery中的AJAX
 	A: load()
 		1: jQuery|$.load(URL[,data][,callback]): 从服务器加载数据,并把返回的数据放入被选元素中

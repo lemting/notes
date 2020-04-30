@@ -8,7 +8,7 @@ Python 文件以 .py 为扩展名
 		2: range(m,n)	=> [m,m+1,m+2,...,n]
 		3: range(m,n,s)	=> [m,m+s,m+s*2,...,n]  */
 		
-/* 	[] 	1: 字符串		str[i]: 字符串第i个字符; str[a:b]: 取[a,b)的字符串; str[a:]: 取[a,len)的字符串; str[:b]: 取[0,b)的字符串
+/* 	[] 	1: 字符串		str[i]: 字符串第i个字符; str[a:b]: 取[a,b)的字符串; str[a:]: 取[a,len)的字符串; str[:b]: 取[0,b)的字符串; str[:]: 取字符串
 		2: 列表元组		list[i]: 列表的第i个元素; list[a:b] list[a:] list[:b] 
 	+	1: 字符串		s1+s2		2: 列表元组  list1+list2
 	*   1: 字符串		str*2 => str+str
@@ -20,7 +20,9 @@ Python 文件以 .py 为扩展名
 	3: 条件过滤:   [<exp> for <var> in <list> if(<exp2>)]: 不满足条件的元素不允通过
 	4: 多层表达式: [<exp> for <var1> in <list1> for <var2> in <list2> [..]]: 多重for循环嵌套   */
 
-//Python 注释: #
+//Python 单行注释: #
+//Python 多行注释: '''  <code>  '''		或者	"""  <code>  """
+//Python 设置文件编码: # -*- coding: utf-8 -*
 
 一: 变量和数据类型
 	A: 变量赋值
@@ -39,7 +41,7 @@ Python 文件以 .py 为扩展名
 			3: float		浮点型
 			4: complex		复数(实部a和虚部b,可以用 a+bj,或者 complex(a,b) 表示, a,b为浮点型)
 		b: String		字符串	//'' ""  由数字,字母,下划线组成
-			1: []		//var[i]: 字符串第i个字符; str[a:b]: 取[a,b)的字符串; str[a:]: 取[a,len)的字符串; str[:b]: 取[0,b)的字符串
+			1: []		/*  var[i]: 字符串第i个字符; str[a:b]: 取[a,b)的字符串; str[a:]: 取[a,len)的字符串; str[:b]: 取[0,b)的字符串; str[:]: 取字符串  */
 							eg: str='Hello World!'; str[2]=>'l'; str[2:4]=>'ll'; str[2:]=>'llo World!'; str[:4]=>'Hell'
 			2: + 			字符串连接运算符
 			3: * 			重复操作 		eg: 'abc'*2 => abcabc
@@ -72,6 +74,11 @@ Python 文件以 .py 为扩展名
 			2: keys()		获取所有 key			eg: tinydict.keys()=> ['name','code','dept',2]
 			3: values()		获取所有 value			eg: tinydict.values()=> ['Sherlock',6734,'sales','dddd']
 			4: del			删除字段元素			eg: del tinydict['name'];
+		f: Set 			集合	//set{}  元素无序, 不可重复				eg: set = set([1,2,3]) => set = {1,2,3}
+			1: |			并集
+			2: &			交集
+			3: -			差集
+			4: ^			对称差集(并集与交集的差集)(a|b - a&b)
 
 二: 运算符
 	A: 算术运算符
@@ -158,6 +165,7 @@ Python 文件以 .py 为扩展名
 				lambda <parameters>: <expression>
 			1: lambda 的主体是一个表达式,而不是一个代码块
 			2: 该语句会返回 <expression>
+				eg: f = lambda x : x+2		=> f(x) = x + 2
 	
 	B: 高阶函数
 			函数其实也是一个变量, 函数名可作为参数传入, 函数返回值可以是函数
@@ -248,6 +256,7 @@ Python 文件以 .py 为扩展名
 			1: import <module1>,..				//引入[多个]模块,通过 module.function 访问指定模块的函数	eg: import math; print math.floor(1.2);
 			2: from <module> import <name1>,.. 	//引入模块的[多个]指定部分			eg: from math import floor; print floor(1.2);
 			3: from <model> import * 			//引入模块的全部内容,不建议使用
+			4: import <module1> as <alias>		//引入模块时可以赋予别名
 		b: 定位模块,查找顺序
 			1: 当前目录
 			2: 如果不在当前目录, Python 则搜索在 shell 变量 PYTHONPATH 下的每个目录
@@ -266,20 +275,277 @@ Python 文件以 .py 为扩展名
 				Phone/c.py:  def C():;
 				Phone/__init__.py: from a import A; from b import B; from c import C;
 				在 import Phone; 后就可以使用函数 A(),B(),C()
-	
+		g: __future__
+				Python的新版本会引入新的功能, 但是, 实际上这些功能在上一个老版本中就已经存在了. 要"试用"某一新的特性, 就可以通过导入 __future__ 模块的某些功能来实现
+			1: 要在 Python 2.7 中引入 3.x 的除法规则, 导入 __future__ 的 division：
+				from __future__ import division
+				print 10 / 3
+			2: __future__ 的 unicode_literals: 在 Python 3.x 中, 字符串统一为unicode, 不需要加前缀 u, 而以字节存储的 str 则必须加前缀 b
+			
+			
 六: 文件 I/O
 	A: Output
 		a: 打印到屏幕 
-			1: print <var>,...
-		b: 
+			1: print(<var>, ... , end='\n')		默认以换行结尾, 不想换行可设置 end=''
 	B: Input
 		a: 读取键盘输入
 			1: raw_input([prompt])		从标准输入读取一行,并返回字符串(去掉结尾的换行符),prompt 为提示文本
 			2: input([prompt]) 			与 raw_input() 基本相似, 但是 input()可以接收一个 Python 表达式作为输入,并将运算结果返回				
+				[x*5 for x in range(2,10,2)] => [10, 20, 30, 40]				//input
+				[x*5 for x in range(2,10,2)] => [x*5 for x in range(2,10,2)] 	//raw_input
+	C: 文件
+		a: 打开文件
+				file = open(<file_name> [, <access_mode>][, <buffering>]) 
+			1: access_mode: 打开文件模式, 默认只读(r) 
+				r(读) w(写) a(追加) +(读写) b(二进制) 
+							r   r+  w   w+  a   a+	 //rb rb+ wb wb+ ab ab+
+				读			+	+		+		+
+				写				+	+	+	+	+
+				创建				+	+	+	+
+				覆盖				+	+		
+				指针在开始	+	+	+	+		
+				指针在结尾					+	+
+				
+			2: buffering: 如果值取0, 就不会有寄存. 如果取1, 访问文件时会寄存行. 如果取大于1的整数, 表明了这就是的寄存区的缓冲大小. 如果取负值, 寄存区的缓冲大小则为系统默认
+		b: File 对象属性
+			1: file.closed 		返回文件是否已关闭
+			2: file.mode		返回打开文件的访问模式
+			3: file.name		返回文件名称
+			4: file.softspace	
+		c: 关闭文件 file.close()
+		d: 写入文件 
+			1: file.write(str) 	//write 不会在字符串的结尾添加换行符 '\n'
+			2: file.flush()		刷新文件内部缓冲
+		e: 读取文件 
+			1: file.read()			尽可能多地读取更多内容, 很可能是直到文件的末尾
+			2: file.read(n)			读取 n 字节的数据
+			3: file.next()			读取下一行数据
+			4: file.readline()		读取一行数据(包括换行符'\n')
+			5: file.readline(n)		读取一行数据, 不超过 n 个字节 (包括换行符'\n')
+			6: file.readlines()		读取所有行(直到结束符 EOF)并返回列表
+				eg: fo = open("runoob.txt", "r")
+					for line in fo.readlines(): print(line,end='')
+			
+		f: 文件指针
+			1: file.tell()					返回当前指针(int)
+			2: file.seek(offset[,from])		指针移动 offset 字节(from=0: 从文件开头开始移动; from=1: 从指针当前位置开始移动; from=2: 从文件末尾开始移动;)
+		g: 重命名文件 os.rename(current_file_name, new_file_name)	//os 模块
+		h: 删除文件 os.remove(file_name)	//os 模块
+		i: 目录 	//os 模块
+			1: os.mkdir(dir) 	创建目录(们)
+			2: os.chdir(dir)	修改当前目录名为 dir
+			3: os.getcwd()		返回当前工作目录
+			4: os.rmdir(dir)	删除目录(只能删除空目录)
+			
+七: 异常处理
+	A: 标准异常
+		a: BaseException			所有异常的基类
+		b: SystemExit				解释器请求退出
+		c: KeyboardInterrupt		用户中断执行(通常是输入^C)
+		d: Exception				常规错误的基类
+		e: StopIteration			迭代器没有更多的值
+		f: GeneratorExit			生成器(generator)发生异常来通知退出
+		g: StandardError			所有的内建标准异常的基类
+		h: ArithmeticError			所有数值计算错误的基类
+		i: FloatingPointError		浮点计算错误
+		j: OverflowError			数值运算超出最大限制
+		k: ZeroDivisionError		除(或取模)零 (所有数据类型)
+		l: AssertionError			断言语句失败
+		m: AttributeError			对象没有这个属性
+		n: EOFError					没有内建输入,到达EOF 标记
+		o: EnvironmentError			操作系统错误的基类
+		p: IOError					输入/输出操作失败
+		q: OSError					操作系统错误
+		r: WindowsError				系统调用失败
+		s: ImportError				导入模块/对象失败
+		t: LookupError				无效数据查询的基类
+		u: IndexError				序列中没有此索引(index)
+		v: KeyError					映射中没有这个键
+		w: MemoryError				内存溢出错误(对于Python 解释器不是致命的)
+		x: NameError				未声明/初始化对象 (没有属性)
+		y: UnboundLocalError		访问未初始化的本地变量
+		z: ReferenceError			弱引用(Weak reference)试图访问已经垃圾回收了的对象
+		a: RuntimeError				一般的运行时错误
+		b: NotImplementedError		尚未实现的方法
+		c: SyntaxError				Python 语法错误
+		d: IndentationError			缩进错误
+		e: TabError					Tab 和空格混用
+		f: SystemError				一般的解释器系统错误
+		g: TypeError				对类型无效的操作
+		h: ValueError				传入无效的参数
+		i: UnicodeError				Unicode 相关的错误
+		j: UnicodeDecodeError		Unicode 解码时的错误
+		k: UnicodeEncodeError		Unicode 编码时错误
+		l: UnicodeTranslateError	Unicode 转换时错误
+		m: Warning					警告的基类
+		n: DeprecationWarning		关于被弃用的特征的警告
+		o: FutureWarning			关于构造将来语义会有改变的警告
+		p: OverflowWarning			旧的关于自动提升为长整型(long)的警告
+		q: PendingDeprecationWarning	关于特性将会被废弃的警告
+		r: RuntimeWarning			可疑的运行时行为(runtime behavior)的警告
+		s: SyntaxWarning			可疑的语法的警告
+		t: UserWarning				用户代码生成的警告
+	B: 异常处理
+		a: try-except
+				try:
+					<code>        #运行别的代码
+				except <exception_name>：
+					<code>        #如果在try部份引发了'name'异常
+				except <exception_name>, <data>:
+					<code>        #如果引发了'name'异常, 获得附加的数据
+				else:
+					<code>        #如果没有异常发生
+			1: except: 						不带异常类型, 则发生任何异常都会触发
+			2: except(exception_name1,..): 	处理多个异常信息
+		b: try-finally
+				try:
+					<code>
+				finally:
+					<code>    #退出try时总会执行
+				raise
+			1: 
+	C: 用户自定义异常
+			异常应该是典型的继承自 Exception 类, 通过直接或间接的方式
+		# 创建自定义异常
+		class Networkerror(RuntimeError):
+			def __init__(self, arg):
+				self.args = arg
+		
+		# 触发该异常
+		try:
+			raise Networkerror("Bad hostname")
+		except Networkerror,e:
+			print e.args
+	
+八: 面向对象
+	a: 创建类 
+		class ClassName: 
+		#class ClassName(ParentClass1[,..]): 	# 创建派生类, 可以多继承
+			'类的帮助信息'   #类文档字符串
+			# 静态成员变量, 该变量为该类所有实例共用
+			<name> [=<value>]
+			/*Python 不允许实例化的类访问私有数据, 但可以使用 object._className__attrName (对象名._类名__私有属性名) 访问属性  
+				eg: runoob = Runoob()  
+					print runoob._Runoob__site
+			*/
+			__private_var = 0  	# private 成员变量 
+			_protected_var = 0	# protected 成员变量 
+			public_var = 0 		# public 成员变量
+		
+			//self 代表类实例, 定义方法时必须要有 self, 调用时不必传入相应的参数(self 不是关键字, 可以使用其他名字) 
+			# 构造函数 # obj = className(args) 创建对象
+			def __init__(self [, <args>]):
+				<code>
+			/* 自定义属性
+				class Person: 
+					def __init__(self, name, **kw):
+						self.name = name
+						for k,v in kw.iteritems():
+							setattr(self, k, v)
+				p = Person('张三', birth='1990-1-1', job='Student')  */
+				
+			# 析构函数 # del(obj) 删除对象
+			def __del__(self ):
+				<code>
+			# 返回字符串 # str(obj)  返回对象的字符串形式
+			def __str__(self):
+				return <str>
+			# 比较对象 # cmp(obj, x) 比较对象
+			def __cmp__(self,x): 
+				return <result>
+			# 重载加法 # obj1 + obj2 对象加法
+			def __add__(self,other):
+				return <newobj>
+			
+			# 成员方法 	__method: private 方法; _method: protected 方法; method: public 方法
+			def <method>(self [, <args>]):
+				<code>
+				[return [<expression>]]	
+				
+			# 静态成员方法
+			@classmethod		//@classmethod 会将该成员方法绑定到 类, 而非类的实例, cls 相当于 self
+			def <method>(cls [, <args>]):
+				<code>
+				[return [<expression>]]	
+				
+		eg: class Employee:
+			   '所有员工的基类'
+				empCount = 0
 
+				def __init__(self, name, salary):
+					self.name = name
+					self.salary = salary		# 通过 self 访问, 修改实例对象的成员变量值
+					Employee.empCount += 1	# 通过类名访问
+				
+				def displayCount(self):
+					print "Total Employee %d" % Employee.empCount
 
-
-
+				def displayEmployee(self):
+					print "Name : ", self.name,  ", Salary: ", self.salary
+			 
+			# 创建 Employee 类的第一个对象
+			emp1 = Employee("Zara", 2000)
+			# 创建 Employee 类的第二个对象
+			emp2 = Employee("Manni", 5000)
+			emp1.displayEmployee()
+			emp2.displayEmployee()
+			print "Total Employee %d" % Employee.empCount
+	
+	b: 内置类属性
+		1: __dict__ 	类的属性(包含一个字典, 由类的数据属性组成)
+		2: __doc__ 		类的文档字符串
+		3: __name__		类名
+		4: __module__	类定义所在的模块 (类的全名是'__main__.className', 如果类位于一个导入模块mymod中, 那么className.__module__ 等于 mymod)
+		5: __bases__ 	类的所有父类构成元素 (包含了一个由所有父类组成的元组)
+	c: 类的继承
+		1: class ClassName(ParentClass1[,..]) 可以多继承
+			/* 继承的父类初始化
+				class ClassName(ParentClass):
+					def __init__(self, <Parent_args>, <args>): 
+						super(ClassName, self).__init__(<Parent_args>) */
+		2: issubclass(sub,sup)		判断 sub 是否是 sup 的子类或子孙类
+		3: isinstance(obj, Class) 	判断 obj 是否是 Class 的实例对象或 Class 子类的实例对象
+	d: 方法重写
+			如果你的父类方法的功能不能满足你的需求, 你可以在子类重写你父类的方法
+	e: 魔术方法
+		1: __init__(self [,args...])	构造函数					obj = className(args)
+		2: __del__(self)				析构函数					del(obj)
+		3: __repr__(self)				转化为供解释器读取的形式	repr(obj)
+		4: __str__(self)				将值转化为字符串的形式		str(obj)
+		5: __cmp__(self, x)				对象比较					cmp(obj, x)
+		6: __len__(self)				
+		7: __slots__ = (<names>)		该类允许的属性列表, 不能添加不在该列表的属性
+		8: __call__
+		
+	f: 运算符重载
+		1: __add__(self,other)			加 +
+		2: __sub__						减 -
+		3: __mul__						乘 *
+		4: __div__						除 /
+		5: __mod__						余 %
+		6: __pow__						幂 ^
+		7: __lt__						<
+		8: __le__						<=
+		9: __eq__						==
+		0: __ne__						!=
+		1: __gt__						>
+		2: __ge__						>=
+		3: __and__						且 and
+		4: __or__						或 or
+		5: __xor__						异或 xor
+		6: __neg__						非 neg
+	g: @property
+			使用 @property 可以达到 get/set 方法的效果的同时简洁使用
+		@property	//该处 @property 注解方法为 get_score(), 使用时可直接通过 对象.score 访问
+		def score(self):
+			return self.__score
+		
+		@score.setter	//该处 @score.setter 为上个 @property 注解后的副产品 set_score, 使用时可以直接 对象.score = 值
+		def score(self, score):
+			if score < 0 or score > 100:
+				raise ValueError('invalid score')
+			self.__score = score
+		
 : 常用函数 
 	1: isinstance(obj,classinfo): 判断对象 obj 是否是已知的 classinfo 类型. 
 			classinfo 取值: int,float,bool,complex,str(字符串),list,dict(字典),set,tuple 
@@ -398,6 +664,7 @@ Python 文件以 .py 为扩展名
 			3: max(list)			返回列表元素最大值
 			4: min(list)			返回列表元素最小值
 			5: list(seq)			将元组转换为列表
+				eg: list('ab') => ['a', 'b']
 			6: zip(list1,list2)		将两个list转为一个列表,元素为元组: zip[i]=(list1[i],list2[i]) 
 		b: 列表方法
 			1: list.append(obj)			在列表末尾添加新的对象
@@ -415,6 +682,7 @@ Python 文件以 .py 为扩展名
 		3: max(tuple)			返回元组中元素最大值.
 		4: min(tuple)			返回元组中元素最小值.
 		5: tuple(seq)			将列表转换为元组.
+			eg: tuple([1,2]) => (1,2)
 	
 	F: 字典函数
 		a: 字典函数
@@ -423,6 +691,7 @@ Python 文件以 .py 为扩展名
 			3: str(dict)			输出字典可打印的字符串表示.
 			4: type(variable)		返回输入的变量类型,如果变量是字典就返回字典类型.
 		b: 字典方法
+			0: dict([['a',1],['b',2]])		{'a':1, 'b':2}
 			1: dict.clear()					删除字典内所有元素
 			2: dict.copy()					返回一个字典的浅复制
 			3: dict.fromkeys(seq[, val])	创建一个新字典,以序列 seq 中元素做字典的键,val 为字典所有键对应的初始值

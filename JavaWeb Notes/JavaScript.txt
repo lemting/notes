@@ -159,7 +159,7 @@ function check() {
 				substring(start [,stop]): 提取字符串中介于两个指定下标之间的字符,返回一个新的字符串(若未给stop则默认抽取到末尾)
 				sup(): 用于把字符串显示为上标
 				split(separator [,howmany]): 把一个字符串分割成字符串数组.separator: 字符串或正则表达式,howmany: 指定返回的数组的最大长度	
-		
+				
 	B:	Array: 数组对象
 			构造方法: 
 				Array(): 默认构造

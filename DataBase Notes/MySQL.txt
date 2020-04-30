@@ -237,7 +237,8 @@ F: 内置函数
 			%：表示0到多个任意字符  
 			_：表示单个任意字符 
 				eg: select 'MySQL' like 'M%';  =>  1(即true)
-		14: replace(String1,String2,String3): 字符串替换,将String1中的子字符串String2替换为String3.		
+		14: replace(String1,String2,String3): 字符串替换,将String1中的子字符串String2替换为String3.
+		15: instr(str,str1): 返回 str1 在 str 的位置 
 	b: 数值运算符与函数
 		1: ceil(num): 向上取整
 		2: floor(num): 向下取整

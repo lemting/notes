@@ -293,7 +293,70 @@ b: 模式表达式  //模式之间 '|' 隔开
 		c: 函数调用不需要加括号
 	
 	
+/* 
+	Hadoop
+1: 单击配置(非分布式) 实例
+	cd /xxx/hadoop			
+	mkdir ./input						
+	cp ./etc/hadoop/*.xml ./input		#复制数据文件到 input 目录
+	./bin/hadoop jar ./share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar grep ./input ./output 'dfs[a-z.]+'
+	cat ./output/*						#查看输出结果
+
+	rm -r ./output
+
+2: 伪分布式配置
+	编辑 core-site.xml
+		gedit ./etc/hadoop/core-site.xml
+			配置文件内容: ...
+			<configuration>
+				<property>
+					<name>hadoop.tmp.dir</name>
+					<value>file:/usr/cpy/hadoop/tmp</value>
+					<description>Abase for other temporary directories.</description>
+				</property>
+				<property>
+					<name>fs.defaultFS</name>
+					<value>hdfs://localhost:9000</value>
+				</property>
+			</configuration>
+	编辑 hdfs-site.xml
+		gedit ./etc/hadoop/hdfs-site.xml
+			配置文件内容: ....
+			
+			
+	执行 NameNode 初始化
+		cd /xxx/hadoop
+		./bin/hdfs namenode -format
+	开启 NameNode 和 DataNode 守护进程
+		./sbin/start-dfs.sh
+	判断是否启动成功, 若成功会列出进程 NameNode DataNode SecondaryNameNode(若未启动, 通过 stop-dfs.sh 关闭进程后, 重新尝试启动) 
+		cd /xxx/hadoop
+		jps
+	关闭 Hadoop 
+		./sbin/stop-dfs.sh
+	再次启动 Hadoop, 无需进行 NameNode 初始化
+		./sbin/start-dfs.sh
 	
+3: 伪分布式配置 实例
+	cd /xxx/hadoop
+	./bin/hdfs dfs -mkdir -p /user/hadoop		#在 HDFS 中创建用户目录
+	./bin/hdfs dfs -mkdir input
+	./bin/hdfs dfs -put ./etc/hadoop/*.xml input 	#复制数据文件到用户目录的 input 目录
+	./bin/hdfs dfs -ls input 						#查看 input 目录文件列表
+	./bin/hadoop jar ./share/hadoop/mapreduce/hadoop-mapreduce-examples-*.jar grep ./input ./output 'dfs[a-z.]+'
+	./bin/hdfs dfs -cat output/*					#查看输出结果	
+	
+	./bin/hdfs dfs -rm -r output					#删除 output 目录
+	
+	
+	#运行程序时, 输出目录不能存在, 可在代码中加入如下代码, 每次运行自动删除输出目录
+	Configuration configuration = new Configuration();
+	Job job = new Job(configuration);
+	Path outputPath = new Path(args[1]);
+	outputPath.getFileSystem(configuration).delete(outputPath, true);
+	
+
+*/
 	
 	
 	

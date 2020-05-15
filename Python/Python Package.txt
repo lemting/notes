@@ -1,0 +1,467 @@
+Python 第三方库
+
+
+一: Numpy (import numpy as np)	//轴(axis): 保存数据的维度; 秩(rank): 轴的数量
+ 
+		提供数组支持, 以及相应的高效的处理函数
+	A: ndarray (a = np.array(..))
+			一个强大的 N 维数组对象, 数组元素类型相同, 下标从 0 开始
+		a: 成员变量
+			1: ndim						秩, 轴的数量(维度的数量)
+			2: shape					ndarray 对象的尺度, 对于矩阵, n 行 m 列
+			3: size						ndarray 对象元素的个数, 相当于 shape 中的 n*m
+			4: dtype					ndarray 对象的元素类型(支持类型: bool, intc, intp, int8, int16, int32, int64, float16~64, uint8~64, complex64, complex128)
+			5: itemsize					ndarray 对象中每个元素的大小, 单位字节
+		b: ndarray 对象的创建
+			1: np.array(list/tuple)		根据列表元组创建, 可以传入 dtype=np.float32 指定元素的类型
+			2: np.arange(n)				(0~n 数组)类似 range(), 返回 [0,n)	eg: np.arange(10) => array([0,1,2,3,4,5,6,7,8,9])
+			3: np.ones(shape)			(1 数组)根据 shape 生成一个全一数组, shape 是元组类型	eg: np.ones((2,3), dtype=np.int32) => array([1,1,1],[1,1,1])
+			4: np.zeros(shape)			(0 数组)全零数组
+			5: np.full(shape,val)		(val 数组)元素全为 val 的数组
+			6: np.eye(n)				(单位矩阵)n*n 的单位矩阵, 对角线为 1, 其余为 0
+			//其他方式
+			1: np.ones_like(a)			根据数组 a 的形状生成一个全 1 数组
+			2: np.zeros_like(a)			根据数组 a 的形状生成一个全 0 数组
+			3: np.full_like(a,val)		根据数组 a 的形状生成一个全 val 数组
+			4: np.linspace()			根据起止数据等间距填充数据, 形成数组	
+											eg: a = np.linspace(1,10,4) => array([1., 4., 7., 10.])   
+												b = np.linspace(1,10,4,endpoint=False) => array([1., 3.25, 5.5, 7.75])
+			5: np.concatenate()			将两个或多个数组合并成一个新数组
+											eg: np.concatenate((a,b)) => array([1., 4., 7., 10., 1., 3.25, 5.5, 7.75])   
+		c: 基本操作
+			1: []						a[i]: 数组第 i 个元素; 
+										a[x,y,z]: 多维的索引, 类似 C 的 a[x][y][z]
+										a[起始编号:终止编号(不含)]; a[起始编号:终止编号(不含):步长];
+										a[m:n] => [m,n); a[m:] => [m,len); a[:n] => [0,n); a[:] => [0,len); 
+										a[m:n:s] => [m,m+s,m+2s,..] & [m,n); a[m::s]: [m,m+s,m+2s,..] & [m,len); a[::s]: [0,s,2s,..] & [0,len); 
+										a[m:n,:n,m::s]: 多维的切片 
+										a[m:n, y, z]: 多维的 切片+索引
+		
+			2: 与标量运算				数组的每一个元素都与标量进行计算
+			
+		
+		d: 成员方法
+			//维度变换
+			1: reshape(shape)			不改变数组元素, 返回一个 shape 形状的数组, 原数组不变
+			2: resize(shape)			与 reshape() 功能一致, 但是修改原数组
+			3: swapaxes(ax1,ax2)		将数组 n 个维度中的两个维度进行交换
+			4: flatten()				对数组进行降维, 返回折叠后的一维数组, 原数组不变
+			//元素类型变换
+			1: astype(new_type)			修改数组元素的类型, 返回修改后数组, 原数组不变 (new_type: np.int32, np.float64,..)
+			//类型转换
+			1: tolist()					返回 ndarray 对象转为成的 List 对象
+			
+	B: CSV 的读写 	//CSV 只能有效的存储一维和二维数组
+		a: np.savetxt(frame, array, fmt='%.18e', delimiter=None)	 			//写入文件, 只能有效的写入一维和二维数组
+			1: frame 				文件,字符串或产生器, 可以是 .gz 或 .bz2 的压缩文件
+			2: array				存入文件的 ndarray 数组
+			3: fmt					下入文件的格式 		eg: %d %.2f %.18e 
+			4: delimiter 			分割字符串, 默认是任何空格
+				
+				eg: a = np.arange(100).reshape(5,20)
+					np.savetxt('a.csv', a, fmt='%d', delimiter=',')
+		b: np.loadtxt(frame, dtype=np.float, delimiter=None, unpack=False)		//读取文件, 只能有效的读取一维和二维数组
+			1: frame 				文件,字符串或产生器, 可以是 .gz 或 .bz2 的压缩文件
+			2: dtype				数据类型
+			3: delimiter			分割字符串, 默认是任何空格
+			4: unpack				True: 读入属性将分别写入不同变量
+				
+				eg: a = np.loadtxt('a.csv', delimiter=',')
+				
+	C: 多维数据存取
+		a: a.tofile(frame, sep='', format='%s')						//写入文件
+			1: frame				文件, 字符串
+			2: sep					分割字符串, 如是空串, 写入文件为二进制
+			3: format				写入数据格式
+			
+				eg: a = np.arange(100).reshape(5, 10, 2)
+					a.tofile('b.dat', sep=',', format='%d')
+		
+		b: np.fromfile(frame, dtype=np.float, count=-1, sep='')		//读取文件
+			1: frame				文件, 字符串
+			2: dtype				数据类型
+			3: count				读入元素个数, -1 表示读入整个文件
+			4: sep					分割字符串, 如是空串, 读取文件为二进制
+				
+				eg: a = np.fromfile('b.dat', dtype-np.int, sep=',').reshape(5, 10, 2)
+				
+	D: 便捷文件读取
+		a: np.save(frame, array)/np.savez(frame, array)				//写入文件
+			1: frame				文件名, .npy/.npz(扩展名/压缩扩展名)
+			2: array				数组
+		b: np.load(frame)
+			1: frame				文件名, .npy/.npz(扩展名/压缩扩展名)
+			
+				eg: a = np.arange(100).reshape(5, 10, 2)
+					np.save('a.npy', a) 	np.savez('a.npz', a)
+					b = np.load('a.npy')	c = np.load('a.npz')
+		
+	C: NumPy 函数 
+		a: 一元函数(可用于标量, ndarray(广播运算))
+			1: np.abs(x)/np.fabs(x)		绝对值
+			2: np.sqrt(x)				平方根
+			3: np.square(x)				平方
+			4: np.log(x)/log2/log10		自然对数 / 2底对数 / 10底对数
+			5: np.ceil(x)				向下取整
+			6: np.floor(x)				向上取整
+			7: np.rint(x)				四舍五入
+			8: np.modf(x)				分离整数部分,小数部份, 返回两个独立数据
+			9: np.cos(x)/sin/tan		三角函数
+			0: np.cosh(x)/sinh/tanh		三角函数
+			1: np.exp(x)				指数
+			2: np.sign(x)				符号值, 结果 1(+), 0, -1(-)
+		b: 二元函数(可用于标量, ndarray(广播运算))
+			1: + - * / **				基本运算
+			2: np.maximum(x,y)/fmax		最大值
+			3: np.minimum(x,y)/fmin		最小值
+			4: np.mod(x,y)				取模 %
+			5: np.copysign(x,y)			将 y 的符号赋予给 x
+			6: > < >= <= == !=			算术运算
+		c: 随机数函数 (np.random.*)
+			//随机数函数
+			1: np.random.rand(d0~dn)	根据 d0~dn 创建随机数数组, 浮点数, 均匀分布, [0,1) 			
+			2: randn(d0,..,dn)			根据 d0~dn 创建随机数数组, 标准正态分布
+			3: randint(m,[n,shape])		根据 shape 创建随机整数或整数数组, 范围 [m,n)			
+			4: seed(s)					随机数种子, s 为给定的种子
+			//随机数固定形状函数
+			1: uniform(m,n,size)		产生具有均匀分布的数组, [m,n), size: 形状
+			2: normal(l,s,size)			产生具有正态分布的数组, l:均值, s:标准差, size: 形状 
+			3: poisson(lan,size)		产生具有泊松分布的数组, lam: 随机事件发生率, size: 形状
+			//其他随机函数
+			1: shuffle(a)				根据数组 a 的 0 轴进行随排序, 改变 a
+			2: permutation(a)			根据数组 a 的 0 轴产生一个新的乱序数组, 不改变 a
+			3: choice(a,[size,r,p])		从一维数组 a 中以概率 p 抽取元素, 形成 size 形状新数组, r:是否可重用元素, 默认 True
+			
+				eg: np.random.rand(2,3) => [[0.5, 0.5, 0.5],[0.5, 0.5, 0.5]]
+		
+		d: 统计函数
+			1: np.sum(a,axis=None)						求和, axis: 指定轴, 整数或元组
+			2: np.mean(a,axis=None)						期望, axis: 指定轴, 整数或元组
+			3: np.average(a,axis=None,weight=None)		加权平均值, axis: 指定轴
+			4: np.std(a,axis=None)						标准差, axis: 指定轴
+			5: np.var(a,axis=None)						方差, axis: 指定轴
+			6: np.ptp(a)								极差
+			7: np.median(a)								中位数
+			8: np.max(a)/min							最大值/最小值
+			9: np.argmax(a)/argmin						最大值/最小值的降一维后下标
+			0: np.unravel_index(index,shape)			根据 shape 将一维下标 index 转为多维下标
+		e: 梯度函数
+			1: np.gradient(a)			梯度, 当 a 为多维时, 返回每个维度梯度(梯度: 斜率, 连续值之间的变化率)
+				
+				eg: a = np.ndarray([15, 3, 12, 13, 14])
+					np.gradient(a)  => array([-12., -1.5, 5., 1., 1.])
+				eg: np.gradient(np.ndarray([a, b, c, d]))  => [b-a, (c-a)/2, (d-b)/2, d-c]
+	
+	
+二: Scipy
+		提供矩阵支持, 以及矩阵相关的数值计算模块
+	
+三: Matplotlib (import matplotlib.pyplot as plt)
+		
+		强大的数据可视化工具,作图库 
+		matplotlib.pyplot 是绘制各类可视化图形的命令子库, 相当于快捷方式
+	A: 绘图函数
+		a: plt.plot(x,y,format_string,**kwargs)		//坐标图
+			1: x						X 轴数据, 列表或数组, 可选		//当 x 不传时, 按照 y 轴顺序绘制数据点, x 轴自动生成		eg: plt.plot([3,1,4,5,2])
+			2: y						Y 轴数据, 列表或数组
+			3: **kwargs					第二组或更多(x,y,format_string)
+				//其他参数: color='green'(颜色), linestyle='dashed'(风格), marker='o'(标记), makerfacecolor='blue'(标记颜色), makersize=20(标记尺寸)
+			4: format_string			(颜色+风格+标记)控制曲线的格式字符串, 可选
+				//颜色字符: 'r'(红) 'g'(绿) 'b'(蓝) 'c'(青绿) 'm'(洋红) 'y'(黄) 'k'(黑) 'w'(白) '#008000'(RGB) '0.8'(灰度值)
+				//风格字符: '-'(实线) '--'(破折线) '-.'(点划线) ':'(虚线) ''(无线条) ' '(无线条)
+				//标记字符: '.'(点标记) ','(像素标记) 'o'(实心圆) 'v'(倒三角) '^'(上三角) '>'(右三角) '<'(左三角) '1'(下花三角) '2'(上花三角) '3'(左花三角) '4'(右花三角)
+				//			's'(实心方形) 'p'(实心五角) '*'(星形) 'h'(竖六边形) 'H'(横六边形) '+'(十字) 'x'(X) 'D'(菱形) 'd'(瘦菱形) '|'(垂直线)
+
+				eg: a = np.arange(10)
+					plt.plot(a, a*1.5, 'og-', a, a*2.5, 'rx', a, a*3.5, '*', a, a*4.5, 'b-.')
+		b: plt.boxplot(data,notch,position)			//箱形图
+		c: plt.bar(left,height,width,bottom)		//条形图
+			1: left						距离远点距离数据
+			2: height					数据显示高度
+			3: width					数据显示宽度
+			4: bottom					距离底部距离
+			
+			eg: N=20
+				theta = np.linspace(0.0, 2*np.pi, N, endpoint=False)
+				radii = 10*np.random.rand(N)
+				width = np.pi/4*np.random.rand(N)
+				ax = plt.subplot(111, projection='polar')
+				bars = ax.bar(theta, radii, width=width, bottom=0.0)
+				for r, bar in zip(radii, bars):
+					bar.set_facecolor(plt.cm.viridis(r/10.))
+					bar.set_alpha(0.5)
+				plt.show()
+			
+		d: plt.barh(width,bottom,left,height)		//横向条形图
+		e: plt.polar(theta,r)						//极坐标图
+
+		f: plt.pie(data,explode)					//饼图
+			1: data						数据
+			2: explode					突出部分
+			3: labels					数据的标签
+			4: colors					数据的颜色
+			5: autopct					数据显示的格式
+			6: shadow					是否有阴影
+			7: startangle				饼图起始角度
+				eg: sizes = [15, 30, 45, 10]
+					explode = (0, 0.1, 0, 0)
+					labels = 'Frogs', 'Hogs', 'Dogs', 'Logs'
+					colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral']
+					plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=False, startangle=90)
+					plt.show()
+		
+		g: plt.psd(x,NEFT=256,pad_to,Fs)			//功率谱密度图
+		h: plt.specgram(x,NEFT=256,pad_to,F)		//谱图
+		i: plt.cohere(x,y,NEFT=256,pad_to,Fs)		//X-Y 相关性函数
+		j: plt.scatter(x,y)							//散点图, x 和 y 长度相同
+		k: plt.step(x,y,where)						//步阶图
+		l: plt.hist(x,bins,density)					//直方图
+			1: x						数据
+			2: bins						直方图个数(根据数据最大值和最小值,分成 bins 组数据)
+			3: density					值为0: y 轴显示个数; 值为1: y 轴显示频率		
+				eg: np.random.seed(0)
+					mu, signa = 100, 20	# 均值,标准差
+					a = np.random.normal(mu, signa, size=100)
+					plt.hist(a, 20, density=1, histtype='stepfilled', facecolor='b', alpha=0.75)
+					plt.show()
+		
+		m: plt.contour(X,Y,Z,N)						//等值图
+		n: plt.vlines()								//垂直图
+		o: plt.stem(x,y,linefmt,makerfmt)			//柴火图
+		p: plt.plot_date()							//数据日期
+			
+		
+		
+	B: 其他函数
+		
+		a: 文本显示函数 
+			//其他参数: fontproperties='SimHei', fontsize=20
+			//显示文本转码($ .. $): \pi = π, \mu = μ, 				eg: r'函数: $y=cos(2\pi x)$' => '函数: y=cos(2πx)'
+			1: plt.xlabel(str)			设置 x 轴标签
+			2: plt.ylabel(str)			设置 y 轴标签
+			3: plt.title(str)			设置绘图标题
+			4: plt.text(x,y,str)		在任意位置增加文本
+			5: plt.annotate()			在图形中增加带箭头的注解
+		
+		b: 绘图区域 (将画布分为多个区域,可绘制多个图形)
+			1: plt.subplot(nrows, ncols, plot_number)						将区域划分成 nrows 行 ncols 列, 并至于第 plot_number 个区域
+			2: plt.subplot2grid(GridSpec,CurSpec,colspan=1,rowspan=1)		设定网格, 选中网格, 确定选中行列区域数量, 编号从 0 开始
+				eg: plt.subplot2grid((3,3),(1,0),colspan=2)	=> 设定网格为 3x3, 选中(1,0)网格, 列合并2单元格
+						0 0 0
+						1 1 0
+						0 0 0
+				eg: plt.subplot2grid((3,3),(0,0),colspan=3)
+					plt.subplot2grid((3,3),(1,0),colspan=2)			1 1 1
+					plt.subplot2grid((3,3),(1,2),rowspan=2)		=>	2 2 3
+					plt.subplot2grid((3,3),(2,0))					4 5 3
+					plt.subplot2grid((3,3),(3,0))
+			3: matplotlib.gridspec
+				eg: import matplotlib.gridspec as gridspec
+					gs = gridspec.GridSpec(3,3)
+					ax1 = plt.subplot(gs[0,:])						1 1 1
+					ax2 = plt.subplot(gs[1,:-1])				=>	2 2 3
+					ax3 = plt.subplot(gs[1:,-1])					4 5 3
+					ax4 = plt.subplot(gs[2,0])
+					ax5 = plt.subplot(gs[2,1])
+		c: 
+			plt.axis([x1,x2,y1,y2])			设置 x 轴起止范围 [x1,x2], y 轴起止范围 [y1,y2]
+			plt.axis('equal')				设置 x 轴 y 轴尺寸相同
+			plt.figure(figsize=(7,5))		创建图像区域, 指定比例
+			plt.grid(True)					显示网格
+			plt.savefig('test',dpi=600)		保存图片
+			plt.show()						显示绘制的图像
+		
+	
+	B: pyplot 中文显示
+			pyplot 默认不支持中文显示
+		a: 第一种, matplotlib.rcParams 修改字体(全局修改)
+			1: rcParams['font.family']		字体(SimHei: 黑体; Kaiti: 楷体; LiSu: 隶书; FangSong: 仿宋; YouYuan: 幼圆; STSong: 华文宋体)
+			2: rcParams['font.style']		字体风格, 'normal': 正常; 'italic': 斜体
+			3: rcParams['font.size']		字体大小, 整数字号 或 'large','x-samll'
+			
+				eg: import matplotlib
+					matplotlib.rcParams['font.family'] = 'SimHei'
+		b: 第二种, 在中文的地方, 增加一个属性: fontproperties
+			eg: a = np.arange(0.0, 5.0, 0.02)
+				plt.xlabel('横轴: 时间', fontproperties='SimHei', fontsize=20)
+				plt.ylabel('纵轴: 振幅', fontproperties='SimHei', fontsize=20)
+				plt.plot(a, np.cos(2*np.pi*a), 'r--')
+				plt.show()
+		
+
+四: Pandas  (import pandas as pd)
+
+		强大, 灵活的数据分析和探索工具
+	A: 数据结构
+		a: Series: 一维数组, 与 Numpy 中的一维 array 类似. 二者与 Python 基本的数据结构 List 也很相近, 
+					其区别是: List 中的元素可以是不同的数据类型, 而 Array 和 Series 中则只允许存储相同的数据类型, 这样可以更有效的使用内存, 提高运算效率. 
+		b: DataFrame: 二维的表格型数据结构. 很多功能与 R 中的 data.frame 类似. 可以将 DataFrame 理解为 Series 的容器. 以下的内容主要以 DataFrame 为主. 
+	B: Series (s = pd.Series(..))
+		a: 构造函数 pd.Series(data[,index])
+			1: data							数据可以是 List,Tuple,Dict,ndarray
+			2: index						默认索引为 0,1,.., 可指定 index 手动设置索引		eg: pd.Series([1,2,3,4],['a','b','c','d']) 
+		b: 成员变量
+			1: index						返回索引的序列
+			2: array				
+			3: values						返回数据的序列
+			4: size							返回基本数据中的元素个数
+			5: empty						返回 Series 中元素是否为空
+			6: plot.pie()/box/hist			绘制各种图
+			
+				eg: pd.Series(np.random.randn(1000)).plot.hist(10)	# 1000个服从正态分布的随机数, 分成10组进行绘制直方图
+			
+		c: 基本操作
+			1: []							s['c'], s[1], s[['c','d','a']],	 	索引访问
+											s[:3], s[1:5:2]						切片操作
+											s[s > s.median()]										
+			2: in							'c' in s							判断索引是否在 Series 对象中
+			3: get()						s.get('f', 100)						获取索引为 'f' 的元素, 没有则返回 100				
+			4: Series + Series				a + b								Series 加会将索引相同的元素进行加法, 索引不同的元素不进行, 返回处理后的 Series 对象
+												eg: a = pd.Series([1,2,3],['c','d','e'])
+													b = pd.Series([9,8,7,6],['a','b','c'])
+													a + b => pd.Series([NaN,NaN,8.0,NaN,NaN],['a','b','c','d','e'])
+			5: 赋值							s['a'] = 5, s['b','c'] = 20
+			6: + - * /						a+b-c*d/e							相同索引项的相加减, 缺项补齐(NaN)后运算, 返回新 Series 对象
+											(s+10-5)*2/3						每一项都进行运行
+		d: 成员方法
+			1: s.reindex()					改变或重排索引(改变索引顺序) 
+											reindex(index[,fill_value=填充缺失位置值, method=('ffill': 当前值向前填充, 'bfill': 向后), copy=True(True: 生成新对象,False: 新旧相等不复制)])
+			2: s.drop()						删除指定索引的元素
+			//绘图函数
+			1: plot(kind='')					绘制各种图
+			2: plot.pie()/box/hist				绘制各种图
+			//索引方法(index)
+			1: s.index.append(idx)				连接另一个 Index 对象, 返回产生新的 Index 对象(添加多个元素)
+			2: s.index.diff(idx)				差集, 返回产生新的 Index 对象( - )
+			3: s.index.intersection(idx)		交集, 返回产生新的 Index 对象( & )
+			4: s.index.union(idex)				并集, 返回产生新的 Index 对象( | )
+			5: s.index.delete(loc)				删除 loc 位置的元素, 返回产生新的 Index 对象(删除索引)
+			6: s.index.insert(loc,e)			在 loc 位置插入元素, 返回产生新的 Index 对象(插入索引)
+			
+	C: DataFrame (d = pd.DataFrame(..))
+		a: 构造函数 pd.DataFrame(data[,index,columns])
+			1: data							数据可以是 Series, DataFrame, 二维 ndarray, 由(一维 ndarray,列表,字典,元组 或 Series)构成的字典
+												eg: d = pd.DataFrame(np.arange(10).reshape(2,5)) => [[0,1,2,3,4],[5,6,7,8,9]]
+												eg: d = pd.DataFrame({'one':pd.Series([1,2,3],['a','b','c']), 'two':pd.Series([9,8,7,6],['a','b','c','d'])})
+														=> [[1.0, 9], [2.0, 8], [3.0, 7], [NaN, 6]]
+			2: index						行索引
+			3: columns						列索引
+		b: 成员变量
+			1: index						行索引, Index 对象
+			2: columns						列索引, Index 对象
+			3: T							转置(行,列的索引和数据转置)
+			4: plot.pie()/box/hist			绘制各种图
+					
+				eg: x = np.random.randn(1000)				# 1000个服从正态分布的随机数
+					pd.DataFrame([x, x+1]).T.plot.box()		# 绘制箱型图
+				
+		b: 基本操作
+			1: []							d['c1'] 		返回该列与行索引构成的 Series 对象
+			2: ix[]							d.ix['r1']		返回该行与列索引构成的 Series 对象
+			3: loc[]						d.loc[0]		返回该行与列索引构成的 Series 对象
+			4: [][]							d['c1']['r2']	返回指定列指定行的元素
+			5: + - * /						d+d2-d3*d4/d5	相同行列索引项的相加减, 缺项补齐(NaN)后运算, 返回新 DataFrame 对象
+											(d+10-5)*2/3	每一项都进行运行
+											(d+b-b2)*b3/b4	每一行都与 Series 对象进行运算, 缺项补齐(NaN)后运算
+			6: 比较运算(>,<,=,..)			d1 > d2			同纬度运算, 且行列数都相同, 返回元素为 bool 的 DataFrame
+											d > s			不同维度运算, 广播运算, 默认在 1 轴
+		c: 成员方法	
+			1: d.reindex()					改变或重排索引(改变索引顺序)	eg: d.reindex(index=[3,2,1])  d.reindex(columns=['c','b','a'])
+											reindex(index, columns, [,fill_value=, method=, copy=True])
+			2: d.drop(loc,axls=0)			删除行/列, axls=0 时删除行, axls=1 时删除列 
+			3: d.add(d2, **argws)			加 +, 可选参数: fill_value=补缺项值
+			3: d.sub(d2, **argws)			减 -
+			3: d.mul(d2, **argws)			乘 *
+			3: d.div(d2, **argws)			除 /
+			//绘图函数
+			1: plot(kind='')					绘制各种图
+			2: plot.pie()/box/hist				绘制各种图
+			//索引方法(index/columns)
+			1: d.x.append(idx)				连接另一个 Index 对象, 返回产生新的 Index 对象(添加多行/列)
+			2: d.x.diff(idx)				差集, 返回产生新的 Index 对象(行/列 - 行/列)
+			3: d.x.intersection(idx)		交集, 返回产生新的 Index 对象(行/列 & 行/列)
+			4: d.x.union(idex)				并集, 返回产生新的 Index 对象(行/列 | 行/列)
+			5: d.x.delete(loc)				删除 loc 位置的元素, 返回产生新的 Index 对象(删除行/列)
+			6: d.x.insert(loc,e)			在 loc 位置插入元素, 返回产生新的 Index 对象(插入行/列)
+	
+	D: 其他方法
+		a: 排序 (NaN 统一放到排序末尾)
+			1: s/d.sort_index(axis=0,ascending=True)		在指定轴上根据 索引 进行排序, 默认升序 
+			2: s.sort_values(axis=0,ascending=True)			在指定轴上根据 数值 进行排序, 默认升序
+			3: d.sort_values(by,axis=0,ascending=True)		在指定轴上根据指定索引的 数值 进行排序, 默认升序, by: axis 轴上的某个索引或索引列表
+					eg:						c.sort_values('a',axis=1,ascending=False)
+							0	1	2	3	4			4	3	2	1	0
+						b	15	16	17	18	19		b	19	18	17	16	15
+						d	10	11	12	13	14	=>	d	14	13	12	11	10
+						a	5	6	7	8	9		a	9	8	7	6	5
+						c	0	1	2	3	4		c	4	3	2	1	0
+		b: 基本统计分析
+			1: s/d.sum()					求和, 按0轴计算,下同
+			2: s/d.count()					非 NaN 的数量
+			2: s/d.mean()/median			平均数/中位数					
+			3: s/d.var()/std				方差/标准差
+			5: s/d.max()/min				最大值/最小值
+			6: s.argmax()/argmin			最大值索引/最小值索引 (自动索引)
+			7: s.idxmax()/idxmin			最大值索引/最小值索引 (自定义索引)
+			8: s/d.describe()				针对0轴(各列)统计汇总 	eg: s.describe()['max'], s.describe()['count'], d.describe().ix['max'],  d.describe()[2]['count']
+			9: s/d.skew()/kurt				计算偏度(三阶矩)/峰度(四阶矩)
+		c: 累计统计分析
+			1: s/d.cumsum()					依次给出前 1,2,..,n 个数的和
+			2: s/d.cumprod()				依次给出前 1,2,..,n 个数的积
+			3: s/d.cummax()/cummin			依次给出前 1,2,..,n 个数的最大值/最小值
+			//滚动计算(窗口计算)
+			1: s/d.rolling(w).sum()			依次计算相邻 w 个元素的和
+			2: s/d.rolling(w).mean()		依次计算相邻 w 个元素的平均值
+			3: s/d.rolling(w).var()/std		依次计算相邻 w 个元素的方差/标准差
+			4: s/d.rolling(w).max()/min		依次计算相邻 w 个元素的最大值/最小值
+		d: 相关分析
+				协方差>0, X Y 正相关; 协方差<0, X Y 负相关; 协方差=0, X Y 独立无关
+				Pearsion 相关系数, r ∈ [-1,1], 如果 fabs(r): 0.8~1.0: 高度线性相关; 0.5~0.8: 显著线性相关; 0.3~0.5: 低度线性相关; 0~0.3: 极弱线性相关或无线性相关;
+			1: s.cov(s2)/d.cov()				计算协方差矩阵
+			2: s.corr(s2,method='pearsion')		计算相关系数矩阵, pearsion(默认),spearman,kendall 等系数
+			3: d.corr(method='pearsion')		计算相关系数矩阵, pearsion(默认),spearman,kendall 等系数
+				eg: hprice = pd.Series([3.04, 22.93, 12.75, 22.6, 12.33], index=['2008', '2009', '2010', '2011', '2012'])
+					m2 = pd.Series([8.18, 18.38, 9.13, 7.82, 6.69], index=['2008', '2009', '2010', '2011', '2012'])
+					hprice.corr(m2)
+				eg: d = pd.DataFrame([range(1,8), range(2,9)])
+					d.corr(method='pearsion')
+		
+	E: Excel 的读写
+	
+		a: pd.read_excel(io[, sheet_name, header, names,..])			//读取将 Excel 文件, 返回 DataFrame 对象.
+			1: io			(文件)字符串,文件的路径对象
+			2: sheet_name	(工作表)决定工作表, 默认 0, 取值: None: 获取全部工作表; int: 零索引位置工作表; string: 指定名称工作表; List: 元素可包含 string/int, 指定多个工作表
+			3: header		(列索引)指定作为列名的行, 默认 0, 取值: None: 数据不含列名
+			4: names		要使用的列名列表, 默认 None, 如不包含标题行, 应显示传递 header=None
+			5: index_col	(行索引)指定列为索引列, 默认 None(0 索引)用作 DataFrame 的行标签
+			6: usecols		要解析的列, 默认 None, 取值: None: 全部列; int: [0,n]列; List<int>: 列号列表; string: "A:E"=>[A,E],"A,B,C,E:G"=>[A,G]-[D]	
+				eg: data = pd.read_excel(file_name, index_col='日期')  # 读取数据，指定“日期”列为索引列
+		b: d.to_excel(io[,])											//DataFrame 对象数据写入 Excel
+		b: pd.ExcelFile(path).parse([sheet_name, header,..])			//将指定的 Excel 工作表解析为 DataFrame 对象.
+		c: pd.ExcelWriter(path[, engine, date_format,..])				//将 DataFrame 对象写入 Excel 工作表.
+		
+		d: 将 Excel 数据读为 DataFrame
+			1: 直接读取
+				eg: df = pd.read_excel('data.xlsx')
+			2: 根据sheet索引
+				eg: xls = pd.ExcelFile('data_nb0.xlsx')  	#读取 Excel 文件
+					df = xls.parse('sheet1')				#解析指定工作表为 DataFrame 对象
+		e: 将 DataFrame 数据写入 Excel
+			1: ExcelWriter + to_excel
+				eg: writer = pd.ExcelWriter('data.xlsx')
+					DataFrame(data).to_excel(writer, sheet_name='sheet1', index=True)
+					writer.save()
+			2: read_excel + to_excel
+				eg: data = pd.read_excel('data.xlsx')
+					DataFrame(data).to_excel('data.xlsx', sheet_name='sheet1', index=True)
+			3: DataFrame.to_excel
+				eg: data = pd.DataFrame({'title1':['张三','李四'], 'title2':[80,90]})
+					data.to_excel('data.xlsx', index=False)
+五: Scikit-Learn
+		支持回归, 分类, 聚类等的强大的机器学习库
+	
+
+六: StatsModels
+		统计建模和计量经济学, 包括描述统计, 统计模型估计和推断
+
+

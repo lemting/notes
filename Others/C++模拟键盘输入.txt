@@ -1,0 +1,109 @@
+#if 1
+#include <iostream>
+#include <string>
+#include <stdlib.h>
+#include <Windows.h>
+
+using namespace std;
+
+/*
+鼠标
+	GetCursorPos();
+	SetCursorPos(x,y);
+	mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0,0);
+	mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+键盘
+	keybd_event('J', 0, 0, 0); //按下
+	keybd_event('J', 0, 2, 0); //释放
+	keybd_event(0x0d, 0, 0, 0); //按下回车
+	keybd_event(0x0d, 0, 2, 0); //释放回车
+延时
+	Sleep(ms);
+	
+VK_OEM_MINUS 0xBD
+VK_OEM_PLUS 0xBB
+VK_OEM_COMMA 0xBC
+VK_OEM_PERIOD 0xBE
+VK_OEM_1 0xBA
+VK_OEM_2 0xBF
+VK_OEM_3 0xC0
+VK_OEM_4 0xDB
+VK_OEM_5 0xDC
+VK_OEM_6 0xDD
+VK_OEM_7 0xDE
+VK_RETURN 0x0D
+VK_SPACE 0x20
+VK_SHIFT 0x10
+VK_CAPITAL 0x14
+
+*/
+void printstr(string s);
+
+int main() {
+	Sleep(3000);
+	LPPOINT point = new POINT;
+	int i = 1;
+	while(true) {
+		GetCursorPos(point);
+		//printstr("Use @this# to% simulate? the keyboard, to. type English\' letters] and{ all= the symbols on the keyboard!");
+		//printstr("[" + to_string(point->x) + "," + to_string(point->y) + "]\n");
+		printstr((i++) + "\n");
+		if(point->x < 10 && point->y < 10) {
+			break;
+		}
+		Sleep(1000);
+	}
+	system("pause");
+	return 0;
+}
+
+void printstr(string s) {
+	char c;
+	int shift = 0;
+	if(GetKeyState(VK_CAPITAL) != 0) {
+		keybd_event(VK_CAPITAL, 0, 0, 0);
+		keybd_event(VK_CAPITAL, 0, 2, 0);
+	}
+	for(int i = 0;i < s.length();i++) {
+		c = s[i]; shift = 0;
+		if(c >= 'a' && c <= 'z') {
+			c -= 32;
+		} else if(c >= 'A' && c <= 'Z') {
+			shift = 1;
+		} else {
+			switch (c) {
+				case '!': shift = 1; case '1': c = '1'; break;
+				case '@': shift = 1; case '2': c = '2'; break;
+				case '#': shift = 1; case '3': c = '3'; break;
+				case '$': shift = 1; case '4': c = '4'; break;
+				case '%': shift = 1; case '5': c = '5'; break;
+				case '^': shift = 1; case '6': c = '6'; break;
+				case '&': shift = 1; case '7': c = '7'; break;
+				case '*': shift = 1; case '8': c = '8'; break;
+				case '(': shift = 1; case '9': c = '9'; break;
+				case ')': shift = 1; case '0': c = '0'; break;
+				case '_': shift = 1; case '-': c = VK_OEM_MINUS; break;
+				case '+': shift = 1; case '=': c = VK_OEM_PLUS; break;
+				case '<': shift = 1; case ',': c = VK_OEM_COMMA; break;
+				case '>': shift = 1; case '.': c = VK_OEM_PERIOD; break;
+				case ':': shift = 1; case ';': c = VK_OEM_1; break;
+				case '?': shift = 1; case '/': c = VK_OEM_2; break;
+				case '~': shift = 1; case '`': c = VK_OEM_3; break;
+				case '{': shift = 1; case '[': c = VK_OEM_4; break;
+				case '|': shift = 1; case '\\': c = VK_OEM_5; break;
+				case '}': shift = 1; case ']': c = VK_OEM_6; break;
+				case '\"': shift = 1; case '\'': c = VK_OEM_7; break;
+				case '\n': c = VK_RETURN; break;
+				case ' ': default: c = VK_SPACE; break;
+			}
+		}
+		if(shift == 1) keybd_event(VK_SHIFT, 0, 0, 0);
+		keybd_event(c, 0, 0, 0);
+		keybd_event(c, 0, 2, 0);
+		if(shift == 1) keybd_event(VK_SHIFT, 0, 2, 0);
+		Sleep(10);
+	}
+}
+
+
+#endif

@@ -197,13 +197,13 @@ create table [if not exists] TABLE_NAME (COLUMN_NAME DATA_TYPE,...) SELECT_STATE
 show tables [from DB_NAME] [like 'PATTERN'| where EXPR];
 ```
 
-#### 	c: 查看数据表创建命令
+#### 	3.3: 查看数据表创建命令
 
 ```mysql
 show create table TABLE_NAME;
 ```
 
-#### 	3.3: 查看数据表结构
+#### 	3.4: 查看数据表结构
 
 1. ```mysql
     show columns from TABLE_NAME;
@@ -213,7 +213,7 @@ show create table TABLE_NAME;
     desc TABLE_NAME;
     ```
 
-#### 	3.4: 插入记录
+#### 	3.5: 插入记录
 
 1. ```mysql
     insert [into] TABLE_NAME [(COLUMN_NAME,...)] {values|value} ({EXPR|default},...),(...),...;
@@ -228,7 +228,7 @@ show create table TABLE_NAME;
     -- (此方法可以将查询结果插入到指定数据表)
     ```
 
-#### 	3.5: 查找记录	
+#### 	3.6: 查找记录	
 
 ```mysql
 select [distinct] SELECT_EXPR [,SELECT_EXPR,...] 		-- distinct: 去重复
@@ -242,7 +242,7 @@ select [distinct] SELECT_EXPR [,SELECT_EXPR,...] 		-- distinct: 去重复
 ];
 ```
 
-#### 	3.6: 子查询: Subquery,出现在其他SQL语句内的select语句
+#### 	3.7: 子查询: Subquery,出现在其他SQL语句内的select语句
 
 ​	子查询嵌套在查询内部(外层查询可以是: select,insert,update,set或do),且必须出现在圆括号内,可以包含多个关键字或条件(eg: distinct,group by,order by,limit,函数等).
 ​	子查询可以返回标量,一行,一列或子查询
@@ -267,7 +267,7 @@ select [distinct] SELECT_EXPR [,SELECT_EXPR,...] 		-- distinct: 去重复
 3. 使用[not]exists的子查询
 ​	如果子查询返回任何行,exists将返回true,否则返回false;
 
-#### 	3.7: 更新记录
+#### 	3.8: 更新记录
 
 1. 单表更新: 
 
@@ -283,7 +283,7 @@ select [distinct] SELECT_EXPR [,SELECT_EXPR,...] 		-- distinct: 去重复
   eg: update goods inner join goods_cates on goods.goods_cate = goods_cates.cate_name set goods.goods_cate = goods_cates.cate_id;				
   ```
 
-#### 	3.8: 删除记录
+#### 	3.9: 删除记录
 
 1. 单表删除: 
 
@@ -297,12 +297,12 @@ select [distinct] SELECT_EXPR [,SELECT_EXPR,...] 		-- distinct: 去重复
     delete TABLE_NAME [.*] [,TABLE_NAME[.*],...] from TABLE_REFERENCES [where WHERE_CONDITION]
     ```
 
-#### 	3.9: 字段属性: 自动编号(auto_increment)
+#### 	3.10: 字段属性: 自动编号(auto_increment)
 
 只能是整形或浮点型,且必须与主键组合使用,默认情况下,起始值为1,每次增量为1
 ​	eg: create table tab(id smallint auto_increment primary key);
 
-#### 	3.10: 修改数据表结构
+#### 	3.11: 修改数据表结构
 
 1. 添加单列
 

@@ -2,7 +2,7 @@ Collection集合总结
 
 	Collection
 		
-		List   有序,可重复	
+		List   有序,可重复
 		
 			ArrayList	有序,可重复
 				底层数据结构是数组,查询快,增删慢
@@ -38,7 +38,7 @@ Collection集合总结
 			
 								   ┌ 是: TreeSet
 						   		   │
-			   ┌───── 是: 排序吗	───┤	 	注意: 如果知道是Set,但不知道是用哪个Set,就用HashSet
+			   ┌───── 是: 排序吗───┤	 	注意: 如果知道是Set,但不知道是用哪个Set,就用HashSet
 			   │			       │
 			   │				   └ 否: HashSet
 			   │
@@ -47,9 +47,9 @@ Collection集合总结
 			   │				   ┌ 是: Vector 		注意: 就算要安全也不用 Vector,用Collections类的方法获取同步的集合
 			   │ 				   │
 			   │				   │		注意: 如果你知道是List,但是不知道用哪个List,就用ArrayList
-			   └───── 否: 安全吗	───┤	
+			   └───── 否: 安全吗───┤	
 								   │		 ┌ 查询多: ArrayList
-								   └ 否:	 ────┤
+								   └ 否: ────┤
 											 └ 增删多: LinkedList
 											 
 	注意: 如果你知道是Collection集合,但是不知道使用谁,就用ArrayList	

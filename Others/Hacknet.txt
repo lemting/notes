@@ -1,0 +1,60 @@
+Hacknet
+
+Lemting-123456
+
+// connect -> probe -> ... -> PortHack -> scan -> ls -> ... -> cd /log -> rm *
+
+//防火墙: analyze 执行 N 次直到可以看到 code, solve <code>
+//代理: 在其他计算机上 shell, 通过过载破解代理, 可使用多个 shell 加快破解速度
+
+//自定义程序
+PortHack					//当需要破解的端口数为 0 时, 执行破解
+SSHCrack 22					// SSH 破解(SSHCrack 端口号)
+FTPBounce 21				// FTP 破解
+SMTPoverflow 25				// SMTP 破解
+SQL_MemCorrupt 1433			// SQL 破解(无视代理和防火墙)
+KBT_Port_Tester 104			// KBT 破解
+eosDeviceScan				//扫描 eOS 设备(可用密码登录: admin-alpine)
+Sequencer
+Decypher <file> [pwd]		//加密, DEC 小组加密, 密码为员工 ID(CEOID: dleatrou)
+DECHead <file>				//获取加密头信息
+Tracekill
+
+//计算机
+login						//登录
+reboot [-i]					//重启(-i: 直接重启)		
+addNote	<note>				//添加笔记
+notes 						//显示笔记					
+
+//文件系统
+ls
+cd		
+exe							//列出所有可执行文件  /local  /bi n						
+mv <file> <new>				//重命名 移动
+rm <file>					//删除
+scp <file> <new>			//下载, 从远程服务器 下载 到本地服务器
+upload <file>				//上传, 从本地指定位置 上传 到 远程服务器当前目录
+
+//文件
+cat
+replace <file> "t" "r"		//将文件的 t 文本替换成 r 文本
+append <file> <data>		//在文件尾追加数据
+
+//进程
+ps							//列出进程(PID)
+kill <PID>					//清除进程
+
+//网络
+connect <IP>				//连接网络电脑
+disconnect/dc				//断开连接
+scan						//扫描已连接计算机的链接并加入服务器地图
+probe/nmap					//查看防火墙端口
+analyze						//分析防火墙
+shell						//让代理服务器过载,在其他计算机上运行. overload: 过载; trap: 陷阱
+solve						// UDP 破解
+ForkBomb					//让系统瘫痪
+
+//其他
+clear						//清除终端
+openCDTray					//打开 CD 托盘
+closeCDTray					//关闭 CD 托盘

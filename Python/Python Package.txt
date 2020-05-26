@@ -1,8 +1,8 @@
 Python 第三方库
 
 
-一: Numpy (import numpy as np)	//轴(axis): 保存数据的维度; 秩(rank): 轴的数量
- 
+一: Numpy (import numpy as np)	//轴(axis): 保存数据的维度; 秩(rank): 轴的数量; 维(dimension)
+	
 		提供数组支持, 以及相应的高效的处理函数
 	A: ndarray (a = np.array(..))
 			一个强大的 N 维数组对象, 数组元素类型相同, 下标从 0 开始
@@ -358,12 +358,13 @@ Python 第三方库
 		b: 基本操作
 			1: []							d['c1'] 		返回该列与行索引构成的 Series 对象
 			2: ix[]							d.ix['r1']		返回该行与列索引构成的 Series 对象
-			3: loc[]						d.loc[0]		返回该行与列索引构成的 Series 对象
-			4: [][]							d['c1']['r2']	返回指定列指定行的元素
-			5: + - * /						d+d2-d3*d4/d5	相同行列索引项的相加减, 缺项补齐(NaN)后运算, 返回新 DataFrame 对象
+			3: loc[]						d.loc[:,:]		返回该行与列索引构成的 Series 对象, 基于行标签和列标签 (x_label, y_label) 进行索引
+			4: iloc[]						d.iloc[:,:]		返回该行与列索引构成的 Series 对象, 基于行索引和列索引 (index, columns) 都是从 0 开始
+			5: [][]							d['c1']['r2']	返回指定列指定行的元素
+			6: + - * /						d+d2-d3*d4/d5	相同行列索引项的相加减, 缺项补齐(NaN)后运算, 返回新 DataFrame 对象
 											(d+10-5)*2/3	每一项都进行运行
 											(d+b-b2)*b3/b4	每一行都与 Series 对象进行运算, 缺项补齐(NaN)后运算
-			6: 比较运算(>,<,=,..)			d1 > d2			同纬度运算, 且行列数都相同, 返回元素为 bool 的 DataFrame
+			7: 比较运算(>,<,=,..)			d1 > d2			同纬度运算, 且行列数都相同, 返回元素为 bool 的 DataFrame
 											d > s			不同维度运算, 广播运算, 默认在 1 轴
 		c: 成员方法	
 			1: d.reindex()					改变或重排索引(改变索引顺序)	eg: d.reindex(index=[3,2,1])  d.reindex(columns=['c','b','a'])
@@ -457,6 +458,12 @@ Python 第三方库
 			3: DataFrame.to_excel
 				eg: data = pd.DataFrame({'title1':['张三','李四'], 'title2':[80,90]})
 					data.to_excel('data.xlsx', index=False)
+	
+	F: CSV 文件的读写
+		
+		a: pd.read_csv(io)		//读取 CSV 文件
+		b: s/d.to_csv(io)		//写入 CSV 文件
+		
 五: Scikit-Learn
 		支持回归, 分类, 聚类等的强大的机器学习库
 	

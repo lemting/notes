@@ -20,7 +20,10 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 				error: function(data) { alert("error"); }
 			});
 */
-/* 集成 Thymeleaf
+
+
+一一一: 集成 Thymeleaf
+	导入 Thymeleaf
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -30,9 +33,8 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
             <groupId>nz.net.ultraq.thymeleaf</groupId>
             <artifactId>thymeleaf-layout-dialect</artifactId>
         </dependency>
-*/
 
-一一一: SpringBoot + MyBatis		//参考文档 (https://blog.csdn.net/winter_chen001/article/details/77249029)
+二二二: SpringBoot + MyBatis		//参考文档 (https://blog.csdn.net/winter_chen001/article/details/77249029)
 	1: 创建 SpringBoot 项目, 添加 Web, MySQL, JDBC, MyBatis 依赖(开启热部署)
 		//mysql 的配置需要删除 runtime 的作用域
 	2: pom.xml 添加 连接池 依赖
@@ -74,7 +76,7 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 	6: 编写 Serivce, Controller		//通过 @Service,@Controller,@RestController,@RequestMapping 等注解 进行注册
 	
 
-二二二: SpringBoot + JSP		//参考文档 (https://blog.csdn.net/hp_yangpeng/article/details/80521866)
+三三三: SpringBoot + JSP		//参考文档 (https://blog.csdn.net/hp_yangpeng/article/details/80521866)
 		 //webapp 下的目录为可直接访问目录(静态资源)   eg: localhost:8080/index.html (实际访问: webapp/index.html)
 	1: 创建 SpringBoot 项目, 添加 Web 依赖(开启热部署)
 	2: pom.xml 添加 JSP 依赖
@@ -104,7 +106,7 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 		spring.mvc.view.prefix=/WEB-INF/jsp/	//页面默认前缀目录
 		spring.mvc.view.suffix=.jsp				//页面默认后缀目录
 	
-三三三: 打包成 jar   //webapp并不会一起打包.如果需要, 则需在pom.xml配置 <resources> 插件
+四四四: 打包成 jar   //webapp并不会一起打包.如果需要, 则需在pom.xml配置 <resources> 插件
 	1: 配置 pom.xml    
 		<groupId>xxx</groupId>
 		<artifactId>xxxx</artifactId>
@@ -134,7 +136,7 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 			*/
 		</build>
 	2: 运行 maven 打包
-		
+	
 	
 	
 一: 获取 SpringBoot 项目
@@ -163,8 +165,18 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 					</configuration>
 				</plugin> </plugins> </build>
 		/* 若使用 IEDA , 使用快捷键 Ctrl + Shift + A 
-			搜索 Registry , 修改 compiler.automake.allow.when.app.running 值为 True(打上勾) 
-			搜索 Make Project automatically, 勾选 Make Project automatically */
+			1. 开启IDEA的自动编译(动态)
+				搜索 Registry , 修改 compiler.automake.allow.when.app.running 值为 True(打上勾)  -> 自动编译
+								修改 compile.document.save.trigger.delay	-> 自动更新文件
+								修改 compile.automake.trigger.delay  		-> 自动更新静态文件
+			2. 开启IDEA的自动编译(静态)
+				搜索 Build Project automatically, 勾选 Make Project automatically 
+			3. 开启IDEA的热部署策略(非常重要)
+				搜索 Edit Configurations -> 选中 SpringBoot 项目 -> Configuration -> 
+								修改 Running Application Update Policies 下的 (On 'Update' action 和 On Frame deactivation) 为 Update resource
+			4. 关闭浏览器缓存(重要)
+				打开谷歌浏览器 -> 打开 F12 的 Network 选项栏 -> 然后勾选 Disable cache 
+				*/
 	B: 项目结构
 		a: src/main/java		主程序,项目代码
 		b: src/main/resources	配置文件
@@ -272,6 +284,7 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 		1: spring.config.name   	//配置文件名称,默认为 application 
 		2: spring.config.location 	//配置文件存放位置,默认为 classpath 目录下
 		3: spring.profiles.active	//根据设置值导入配置文件: application-{spring.profiles.active}.yml 或 application-{spring.profiles.active}.properties
+		4: spring.resources			//设置资源目录
 	b: Spring MVC (WebMvcProperties)
 		1: spring.mvc.view.prefix 	//指定mvc视图的前缀. 
 		2: spring.mvc.view.suffix	//指定mvc视图的后缀. (实际视图名 = prefix + 视图名 + suffix)
@@ -288,36 +301,69 @@ File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Au
 		1: mybatis.config-location		//mybatis 核心配置文件所在路径
 		2: mybatis.type-aliases-package //mybatis 别名扫描包
 		3: mybatis.mapper-locations		//所有的mapper映射文件
-	c: DataSource (数据源)
+	e: DataSource (数据源)
 		1: spring.datasource.type		//连接池数据源	eg: com.mchange.v2.c3p0.DriverManagerDataSource
 		2: spring.datasource.driver-class-name = com.mysql.jdbc.Driver	//数据库驱动类
 		3: spring.datasource.url		
 		4: spring.datasource.username
 		5: spring.datasource.password
 		6: spring.datasource.data	
-	c: Http
+	f: Http
 		1: spring.hateoas.apply-to-primary-object-mapper   	//设定是否对object mapper也支持HATEOAS,默认为: true 
 		2: spring.http.converters.preferred-json-mapper 	//是否优先使用JSON mapper来转换. 
 		3: spring.http.encoding.charset 	//指定http请求和相应的Charset,默认: UTF-8 
 		4: spring.http.encoding.enabled 	//是否开启http的编码支持,默认为true 
 		5: spring.http.encoding.force  		//是否强制对http请求和响应进行编码,默认为true
-	d: logging
+	g: logging
 		1: logging.path=/var/logs 		//日志文件路径
 		2: logging.file=myapp.log 		//日志文件名
 		3: logging.config= # location of config file (default classpath:logback.xml for logback) 
-		4: logging.level.*= # levels for loggers, e.g. “logging.level.org.springframework=DEBUG” (TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF)
-			
-	e: devtools
+		4: logging.level.*= # levels for loggers, e.g. “logging.level.org.springframework=DEBUG” (TRACE, DEBUG, INFO, WARN, ERROR, FATAL, OFF)	
+	h: devtools
 		1: spring.devtools.livereload.port		//服务器端口
 		2: spring.devtools.restart.enabled		//是否启用自动重启
-				
+	i: Thymeleaf
+		1: spring.thymeleaf.prefix		//Thymeleaf 模板文件前缀, eg: classpath:/templates/
+		2: spring.thymeleaf.suffix		//Thymeleaf 模板文件后缀, eg: .html
+		3: spring.thymeleaf.mode		//模式, eg: HTML
+		4: spring.thymeleaf.encoding	//编码, eg: UTF-8
+		5: spring.thymeleaf.cache		//缓存, eg: false
+	j: Tomcat
+		1: server.tomcat.accesslog.prefix	//前缀
+		2: server.tomcat.uri-encoding		//URI 编码, eg: utf-8
 	
-			
 	
 	
-	
-	
-	
+eg:
+server:
+  port: 8888    #设置端口号
+  servlet:
+    context-path: /wisdomhotel	#设置访问url需添加前缀: 项目名(WisdomHotel)
+  tomcat:
+    accesslog:
+      prefix: /
+    uri-encoding: utf-8
+spring:
+  profiles:
+    active: dev    #开发环境: dev, 上线环境: prod
+  servlet:
+    multipart:
+      max-request-size: 10MB # 上传文件总的最大值
+      max-file-size: 10MB    # 单个文件的最大值
+  thymeleaf:
+    prefix: classpath:/templates/
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+  datasource:  #配置数据源
+    url: jdbc:mysql://127.0.0.1:3306/wisdom_hotel?serverTimezone=GMT%2B8
+	username: root
+	password: lemting
+	driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  mapper-locations: file:${mpath.project-path}/resources/mapper/*.xml  #扫描 XxxMapper.xml 一定要对应mapper映射xml文件的所在路径
+  type-aliases-package: com.lemting.wisdomhotel.domain  	#对应实体类的路径	
 	
 	
 	

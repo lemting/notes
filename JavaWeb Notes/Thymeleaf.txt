@@ -159,6 +159,7 @@ A: 注释
 			1: #dates.format(<data>,<format>): 将时间日期格式化		
 					eg: ${#dates.format(dd.data, 'yy-MM-dd HH:mm:ss')}
 					eg: ${#dates.format((long)1582112480 * 1000, 'yy-MM-dd HH:mm:ss')}
+					eg: ${#dates.format(new java.util.Date(new Long(owner.ownerCheckinTime) * 1000),'yyyy-MM-dd')}
 		f: #calendars		类似于 #dates 但是 java.util.Calendar 对象
 		g: #numbers			用于格式化数字对象的方法
 		h: #strings			String对象的方法: contains,startsWith,prepending / appending等

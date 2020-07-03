@@ -1,0 +1,731 @@
+
+
+Console.Write(): 打印不换行
+Console.WriteLine(): 打印换行
+
+
+访问修饰符
+	1: public				所有对象都可以访问
+	2: private				对象本身在对象内部可以访问
+	3: protected			只有该类对象及其子类对象可以访问
+	4: internal				同一个程序集的对象可以访问
+	5: protected interna	访问限于当前程序集或派生自包含类的类型
+
+需要注意
+	1: C# 是大小写敏感的
+	2: 所有的语句和表达式必须以分号 ';' 结尾
+	3: 程序的执行从 Main 方法开始
+	4: 与 Java 不同的是, 文件名可以不同于类的名称
+
+一: C# 基础
+	A: 程序结构
+		a: 一个 C# 程序主要包括以下部分
+			1: 命名空间声明(Namespace declaration)
+			2: 一个 Class
+			3: Class 方法
+			4: Class 属性
+			5: 一个 Main 方法: static void Main(string[] args){}
+			6: 语句(Statements)& 表达式(Expressions)
+			7: 注释
+				
+			eg:	using System; /* 引用命名空间 */
+				namespace HelloWorldApplication {   /* 命名空间包含一系列的类 */
+					class HelloWorld {
+						static void Main(string[] args) {	/* Main 方法 */
+							Console.WriteLine("Hello World");
+							Console.ReadKey();
+						}
+					}
+				}
+		b: 基本语法
+			1: using 关键字		//using 关键字用于在程序中包含命名空间, 一个程序可以包含多个 using 语句
+			2: class 关键字		//用于声明一个类
+			3: 注释				//单行注释: // 		多行注释: /*  */	文档注释: ///
+			4: 成员变量			//变量是类的属性或数据成员, 用于存储数据
+			5: 成员函数			//函数是一系列执行指定任务的语句. 类的成员函数是在类内声明的
+			6: 实例化一个类		// T t = new T([args]);
+		c: 标识符
+				标识符是用来识别类, 变量, 函数或任何其它用户定义的项目
+			1: 必须以字母, 下划线或 '@' 开头, 后面可以跟一系列的字母, 数字(0-9), 下划线 '_', '@'
+			2: 标识符中的第一个字符不能是数字
+			3: 标识符必须不包含任何嵌入的空格或符号, 比如 ? - +! # % ^ & * ( ) [ ] { } . ; : " ' / \
+			4: 标识符不能是 C# 关键字. 除非它们有一个 @ 前缀.  eg: @if 是有效的标识符, 但 if 不是, 因为 if 是关键字
+			5: 标识符必须区分大小写
+			6: 不能与 C# 的类库名称相同
+		d: Console.Write()			//写入标准输出流, 可以像 C 语言的 printf 那样设置参数: Console.WriteLine("Hello {0}!!! {1}", "World", 1234)
+			1: Console.Write()			//打印不换行
+			2: Console.WriteLine()		//打印换行
+		e: Console.Read()			//读取标准输入流
+			1: Console.Read()			//读取一个字符
+			2: Console.ReadKey()		//读取一个字符或功能键
+			3: Console.ReadLine()		//读取一行字符
+			
+	B: 数据类型
+			在 C# 中, 变量分为以下几种类型: 值类型(Value types); 引用类型(Reference types); 指针类型(Pointer types)
+		a: 值类型(Value types)
+				值类型变量可以直接分配给一个值. 它们是从类 System.ValueType 中派生的
+			//整形
+			1: int						//32 位有符号整数类型, 默认 0
+			2: long						//64 位有符号整数类型, 默认 0L
+			3: short					//16 位有符号整数类型, 默认 0
+			4: sbyte					//8 位有符号整数类型, 默认 0
+			//无符号整型
+			1: byte						//8 位无符号整数, 默认 0
+			2: uint						//32 位无符号整数类型, 默认 0
+			3: ulong					//64 位无符号整数类型, 默认 0
+			4: ushort					//16 位无符号整数类型, 默认 0
+			//浮点型
+			6: float					//32 位单精度浮点型, 默认 0.0F
+			5: double					//64 位双精度浮点型, 默认 0.0D
+			4: decimal					//128 位精确的十进制值, 28-29 有效位数, 默认 0.0M
+			//其他
+			1: bool						//布尔值, 默认 false
+			2: char						//16 位 Unicode 字符, 默认 '\0'
+			
+		b: 引用类型(Reference types)
+				引用类型不包含存储在变量中的实际数据, 但它们包含对变量的引用, 它们指的是一个内存位置
+				内置的引用类型有: object, dynamic 和 string
+			1: Object		对象类型, 是 C# 通用类型系统(Common Type System - CTS)中所有数据类型的终极基类. object 是 System.Object 类的别名
+			2: Dynamic		动态类型, 可以存储任何类型的值在动态数据类型变量中, 这些变量的类型检查是在运行时发生的
+								eg: dynamic d = 20;
+			3: String		字符串类型, 允许给变量分配任何字符串值. string/String 是 System.String 类的别名. @: 将转义字符 '\' 当作普通字符对待
+								eg: String s = "hello"; string str = @"C:\Windows"; 	=> 		s = "hello", str = "C:\\Windows"
+			4: Nullable		可空类型	eg: int? i = 3;  =>  Nullable<int> i = new Nullable<int>(3); //int? i; 默认值为 null 	//a ?? 11; 如果 a 为 null, 则返回 11
+								
+			5: 用户自定义引用类型
+			
+		c: 指针类型(Pointer types)
+				指针类型变量存储另一种类型的内存地址
+			1: type* identifier;		eg: int* iptr;
+		d: 类型转换
+			1: 强制类型转换					eg: double d = 5673.74; int i = (int)d;
+			2: Convert.ToInt32(str)		//将字符串转为 32 位整数类型, 可以传入第二个参数指定字符串的进制 	eg: Convert.ToInt32("10",2); => 2
+										//其他类似: ToBoolean,ToByte,ToChar,ToDateTime,ToDecimal,ToDouble,ToInt16,ToInt32,ToInt64,ToSbyte,ToSingle,ToType,ToUInt16,ToUInt32,ToUInt64
+			3: *.ToString()				//其他类型转为字符串
+		e: 常量
+				常量是固定值, 程序执行期间不会改变, 常量可以是任何基本数据类型
+			1: 整数常量					0x 或 0X 表示十六进制, 0 表示八进制, 没有前缀则表示十进制; U 或 u 后缀表示无符号, L 或 l 表示
+			2: 浮点常量
+			3: 字符常量/字符串常量
+			4: 定义常量					//const <type> <name> = value;
+			
+	C: 程序逻辑
+		a: 运算符
+			1: 算术运算符(+ - * / % ++ --)
+			2: 关系运算符(== != > < >= <=)
+			3: 逻辑运算符(&& || !)
+			4: 位运算符(& | ^ ~ << >>)
+			5: 赋值运算符(= += -= *= /= %= <<= >>= &= |= ^=)
+			6: 其他运算符
+				sizeof()			//获取数据类型的大小
+				typeof() 			//获取 class 的类型
+				&					//获取变量的地址 
+				*					//变量的指针 
+				? :					//三目运算符
+				is					//判断对象是否为某一类型
+				as					//强制转换, 即使转换失败也不会抛出异常		eg: Object obj = new StringReader("Hello"); StringReader r = obj as StringReader;
+		b: 选择结构
+			1: if() {
+				} else if() {
+				} else {
+				}
+			2: switch() {
+					case <value1>: break;
+					case <value2>: break;
+					default: break;
+				}
+		c: 循环结构 (continue, break)
+			1: for (;;) { }
+			2: foreach( ? in ? ) {} 
+			3: while() { }
+			4: do { } while();
+	
+	D: 方法
+		a: 定义方法
+				<AccessSpecifier> <ReturnType> <MethodName>(<args>) {
+				   <code>
+				}
+			1: AccessSpecifier		访问修饰符
+			2: ReturnType			返回值类型
+			3: MethodName			方法名字
+			4: args					参数列表
+			5: code					方法主体代码
+	
+				eg: public int FindMax(int num1, int num2) {
+						return num1 > num2 ? num1 : num2;
+					}
+		b: 参数传递
+			1: 值参数				//将实参的值复制给形参, 当形参的值发生改变时, 不会影响实参的值
+			2: 引用参数				//将实参的内存位置的引用复制给形参, 可用在声明参数时使用 ref 实现	
+										eg: public void swap(ref int x, ref int y) { int temp = x; x = y; y = x; }
+			3: 输出参数				//这种方式可以返回多个值, 输出参数会把方法输出的数据赋给自己, 其他方面与引用参数相似. 可用在声明参数时使用 out 实现
+										eg: public void getValue(out int x) { int temp = 5; x = temp; }		Main{ int a = 100; getValue(out a); }  // a = 5
+			4: 参数数组				//可以传递数组实参, 也可以传递一组数组元素, 可用在声明参数时使用 params 实现
+										eg: public int AddElements(params int[] arr) { return sum; }	Main{ AddElements(512, 720, 250, 567, 889); AddElements(new int[]{512, 720, 250, 567, 889}) }
+		c: 匿名方法
+				在匿名方法中不需要指定返回类型, 它是从方法主体内的 return 语句推断的
+			eg: delegate void NumberChanger(int n);  //创建委托
+				namespace .. class .. Main {
+					NumberChanger nc = delegate(int x) {  //使用匿名方法创建委托实例
+						Console.WriteLine("Anonymous Method: {0}", x);
+					};
+					nc(10);
+					nc = new NumberChanger(Console.WriteLine); //使用命名方法实例化委托
+					nc(567);
+				}	
+	
+	E: 数组(Array)
+			数组是一个存储相同类型元素的固定大小的顺序集合	
+		a: 声明数组
+			//一维数组
+			1: <type>[] <name>;
+			2: <type>[] <name> = {value1, value2,..};
+			3: <type>[] <name> = new <type>[<len>];
+			//多维数组
+			1: <type>[,] <name>;			eg: int [,] a = new int [3,4] { {0, 1, 2, 3}, {4, 5, 6, 7}, {8, 9, 10, 11} }
+			2: <type>[,,,] <name>;
+			//交错数组
+			1: <type>[][] <name>;			eg: int[][] a = new int[][]{new int[]{0, 0}, new int[]{1, 2}, new int[]{2, 4}, new int[]{3, 6}, new int[]{4, 8} };
+			2: <type>[][][][] <name>;
+		b: 数组操作
+			1: arr[i]				访问一维数组
+			2: arr[i,j]				访问多维数组
+			3: arr[i][j]			访问交错数组
+			
+	F: 结构体(Struct)
+		a: 结构体的定义
+			struct Books {
+			   public string title;
+			   public string author;
+			   public string subject;
+			   public int book_id;
+			};  
+		b: C# 的结构体与 C++ 的不同
+			1: 结构体可带有方法, 字段, 索引, 属性, 运算符方法和事件
+			2: 结构体可定义构造函数, 但不能定义析构函数. 但是, 不能为结构体定义无参构造函数. 无参构造函数(默认)是自动定义的, 且不能被改变
+			3: 与类不同, 结构体不能继承其他的结构体或类
+			4: 结构体不能作为其他结构体或类的基础结构体
+			5: 结构体可实现一个或多个接口
+			6: 结构体成员不能指定为 abstract, virtual 或 protected
+			7: 当您使用 new 操作符创建一个结构体对象时, 会调用适当的构造函数来创建结构体. 与类不同, 结构体可以不使用 new 操作符即可被实例化
+			8: 如果不使用 new 操作符, 只有在所有的字段都被初始化之后, 字段才被赋值, 对象才被使用
+		c: 结构体与类的不同
+			1: 类是引用类型, 结构体是值类型
+			2: 结构体不支持继承
+			3: 结构体不能声明默认的构造函数
+		
+	G: 枚举(Enum)
+			枚举是一组命名整型常量, C# 枚举是值类型: 枚举包含自己的值, 且不能继承或传递继承
+		a: 枚举的声明
+			//枚举列表中的每个符号代表一个整数值, 一个比它前面的符号大的整数值. 默认情况下, 第一个枚举符号的值是 0
+			enum <enum_name> { 
+				enumeration list 
+			};
+			
+			eg: enum Days { Sun, Mon, tue, Wed, thu, Fri, Sat };
+	
+	H: 类(Class)
+		a: 类的定义
+			<AccessSpecifier> class <className> [: <parentClass1>,<parentClass2>,..] { //可以多继承
+				//静态成员在访问修饰符后加 static, 可以通过 类名.成员 访问
+				
+				// 成员变量, 默认访问标识符是 private
+				<AccessSpecifier> <type> variable1;
+				...
+				
+				// 构造函数
+				<AccessSpecifier> <className>(<args>) {
+				}
+				// 析构函数 
+				~<className>() {
+				}
+				
+				// 成员方法, 默认访问标识符是 private
+				<AccessSpecifier> <returnType> <methodName>(<args>) {
+				}
+				...
+			}
+		b: 继承
+			1: class <className>: <parentClass>
+			2: class <className>: <parentClass1>,<parentClass2>,..
+			3: 调用父类构造函数
+				public className(<args1>,<args2>) : base(<args1>) {
+				}
+		c: 抽象类
+					abstract class <className> {}
+			1: 不能创建一个抽象类的实例
+			2: 不能在一个抽象类外部声明一个抽象方法		
+				eg: abstract public int area();	 	//抽象类的抽象方法
+					public override int area() {}	//子类重载该方法
+			3: 抽象类不能被声明为 sealed
+			4: 类的成员方法需要在继承类中实现时, 可以使用虚方法
+				eg: public virtual void draw() {}	//定义虚方法
+					public override void draw() {}	//子类重载该方法
+		d: 密封类(最终类)
+					sealed class <className> {}
+			1: 当一个类被声明为 sealed 时, 它不能被继承
+			2: 抽象类不能被声明为 sealed
+		e: 运算符重载
+			1: 一元运算符(+ - ! ~ ++ --)
+				public static Box operator + (Box b) { }
+			2: 二元运算符(+ - * / %)
+				public static Box operator + (Box b, Box c) { }
+			3: 位运算符(& | ^ << >>)
+				public static Box operator << (Box b, Box c) { }
+			4: 比较运算符(== != > < >= <=)
+				public static Box operator == (Box b, Box c) { }
+			5: 不能直接重载(&& ||)
+			6: 不能重载(+= -= *= /= %= = ?: -> new is sizeof typeof)
+	
+	I: 接口(Interface)
+			接口只包含了成员的声明, 成员的定义是派生类的责任, 接口声明默认是 public 的
+		a: 接口定义
+			interface <interfaceName> {
+				<returnType> <methodName>(<args>);
+			}
+		b: 实现接口
+			class InterfaceImplementer: IMyInterface {
+				public void MethodToImplement() { } //实现 IMyInterface 接口的 MethodToImplement()方法
+			}
+		c: 接口可以继承接口
+	
+	J: 预处理器指令
+			预处理器指令指导编译器在实际编译开始之前对信息进行预处理, 以 # 开始
+		a: 预处理器指令列表
+			1: #define				//用于定义一系列成为符号的字符
+			2: #undef				//用于取消定义符号
+			3: #if					//用于测试符号是否为真
+				#else				
+				#elif
+				#endif				//指定一个条件指令的结束	
+			4: #line				//可以修改编译器的行数以及(可选地)输出错误和警告的文件名
+			5: #error				//允许从代码的指定位置生成一个错误
+			6: #warning				//允许从代码的指定位置生成一级警告
+			7: #region				//可以在使用 Visual Studio Code Editor 的大纲特性时, 指定一个可展开或折叠的代码块
+				#endregion			//标识着 #region 块的结束
+			8: #pragma				//可以抑制或还原指定的编译警告
+		b: #define
+			1: #define symbol
+		c: #if #else #elif #endif
+			eg: #define PI
+				using System;
+				namespace PreprocessorDAppl {
+					class Program {
+						static void Main(string[] args)
+						#if (PI)
+							Console.WriteLine("PI is defined");     //PI 不存在, 则这条语句不编译
+						#else
+							Console.WriteLine("PI is not defined"); //PI 存在, 则这条语句不编译
+						#endif
+					}
+				}
+		d: #warning #error
+			eg: #if DEBUG && RELEASE  
+					#error "You've defined DEBUG and RELEASE simultaneously!"  
+				#endif  
+				#warning "Don't forget to remove this line before the boss tests the code!"  
+	
+	K: 正则表达式
+		a: 正则表达式使用规则: https://www.runoob.com/csharp/csharp-regular-expressions.html
+		b: Regex 类成员方法 (using System.Text.RegularExpressions;)
+			1: bool IsMatch(str)					//判断 str 是否符合 Regex 构造函数中的正则表达式
+			2: bool IsMatch(str,index)				//判断 str 是否符合 Regex 构造函数中的正则表达式, 从 str 的 index 位置开始判断
+			3: MatchCollection Matches(str)			//返回 str 中符合正则表达式的匹配项
+			4: string Replace(str,replace)			//替换, 将 str 中符合正则表达式的字符串替换成 replace
+			5: string[] Split(str)					//分割, 将 str 根据正则表达式分割成子字符串数组
+				eg: Regex rgx = new Regex("\\s+");
+					string result = rgx.Replace("Hello   World   ", " "); //结果: result = "Hello World "
+					
+		c: Regex 类静态方法 (using System.Text.RegularExpressions;)
+			1: static bool IsMatch(str,pattern)				//判断 str 是否符合正则表达式 pattern
+			2: static MatchCollection Matches(str,pattern)	//返回 str 中符合正则表达式 pattern 的匹配项
+				eg: MatchCollection mc = Regex.Matches("A Thousand Splendid Suns", @"\bS\S*");
+					foreach (Match m in mc) { Console.Write(m + " "); } //输出: Splendid Suns
+		
+	L: 异常处理
+		a: 关键字
+			1: try									//标识了特定的异常的代码块
+			2: catch								//捕获指定异常
+			3: finally								//不管异常是否被抛出都会执行
+			4: throw								//抛出指定的异常
+		b: 异常类
+			1: System.Exception						//所有异常类的顶层父类
+			2: System.ApplicationException			//继承自 System.Exception, 支持由应用程序生成的异常. 所以程序员定义的异常都应派生自该类
+			3: System.SystemException				//继承自 System.Exception, 所有预定义的系统异常的基类
+			// System.SystemException 子类
+			1: System.IO.IOException				// I/O 错误
+			2: System.IndexOutOfRangeException		//数组越界错误
+			3: System.ArrayTypeMismatchException	//数组类型不匹配错误
+			4: System.NullReferenceException		//空指针异常错误
+			5: System.DivideByZeroException			//除以零错误
+			6: System.InvalidCastException			//类型转换错误
+			7: System.OutOfMemoryException			//内存不足错误
+			8: System.StackOverflowException		//栈溢出错误
+		c: 异常处理
+			1: 语法
+				try {
+				   // 引起异常的语句
+				} catch( ExceptionName e1 ) {
+					// 错误处理代码
+				} catch( ExceptionName e2 ) { 
+					// 错误处理代码
+				}finally { 
+				   // 要执行的语句
+				}
+		d: 自定义异常
+			1: 创建自定义异常类, 继承 ApplicationException 类
+				eg: public class TempIsZeroException: ApplicationException {
+						public TempIsZeroException(string message): base(message) {
+						}
+					}
+			2: 抛出自定义异常
+				if(true)
+					throw (new TempIsZeroException("this is a exception"));
+		
+	M: 文件 IO
+		a: I/O 类 (using System.IO)
+			//文件
+			1: File								//有助于处理文件
+			2: FileInfo							//用于对文件执行操作
+			3: FileStream						//用于文件中任何位置的读写
+			//目录
+			1: Directory						//有助于操作目录结构
+			2: DirectoryInfo					//用于对目录执行操作
+			3: DriveInfo						//提供驱动器的信息
+			4: Path								//对路径信息执行操作
+			//二进制流
+			1: BinaryReader						//从二进制流读取原始数据
+			2: BinaryWriter						//以二进制格式写入原始数据
+			//字节流
+			1: StreamReader						//用于从字节流中读取字符
+			2: StreamWriter						//用于向一个流中写入字符
+			//缓冲流
+			1: BufferedStream					//字节流的临时存储
+			//字符流
+			1: StringReader						//用于读取字符串缓冲区
+			2: StringWriter						//用于写入字符串缓冲区
+		b: FileStream 类
+				FileStream <name> = new FileStream(<fileName>,<FileMode 枚举>, <FileAccess 枚举>, <FileShare 枚举>);
+			1: FileMode						//FileMode.Append: 文件追加,无则创建; Create: 创建文件,有先删除; CreateNew: 创建文件,有则报错; 
+											//Open: 打开文件,无则报错; OpenOrCreate: 打开文件,无则创建; Truncate: 打开文件,清空文件(保留创建初始日期),无则报错
+			2: FileAccess					//FileAccess.Read: 读权限; Write: 写权限; ReadWrite: 读写权限
+			3: FileShare					//FileShare.Inheritable: 允许文件句柄可由子进程继承; None: 谢绝共享当前文件; Read: 允许随后打开文件读取; 
+											//ReadWrite: 允许随后打开文件读取或写入; Write: 允许随后打开文件写入; Delete: 允许随后删除文件
+				eg: FileStream F = new FileStream("test.dat", FileMode.OpenOrCreate, FileAccess.ReadWrite);
+			//FileStream 类成员方法
+			1: WriteByte(byte)				//将 byte 写入文件
+			2: ReadByte()					//返回读取的下一个字符
+			3: Close()						//关闭流
+		c: 文本文件的读写
+			//StreamReader 类, 继承自 TextReader
+			1: int Read()					//读取一个字符
+			2: ReadLine()					//读取一行
+			//StreamWriter 类, 继承自 TextWriter
+			1: Write(bool/char/decimal)		//写入, 不换行
+				Write(double/int/string)	
+			2: WriteLine(s)					//写入, 换行
+			3: Flush()						//刷新缓冲区
+			
+				eg: StreamReader sr = new StreamReader("input.txt");
+					StreamWriter sw = new StreamWriter("output.txt");
+					String line = "";
+					while ((line = sr.ReadLine()) != null) {
+						sw.WriteLine(line);
+						sw.Flush();
+					}
+					sr.Close(); sw.Close();
+		d: 二进制文件的读写
+			//BinaryReader 类, 构造函数: BinaryReader(FileStream)
+			1: Read()						//读取字符, 返回 int, 其他类似: ReadBoolean(), ReadByte(), ReadBytes(count), ReadChar(), ReadChars(count), ReadDouble(), ReadInt32(), ReadString()
+			//BinaryWriter 类, 构造函数: BinaryWriter(FileStream)
+			1: Write(bool/byte/byte[])		//写入, 不换行
+				Write(char/char[])
+				Write(double/int/string)
+			2: Seek(offset,SeekOrigin)		//设置当前流内的位置
+			3: Flush()						//刷新缓冲区
+	
+				eg: BinaryReader br;
+					BinaryWriter bw;
+					try {
+						br = new BinaryReader(new FileStream("D:\\input", FileMode.Open));
+						bw = new BinaryWriter(new FileStream("D:\\output", FileMode.Create));
+						int i = br.ReadInt32(); double d = br.ReadDouble(); bool b = br.ReadBoolean(); String s = br.ReadString();
+						bw.Write(i); bw.Write(d); bw.Write(b); bw.Write(s);
+						bw.Flush(); bw.Close(); br.Close();
+					} catch (IOException e) {
+						Console.WriteLine(e.Message + "\n Cannot create file.");
+					}
+		
+		e: 文件系统的操作
+			//DirectoryInfo 类成员变量
+			1: Attributes					//获取当前文件或目录的属性
+			2: CreationTime					//当前文件或目录的创建时间
+			3: Exists						//目录是否存在
+			4: Extension					//文件存在的字符串
+			5: FullName						//目录或文件的完整路径
+			6: LastAccessTime				//当前文件或目录最后被访问的时间
+			7: Name							//该 DirectoryInfo 实例的名称
+			//DirectoryInfo 类成员方法
+			1: Create()						//创建目录
+			2: CreateSubdirectory(path)		//在指定路径 path 创建子目录, 返回 DirectoryInfo 实例
+			3: Delete()						//如果为空目录, 删除该目录
+			4: GetDirectories()				//返回当前目录的子目录, 返回 DirectoryInfo[]
+			5: GetFiles()					//返回当前目录文件列表, 返回 FileInfo[]
+			//FileInfo 类成员变量
+			1: Attributes
+			2: CreationTime/LastAccessTime
+			3: Exists
+			4: Extension/FullName
+			5: Directory					//文件所属目录, 返回 DirectoryInfo 实例			
+			6: LastWriteTime				//文件最后写入的时间
+			7: Length						//文件字节大小
+			8: Name
+			//FileInfo 类成员方法
+			1: AppendText()					//创建一个 StreamWriter, 追加文本
+			2: Create()						//创建文件, 返回 FileStream
+			3: Delete()						//删除文件
+			4: MoveTo(target)				//移动文件
+			5: Open(mode,access,share)		//打开文件, 返回 FileStream
+			6: OpenRead()					//只读, 打开文件, 返回 FileStream
+			7: OpenWrite()					//只写, 打开文件, 返回 FileStream
+				
+				eg: DirectoryInfo mydir = new DirectoryInfo(@"c:\Windows");
+					FileInfo [] f = mydir.GetFiles();
+					foreach (FileInfo file in f) {
+						Console.WriteLine("File Name: {0} Size: {1}", file.Name, file.Length);
+					}
+		
+二: C# 高级
+	A: 集合(using System.Collection)
+		a: ArrayList (动态数组)
+				它基本上可以替代一个数组, 动态数组会自动重新调整它的大小
+			//成员变量
+			1: Capacity							//获取/设置 ArrayList 可以包含的元素个数
+			2: Count							//元素个数
+			3: IsFixedSize						//是否具有固定大小
+			4: IsReadOnly						//是否只读
+			5: IsSynchronized					//是否同步(线程安全)
+			6: []								//访问指定索引元素
+			7: SyncRoot							//获取一个对象用于同步访问 ArrayList
+			//成员方法
+			1: Add(object)						//添加, 末尾添加元素. return int
+			2: AddRange(ICollection)			//添加, 末尾添加集合的所有元素
+			3: Insert(index,object)				//插入, 在 index 位置插入元素 object
+			4: InsertRange(index,ICollection)	//插入, 在 index 位置插入集合的所有元素
+			5: Clear()							//清空, 移除所有的元素
+			6: Contains(object)					//存在, 判断 object 元素是否在 ArrayList 中
+			7: GetRange(index,count)			//截取, 返回子集, return ArrayList
+			8: IndexOf(object)					//查找, 返回 object 在数组中的索引
+			9: Remove(object)					//删除, 删除数组中第一次出现的 object 
+			0: RemoveAt(index)					//删除, 删除数组中 index 位置的元素
+			1: RemoveRange(index,count)			//删除, 删除数组中 index 位置开始的 count 个元素
+			2: Reverse()						//倒序, 逆转数组中的元素顺序
+			3: SetRange(index,ICollection)		//替换, 将数组 index 位置开始的元素替换成集合的元素
+			4: Sort()							//排序, 对数组的元素进行排序
+			5: TrimToSize()						//容量, 设置容量为数组元素的实际个数
+			
+				eg: ArrayList al = new ArrayList(); 
+					al.Add(45); al.Add(78); al.Add(33); al.Add(56); al.Add(12); al.Add(23); al.Add(9);
+					foreach (int i in al) { Console.Write(i + " "); } Console.WriteLine();
+					al.Sort();
+					foreach (int i in al) { Console.Write(i + " "); } Console.WriteLine();
+					
+		b: Hashtable (哈希表)
+				键值对, 它使用键来访问集合中的元素
+			//成员变量
+			1: Count							//键值对个数
+			2: IsFixedSize						//是否具有固定大小
+			3: IsReadOnly						//是否只读
+			4: []								//获取值/设置值
+			5: Keys								//键的数组, 返回 ICollection
+			6: Values							//值的数组, 返回 ICollection
+			//成员方法
+			1: Add(key,value)					//添加, 添加键值对, 键值都是 Object 类型
+			2: Clear()							//清空, 移除所有键值对
+			3: ContainsKey(key)					//存在, 判断键是否存在
+			4: ContainsValue(value)				//存在, 判断值是否存在
+			5: Remove(key)						//删除, 删除指定键的键值对
+					
+				eg: Hashtable ht = new Hashtable();
+					ht.Add("001", "Zara Ali"); ht.Add("002", "Abida Rehman"); ht.Add("003", "Joe Holzner"); ht.Add("004", "Mausam Benazir Nur"); ht.Add("005", "M. Amlan");
+					ICollection key = ht.Keys;
+					foreach (string k in key) { Console.WriteLine(k + ": " + ht[k]); }
+			
+		c: SortedList (排序列表)
+				使用键和索引来访问列表中的项, 排序列表是数组和哈希表的组合
+				使用索引访问各项, 则它是一个动态数组(ArrayList); 使用键访问各项, 则它是一个哈希表(Hashtable)
+				集合中的各项总是按键值排序
+			//成员变量
+			1: Capacity
+			2: Count
+			3: IsFixedSize
+			5: IsReadOnly	
+			6: []
+			7: Keys
+			8: Values
+			//成员方法
+			1: Add(key,value)
+			2: Clear()
+			3: ContainsKey(key)
+			4: ContainsValue(value)
+			5: GetByIndex(index)				//获取 index 位置的元素
+			6: GetKey(index)					//获取 index 位置的 key
+			7: GetKeyList()						//获取 key 列表 IList
+			8: GetValueList()					//获取 value 列表 IList
+			9: IndexOfKey(key)					//获取 key 的索引
+			0: IndexOfValue(value)				//获取 value 的索引
+			1: Remove(key)						//删除 key 对应的元素
+			2: RemoveAt(index)					//删除 index 位置的元素
+			3: TrimToSize()						//设置容量为元素实际个数
+			
+				eg: SortedList sl = new SortedList();
+					sl.Add("001", "Zara Ali"); sl.Add("002", "Abida Rehman"); sl.Add("003", "Joe Holzner"); sl.Add("004", "Mausam Benazir Nur"); sl.Add("005", "M. Amlan");
+					ICollection key = sl.Keys;
+					foreach (string k in key) { Console.WriteLine(k + ": " + sl[k]); }
+		
+		d: Stack (堆栈)
+				后进先出的对象集合
+			//成员变量
+			1: Count							//元素个数
+			//成员方法
+			1: Clear()
+			2: Contains(object)					//存在, 判断元素是否存在
+			3: Peek()							//获取, 获取顶部元素, 但不删除
+			4: Pop()							//取删, 获取顶部元素, 并删除
+			5: Push(object)						//添加, 在顶部添加元素
+			6: ToArray()						//返回 Stack 转成的数组 object[]
+		
+		e: Queue (队列)
+				先进先出的对象集合
+			//成员变量
+			1: Count							//元素个数
+			//成员方法
+			1: Clear()
+			2: Contains(object)					//存在, 判断元素是否存在
+			3: Dequeue()						//取删, 获取开头元素并删除
+			4: Enqueue()						//添加, 在末尾添加元素
+			6: ToArray()						//返回 Queue 转成的数组 object[]
+			7: TrimToSize()						//设置容量为 Queue 中元素的实际个数
+		
+		f: BitArray (点阵列)
+				使用值 1 和 0 来表示的二进制数组
+			//成员变量
+			1: Count							//元素个数
+			2: IsReadOnly
+			3: Length							//获取/设置 元素个数
+			//成员方法
+			1: Get(index)						//获取, 获取 index 位置的元素
+			2: Set(index,bool)					//设置, 设置 index 位置的元素值
+			3: SetAll(bool)						//设置, 设置 BitArray 所有元素的值
+			4: And(BitArray)					//按位与, 返回计算后的 BitArray
+			5: Or(BitArray)						//按位或, 返回计算后的 BitArray
+			6: Xor(BitArray)					//按位异或, 返回计算后的 BitArray
+			7: Not()							//按位取反, 返回计算后的 BitArray
+	
+	B: 泛型
+			delegate T NumberChanger<T>(T n); T[]; HashSet<T>;
+	
+		
+五: 常用对象	
+	A: String (字符串)	
+		a: 成员变量
+			1: Chars						//
+			2: Length						//长度, 字符串字符数
+		b: 成员方法
+			1: Contains(str)				//判断, 判断字符串是否包含子串 str
+			2: CopyTo(i,chars,ci,len)		//复制, 从索引 i 开始复制 len 个字符到字符数组 chars 的 ci 位置
+			3: EndsWith(str)				//结尾, 判断字符串是否以 str 结尾
+			4: StartsWith(str)				//开头, 判断字符串是否以 str 开头
+			5: Equals(str)					//比较, 判断字符串是否与 str 相等
+			6: IndexOf(char)				//查找, 查找 char 在字符串的索引
+			6: IndexOf(str)					//查找, 查找 str 在字符串的索引
+			7: IndexOfAny(char[])			//查找, 查找指定字符数组中任意字符在字符串的索引
+			7: IndexOfAny(char[],index)		//查找, 查找从 index 开始指定字符数组中任意字符在字符串的索引
+			8: LastIndexOf(char)			//查找, 从后开始查找 char 在字符串的索引
+			8: LastIndexOf(str)				//查找, 从后开始查找 str 在字符串的索引
+			9: Insert(index,str)			//插入, 返回字符串从 index 开始插入 str 后的字符串
+			0: Remove(index)				//删除, 返回删除 index 位置字符后的字符串
+			0: Remove(index, count)			//删除, 返回删除从 index 位置开始的 count 个字符后的字符串
+			1: Replace(oldChar,newChar)		//替换, 返回将 oldChar 替换成 newChar 后的新字符串
+			1: Replace(oldStr,newStr)		//替换, 返回将 oldStr 替换成 newStr 后的新字符串
+			2: Split(params char[])			//分割, 返回当前字符串根据字符数组中的元素进行分割后的字符串数组
+			2: Split(char[],count)			//分割, 返回当前字符串根据字符数组中的元素进行分割后的字符串数组, 数组最大长度为 count
+			3: ToCharArray()				//转换, 返回包含字符串所有字符的字符数组
+			3: ToCharArray(index,len)		//转换, 返回包含字符串从 index 开始的 len 个字符的字符数组
+			4: ToLower()					//转换, 字符串转小写
+			5: ToUpper()					//转换, 字符串转大写
+		c: 静态方法
+			1: Compare(s1,s2)				//比较, 比较 s1 s2 返回一个表示它们在排列顺序中相对位置的整数
+			1: Compare(s1,s2,ignore)		//比较, ignore 为 true 时忽略大小写
+			2: Equals(s1,s2)				//比较, 判断 s1 s2 是否相等
+			3: Concat(s1,s2)				//拼接, 返回 s1 s2 拼接后的字符串
+			3: Concat(params String[])		//拼接, 可传入多个字符串 或 传入字符串数组
+			4: Join(s,String[])				//拼接, 将字符串数组以 s 为分隔符拼接
+			4: Join(s,String[],i,count)		//拼接, 将字符串数组从 i 后的 count 个元素以 s 为分隔符拼接
+			5: Copy(str)					//复制, 创建一个新的 String 对象, 具有与 str 相同的值
+			6: Format(format,Object)		//格式化, 把指定字符串中一个或多个格式项替换为指定对象的字符串表示形式
+			7: IsNullOrEmpty(str)			//判空, 判断 str 是否为 null 或为空串 
+			
+			
+	B: Array (数组)
+		a: 成员变量	
+			1: IsFixedSize					//返回数组是否带有固定大小
+			2: IsReadOnly					//返回该值指示数组是否只读
+			3: Length						//返回数组元素个数, 32 位整形
+			4: LongLength					//返回数组元素个数, 64 位整形
+			5: Rank							//返回数组的秩
+		b: 成员方法
+			1: CopyTo(arr, index)			//复制, 从当前一维数组中复制所有元素到 arr 的 index 位置
+			2: GetLength()					//获取长度, 返回数组元素个数, 32 位整形
+			3: GetLongLength()				//获取长度, 返回数组元素个数, 64 位整形
+			4: GetLowerBound()				//获取数组中指定维度的下界
+			5: GetUpperBound()				//获取数组中指定维度的上界
+			6: GetType()					//获取当前实例的类型. 从对象(Object)继承
+			7: GetValue(index)				//获取元素, 获取一维数组中 index 位置的值
+			8: SetValue(Object,index)		//设置元素, 给一维数组中 index 位置的元素设置值
+			9: ToString()					//返回一个表示当前对象的字符串. 从对象(Object)继承
+		c: 静态方法
+			1: Clear()						//根据元素的类型, 设置数组中某个范围的元素为零, 为 false 或者为 null
+			2: Copy(arr1,arr2,len)			//复制, 从 arr1 第一个元素开始复制 len 个元素到 arr2 的第一个元素位置
+			3: Sort(arr)					//排序, 使用 arr 的每个元素的 IComparable 实现来排序整个一维数组中的元素
+			4: Reverse(arr)					//逆转 arr 中元素的顺序
+			5: IndexOf(arr, Object)			//获取索引, 搜索指定的对象, 返回 arr 中第一次出现的索引
+			
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

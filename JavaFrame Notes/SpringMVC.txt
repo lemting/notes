@@ -18,7 +18,13 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 	@Controller 重定向和转发
 		返回的视图中加上前缀: redirect(重定向),forward(转发)
 			eg: @Controller @RequestMapping("/index")
-				public String index() { return "redirect:/hello"; }
+				class IndexController {
+					@RequestMapping("hello")
+					public String index() { return "redirect:/hello"; }
+				}
+			注意: 重定向(转发也一样)链接加 '/' 前缀, 代表绝对链接(相对根链接), 不加则表示相对本 Controller 的链接
+				redirect:/hello	重定向到 /hello
+				redirect:hello	重定向到 /index/hello, 访问该方法的 uri 为 /index/hello 与重定向链接一致, 故会造成重定向过多报错	  
 				
 	RedirectAttributes: (参数绑定,自动注入)用于重定向之后还能带参数跳转的
 		1: attr.addAttribute(key, value): 重定向之后,在 url 后面拼接参数
@@ -44,7 +50,6 @@ springmvc.xml 其实跟 Spring 的核心配置文件 applicationContext.xml 是�
 		public Object getData() { return Data; }
 		public void setData(Object data) { Data = data; }
 	}
-
 
 */
 

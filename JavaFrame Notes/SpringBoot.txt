@@ -1,4 +1,6 @@
-Spring Boot
+Spring Boot 使 编码,配置,部署,监控 变简单
+
+
 
 //Idea 修改(错误: 找不到 Bean) Severity 等级为 Warning
 File -> Settings -> Editor -> Inspections -> Spring -> Spring Core -> Code -> Autowiring for Bean Class -> 修改 Severity 为 Warning

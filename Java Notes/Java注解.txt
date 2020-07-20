@@ -2,12 +2,13 @@ A: 自定义注解
 	@Target({ElementType.METHOD,ElementType.TYPE})	
 		/*使用域: 
 		 * CONSTRUCTOR: 构造方法声明;
-		 * FIELD: 字段声明;
-		 * LOCAL_VARIABLE: 局部变量声明;
-		 * METHOD: 方法声明;
-		 * PACKAGE: 包声明;
-		 * PARAMETER: 参数声明;
-		 * TYPE: 类,接口
+		 * FIELD: 字段,枚举常量;
+		 * LOCAL_VARIABLE: 局部变量;
+		 * METHOD: 方法;
+		 * PACKAGE: 包;
+		 * PARAMETER: 方法参数;
+		 * ElementType: 注解
+		 * TYPE: 类,接口,枚举,注解
 		 */
 	@Retention(RetentionPolicy.RUNTIME)		
 		/*生命周期: 
@@ -17,8 +18,7 @@ A: 自定义注解
 		 */
 	@Inherited	//该标识注解代表: 允许子类继承父类的该自定义注解(只会继承类注解,方法注解不会被继承)
 	@Documented	//该标识注解代表: 生成javadoc时会包含注解
-	public @interface 自定义注解
-	{
+	public @interface 自定义注解 {
 		/*
 		 * 1: 成员类型受限,合法类型包括[基本数据类型]和String,Class,Annotation,Enumeration
 		 * 2: 如果注解只有一个成员,则成员名必须取名为 value(),在使用时可以忽略成员名和赋值号

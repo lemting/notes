@@ -342,7 +342,7 @@ Spring 解决post乱码
 						<bean id="dataSource" class="com.mchange.v2.c3p0.ComopooledDataSouce">
 							//参数
 							<property name="driverClass" value="com.mysql.cj.jdbc.Driver"></property>
-							<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/lemting?serverTimezone=GMT%2B8");"></property>
+							<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/lemting?serverTimezone=GMT%2B8"></property>
 							<property name="user" value="root"></property>
 							<property name="password" value="lemting"></property>
 						</bean>

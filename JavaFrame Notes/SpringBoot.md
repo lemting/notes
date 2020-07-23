@@ -1793,7 +1793,43 @@ public class UserControllerTests2 {
 
 ## * 其他
 
-### 1. 文字/图片 Banner
+### 1. @Autowired 注入静态成员
+
+> 不能直接注入静态成员, 需要通过其他方式注入
+
+#### 1.1 方式一: 通过 set 方法
+
+```java
+@Component  //需要纳入 Spring 容器管理
+public class Test {
+    //静态成员变量
+    private static DataSource dataSource;
+    @Autowired  //注解在非静态 set 方法上
+    public void setDataSource(DataSource dataSource) {
+        JDBCUtil.dataSource = dataSource;
+    }
+}
+```
+
+#### 1.2 方式二: 通过 @PostConstruct
+
+```java
+@Component  //需要纳入 Spring 容器管理
+public class Test {
+    //静态成员变量
+    private static DataSource dataSource;
+	@Autowired //注入非静态相同的对象
+    private DataSource ds;
+    @PostConstruct //注解初始化方法
+    public void init() {
+        JDBCUtil.dataSource = ds; //将注入的对象赋值给静态成员
+    }
+}
+```
+
+
+
+### 2. 文字/图片 Banner
 
 > 在 SpringBoot 开始运行的时候, 会在控制台(默认控制台)打印 Spring 的 ASSIC 字
 >

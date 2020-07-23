@@ -1,10 +1,57 @@
 # notes
 # @author Lemting
-                                          学习笔记
-DataBase, Java, JavaWeb, JavaFrame, php, Others
-
-DataBase: MySQL, Oracle
-Java: JavaSE, Java注解, 数据结构, JDBC, DBUtils
-JavaWeb: HTML, CSS, JavaScript, Ajax, XML, Json, jQuery, JSP, JSTL, EL, Servlet, 过滤器和监听器, 验证码和二维码, Thymeleaf, Bootstrap
-JavaFrame: Hibernate, Maven, MyBatis, Spring, ,SpringMVC, Struts2, SpringBoot
-Others: Git, VB, CE汇编, dos, Linux
+- DataBase Notes
+    - MySQL
+    - Oracle
+    - Redis
+- Java Notes
+    - JavaSE
+    - Smail
+    - JDBC
+    - DBUtils
+    - Java 注解
+    - 设计模式
+    - Android
+    - 数据结构
+    - Java 加解密
+- JavaWeb Notes
+    - HTML
+    - CSS, WXSS
+    - JavaScript
+    - JSP
+    - JSTL 和 EL 表达式
+    - Servlet
+    - Ajax 和 JSON
+    - XML
+    - JavaWeb 过滤器和监听器
+    - 验证码和二维码
+    - jQuery
+    - Bootstrap
+    - Thymeleaf
+    - Velocity
+- JavaFrame Notes
+    - Hibernate
+    - Maven
+    - MyBatis
+    - Struts2
+    - Spring
+    - SpringMVC
+    - SpringBoot
+    - SpringData
+- php
+    - php
+    - ThinkPHP
+- Python
+    - Python
+    - Python 第三方包
+    - Anaconda3
+- C#
+    - C#
+- Others
+    - Git
+    - CE 汇编
+    - dos
+    - Linux
+    - VB
+    - Hacknet
+    - C++ 模拟键盘输入

@@ -11,6 +11,11 @@ A: 常用
 	b: color <f><b>		//更改 DOS窗口 颜色(f: 前景色; b: 背景色; 取值: 一位十六进制数)
 	c: cls				//清屏
 	d: ipconfig -flushdns	//刷新DNS
+	e: chcp [n]			//查看[修改] CodePage(cmd 编码)
+		1: chcp 			查看
+		2: chcp 65001		UTF-8
+		3: chcp 936			GBK 简体中文
+		4: chcp 938			Big5 繁体中文
 		
 B: 系统工具
 	a: services.msc		//打开 服务

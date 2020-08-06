@@ -115,3 +115,15 @@ $number.format('0.00',$order.amount)<br/>
 $name = $request.getParameter("name")
 ```
 
+## 三. velocity-tools
+
+> 引入依赖
+
+```xml
+<dependency>
+	<groupId>org.apache.velocity</groupId>
+	<artifactId>velocity-tools</artifactId>
+	<version>1.3</version>
+</dependency>
+```
+

@@ -82,8 +82,22 @@ Maven是基于项目对象模型(POM),可以.通过一小段描述信息来管�
 		
 		
 		
-		
-		
+三: 仓库
+	<mirrors>
+		<mirror>
+			<id>aliyunmaven</id>
+			<name>阿里云公共仓库</name>
+			<mirrorOf>*</mirrorOf>
+			<url>https://maven.aliyun.com/repository/public</url>
+		 </mirror>
+		 
+		 <mirror>
+			<id>apache-repo</id>
+			<name>ApacheRepository</name>
+			<mirrorOf>apache-repo</mirrorOf>
+			<url>https://repository.apache.org/content/groups/public</url>
+		 </mirror>
+	</mirrors>
 		
 		
 		

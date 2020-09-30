@@ -1,0 +1,22 @@
+Foxmail						邮箱
+IObit Uninstaller			卸载
+
+cpu-z						CPU 信息
+MSI Afterburner				
+
+Notepad++					文本编辑器
+Typora						Markdown 文件
+FreeFileSync				文件同步
+Listary						文件查找
+
+
+Postman						接口测试
+ApiPost						接口测试(有中文)
+
+Navicat						数据库可视化
+
+
+Xshell						远程连接(shell)
+Xftp						远程连接(文件系统)
+
+Arthas						Java 诊断工具

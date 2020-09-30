@@ -103,21 +103,117 @@ F: 进程
 
 
 
+bat 脚本
+A: 其他
+	a: echo off 			//禁止命令回显, 此语句后的所有运行的命令都不显示命令本身(不包括输出结果)
+	b: echo on				//开启命令回显
+	c: @<cmd>				//禁止命令回显(仅作用于当前语句) 		
+								eg: @set aaaa=1
+	d: rem <msg>			//注释
+	e: echo <msg>			//输出
+	f: pause				//暂停
+	g: exit /b <code>		//退出脚本, /b 表示仅退出当前脚本		
+								eg: exit /b 0
+	h: call <other>			//调用其他批处理(可以传入参数,其他批处理可以 %1,%2,..,%9 取出参数)
+								eg: call test.bat helloworld
+	i: type <file>			//输出文件内容
+								eg: type %0 //输出本文件的内容
+	j: set					//设置变量
+								eg: set x=1
+
+B: if 条件判断
+	if [not] "参数" == "字符串" (  			//判断值是否相等
+	) else if [not] exist [路径\文件名] (	//判断文件是否存在
+	) else (
+	)
+	
+		eg: if %1 == "abc 123"  (
+				echo first var'value is: abc 123
+			) else (
+				echo first var'value not excepted, it is: %1
+			)
+		eg: if exist "123.txt"  (
+				echo content of file 123.txt is :
+				type "123.txt"
+			) else (
+				echo 123.txt is not exist.
+			)
 
 
+C: for 循环
+	for %%i in (%list%) do (
+		...
+	)
 
+	eg: set list=1 2 3 4 5 6 7 8 9
+		for %%i in (%list%) do (
+			for %%j in (%list%) do (
+				if %%i < %%j (
+					echo %%i x %%j = %%i*%%j
+				)
+			)
+		)
+		
+D: goto 语句
+	结合标签进行跳转
+	eg: @echo off
+		if "%1" == "" (
+			goto default
+		) else if "%1" == "helloworld" (
+			goto helloworld
+		)
+		:default
+		echo you come to default .
+		goto end
+		:hellowrold
+		echo why you come to hello world ?
+		goto end
+		:end
 
+E: 字符串处理 
+	a: newStr=%str1%%str2%			//字符串拼接
+			eg: set str1=abc
+				set str2=123
+				set newStr=%str1%%str2%
+				echo %newStr%
+	b: %var:~x,y%					//字符串截取, x > 0 时, 从左往右; x < 0 时, 从右往左
+			eg: set str=1234
+				set trunk=%str:~2,4%
+				echo %trunk%
+				echo %src:~-5,4%
+	c: %var:str1=str2%				//字符串替换, 替换为空即为删除
+			eg: set str5=abc 123 4 5 6 7 8
+				echo %str5: =%
 
+F: 特殊标记符
+	a: CR      			//0D 命令行结束符
+	b: Space			//20 空格
+	c: Tab				//09 制表符
+	d: + 				//命令文件连接符
+	e: * ?				//文件通配符
+	f: ""				//字符串界定符
+	g: ^				//转义符
+	h: |				//管道符
+	i: > >>				//文件重定向符
+	j: @				//命令行回显屏蔽符
+	k: /				//参数开关引导符
+	l: :				//批处理标签引导符
+	m: %				//批处理变量引导符
 
+G: 组合命令
+		<cmd1> & <cmd2> & ...
+		<cmd1> && <cmd2> && ...
+		<cmd1> || <cmd2> || ...
+	a: &				//执行多个命令
+	b: &&				//执行多个命令, 遇到出错则不执行后面的命令
+	c: ||				//执行多个命令, 遇到出错则继续执行后面的命令, 直到执行成功
 
-
-
-
-
-
-
-
-
+H: 管道命令
+	<cmd1> | <cmd2> | ...		//将第一条命令的结果作为第二条命令的参数来使用
+	
+I: 重定向
+	
+	
 
 
 

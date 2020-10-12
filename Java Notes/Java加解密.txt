@@ -42,6 +42,8 @@ B: Base64 加解密
 		3: 获取对应的对象后,根据对应方法进行加解密
 			eg: encoder.encode("加密".getBytes());
 				decoder.decoder("5Yqg5a+G");
+				111001 011000 101010 100000 111001 011010 111110 000110
+				11100101 10001010 10100000 11100101 10101111 10000110
 	b: Commons Codec 的实现
 			//通过静态方法进行加解密 (需要导入  commons-codec.jar)
 		1: org.apache.commons.codec.binary.Base64 的静态方法

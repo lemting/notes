@@ -20,3 +20,5 @@ Xshell						远程连接(shell)
 Xftp						远程连接(文件系统)
 
 Arthas						Java 诊断工具
+
+ApkIDE						apk 反编译软件
